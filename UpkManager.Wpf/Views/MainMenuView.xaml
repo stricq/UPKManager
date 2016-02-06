@@ -33,6 +33,10 @@
     <MenuItem Header="_Settings" Foreground="White">
       <MenuItem Header="Skip _Properties"     Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipProperties}" />
       <MenuItem Header="Skip _Object Parsing" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipParsing}" />
+
+      <Separator />
+
+      <MenuItem Header="S_ettings..." Foreground="{StaticResource BackgroundColor}" />
     </MenuItem>
 
   </Menu>

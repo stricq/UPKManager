@@ -3,6 +3,8 @@ Blade and Soul UPK File Manager
 
 Extract and re-integrate Texture2D and other object types.
 
+Visual Studio 2015 .Net 4.6.1
+
 # External NuGet Source
 
 In Visual Studio:

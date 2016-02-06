@@ -95,6 +95,7 @@
     <Compile Include="Contracts\IAutoMapperConfiguration.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
     <Compile Include="Controllers\FileHeaderController.cs" />
+    <Compile Include="Controllers\FileTreeController.cs" />
     <Compile Include="Controllers\HeaderTablesController.cs" />
     <Compile Include="Controllers\HexController.cs" />
     <Compile Include="Controllers\ImageController.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Models\Tables\DomainGenerationTableEntry.cs" />
     <Compile Include="Models\DomainString.cs" />
     <Compile Include="Models\Tables\DomainObjectTableEntry.cs" />
+    <Compile Include="ViewModels\FileTreeViewModel.cs" />
     <Compile Include="ViewModels\HexDataViewModel.cs" />
     <Compile Include="Models\Tables\DomainNameTableIndex.cs" />
     <Compile Include="Models\Tables\DomainExportTableEntry.cs" />
@@ -148,6 +150,7 @@
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
+    <Compile Include="ViewModels\UpkFileInfo.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

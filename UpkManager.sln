@@ -20,6 +20,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Solution Items", "00 Solution Items", "{715DB300-AAD3-450A-8D14-F581CD02959C}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		UPK_Format.pdf = UPK_Format.pdf
 		UpkManager.sln.DotSettings = UpkManager.sln.DotSettings
 	EndProjectSection
 EndProject
