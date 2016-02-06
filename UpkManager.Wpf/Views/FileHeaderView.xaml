@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="UpkManager.Wpf.Views.FileHeaderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
+             mvvm:ViewModelLocator.ComposedViewModel="FileHeaderViewModel"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="768">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <Label     Grid.Row="0" Grid.Column="0" Content="Filename:"                       Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=Header.FullFilename}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" />
+
+    <Label     Grid.Row="1" Grid.Column="0" Content="Signature:"                                          Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Header.Signature, StringFormat=0x{0:X8}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="2" Grid.Column="0" Content="Package Version:"                                            Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=Header.Version, StringFormat=0x{0:X4} \= {0:N0}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="3" Grid.Column="0" Content="Licensee Version:"                                            Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=Header.Licensee, StringFormat=0x{0:X4} \= {0:N0}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="4" Grid.Column="0" Content="Header Size:"                                                   Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=Header.Size, StringFormat=0x{0:X8} \= {0:N0} Bytes}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="5" Grid.Column="0" Content="Package Group:"                  Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Path=Header.Group.String}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" />
+
+    <Label     Grid.Row="6" Grid.Column="0" Content="Package Flags:"                                  Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Path=Header.Flags, StringFormat=0x{0:X8}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="7" Grid.Column="0" Content="Name Table:" Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="7" Grid.Column="1"                       Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas">
+      <Run Text="{Binding Path=Header.NameTableCount,  StringFormat=0x{0:X8} \= {0:N0} Entries}" />
+      <Run Text="{Binding Path=Header.NameTableOffset, StringFormat=@ 0x{0:X8}}" />
+    </TextBlock>
+
+    <Label     Grid.Row="8" Grid.Column="0" Content="Export Table:" Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="8" Grid.Column="1"                         Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas">
+      <Run Text="{Binding Path=Header.ExportTableCount,  StringFormat=0x{0:X8} \= {0:N0} Entries}" />
+      <Run Text="{Binding Path=Header.ExportTableOffset, StringFormat=@ 0x{0:X8}}" />
+    </TextBlock>
+
+    <Label     Grid.Row="9" Grid.Column="0" Content="Import Table:" Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="9" Grid.Column="1"                         Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas">
+      <Run Text="{Binding Path=Header.ImportTableCount,  StringFormat=0x{0:X8} \= {0:N0} Entries}" />
+      <Run Text="{Binding Path=Header.ImportTableOffset, StringFormat=@ 0x{0:X8}}" />
+    </TextBlock>
+
+    <Label     Grid.Row="10" Grid.Column="0" Content="Depends Offset:"                                              Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding Path=Header.DependsTableOffset, StringFormat=0x{0:X8}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="11" Grid.Column="0" Content="GUID:"                         Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding Path=Header.GuidString}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="12" Grid.Column="0" Content="Generations:"                                                                  Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="12" Grid.Column="1" Text="{Binding Path=Header.Generations.Count, StringFormat=0x{0:X8} \= {0:N0} Entries}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="13" Grid.Column="0" Content="Engine Version:"                                         Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="13" Grid.Column="1" Text="{Binding Path=Header.EngineVersion, StringFormat=0x{0:X4}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="14" Grid.Column="0" Content="Cooker Version:"                                         Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="14" Grid.Column="1" Text="{Binding Path=Header.CookerVersion, StringFormat=0x{0:X4}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="15" Grid.Column="0" Content="Compression Flags:"                                         Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="15" Grid.Column="1" Text="{Binding Path=Header.CompressionFlags, StringFormat=0x{0:X8}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="16" Grid.Column="0" Content="Compressed Chunks:"                                                                 Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="16" Grid.Column="1" Text="{Binding Path=Header.CompressedChunks.Count, StringFormat=0x{0:X8} \= {0:N0} Entries}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="17" Grid.Column="0" Content="Unknown 1:"                                                Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="17" Grid.Column="1" Text="{Binding Path=Header.Unknown1, StringFormat=0x{0:X8}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+    <Label     Grid.Row="18" Grid.Column="0" Content="Unknown 2:"                                                Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="CadetBlue" />
+    <TextBlock Grid.Row="18" Grid.Column="1" Text="{Binding Path=Header.Unknown2, StringFormat=0x{0:X8}}" Padding="5,3,5,5" HorizontalAlignment="Left"  Foreground="{StaticResource ForegroundColor}" FontFamily="Consolas" />
+
+  </Grid>
+
+</UserControl>

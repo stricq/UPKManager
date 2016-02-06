@@ -1,0 +1,77 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Colors -->
+
+  <SolidColorBrush x:Key="BackgroundColor" Color="#FF1E1F22" />
+
+  <SolidColorBrush x:Key="ForegroundColor" Color="LightGray" />
+
+  <SolidColorBrush x:Key="ContentControlBorderColor" Color="#FF363EF8" />
+
+  <SolidColorBrush x:Key="StatusBarBorderColor" Color="#C4C4C4" />
+
+  <SolidColorBrush x:Key="ListItemTransparent"            Color="Transparent" />
+  <SolidColorBrush x:Key="ListItemSelectedColor"          Color="#FF363EF8" />
+  <SolidColorBrush x:Key="ListItemSelectedForeColor"      Color="White" />
+  <SolidColorBrush x:Key="ListItemErrorColor"             Color="LightCoral" />
+  <SolidColorBrush x:Key="ListItemErrorForeColor"         Color="Black" />
+  <SolidColorBrush x:Key="ListItemSelectedErrorColor"     Color="Magenta" />
+  <SolidColorBrush x:Key="ListItemSelectedErrorForeColor" Color="White" />
+
+  <SolidColorBrush x:Key="TabItemBorderSelectedColor"   Color="#FF363EF8" />
+  <SolidColorBrush x:Key="TabItemBorderUnSelectedColor" Color="#FF3A3A3A" />
+
+  <!-- Gradients -->
+
+  <LinearGradientBrush x:Key="GridSplitterGradientLeftRight" EndPoint="1,0.5" StartPoint="0,0.5">
+    <GradientStop Color="#FF8F8F8F" Offset="0" />
+    <GradientStop Color="#FF565656" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="GridSplitterGradientRightLeft" EndPoint="1,0.5" StartPoint="0,0.5">
+    <GradientStop Color="#FF565656" Offset="0" />
+    <GradientStop Color="#FF8F8F8F" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="GridSplitterGradientUpDown" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF8F8F8F" Offset="0" />
+    <GradientStop Color="#FF565656" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="HeaderGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF3535AF" Offset="0" />
+    <GradientStop Color="#FF1C1C64" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="ListHeaderGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FFD6E6F9" Offset="0" />
+    <GradientStop Color="#FF95B1F5" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="TabItemSelectedGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF3535AF" Offset="0" />
+    <GradientStop Color="#FF1C1C64" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="TabItemUnSelectedGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF8F8F8F" Offset="0" />
+    <GradientStop Color="#FF565656" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="MenuGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF565656" Offset="0" />
+    <GradientStop Color="#FF8F8F8F" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="ConfiguredLevelGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#008F8F" Offset="0" />
+    <GradientStop Color="#005656" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="InvalidLevelGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#8F0000" Offset="0" />
+    <GradientStop Color="#560000" Offset="1" />
+  </LinearGradientBrush>
+
+</ResourceDictionary>

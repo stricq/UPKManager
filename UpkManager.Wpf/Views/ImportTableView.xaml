@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="UpkManager.Wpf.Views.ImportTableView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
+             mvvm:ViewModelLocator.ComposedViewModel="FileHeaderViewModel"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="768">
+
+  <Grid Margin="-2">
+    <ListView ItemsSource="{Binding Path=Header.ImportTable}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}"
+               b:GridViewBehaviors.AutoResizeColumns="True">
+      <ListView.View>
+        <GridView>
+
+          <GridViewColumn Header="Index">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=TableIndex, StringFormat=0x{0:X8}}" TextAlignment="Right" FontFamily="Consolas" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
+
+          <GridViewColumn Header="Name">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=Name}" TextAlignment="Left" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
+
+          <GridViewColumn Header="Package Name">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=PackageName}" TextAlignment="Left" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
+
+          <GridViewColumn Header="Type Name">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=TypeName}" TextAlignment="Left" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
+
+          <GridViewColumn Header="Owner Name">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=OwnerName}" TextAlignment="Left" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
+
+        </GridView>
+      </ListView.View>
+    </ListView>
+  </Grid>
+
+</UserControl>

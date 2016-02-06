@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Wpf", "UpkManager.Wpf\UpkManager.Wpf.csproj", "{D43F407B-1D73-43A6-9711-27F8DB2D188C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 Presentation", "01 Presentation", "{B9DF1A9E-F1D8-421F-B1F9-7C6EC7A66B94}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 Domain", "02 Domain", "{63DD830A-A38B-4997-AF10-6C546DB06083}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Domain", "UpkManager.Domain\UpkManager.Domain.csproj", "{04C2CFAF-8F1E-4631-88A6-0B9DC017452E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 Repository", "03 Repository", "{007002FA-C0CA-4AF8-94B8-D8447EFF8B5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Repository", "UpkManager.Repository\UpkManager.Repository.csproj", "{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Entities", "UpkManager.Entities\UpkManager.Entities.csproj", "{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Solution Items", "00 Solution Items", "{715DB300-AAD3-450A-8D14-F581CD02959C}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		UpkManager.sln.DotSettings = UpkManager.sln.DotSettings
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D43F407B-1D73-43A6-9711-27F8DB2D188C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D43F407B-1D73-43A6-9711-27F8DB2D188C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D43F407B-1D73-43A6-9711-27F8DB2D188C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D43F407B-1D73-43A6-9711-27F8DB2D188C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04C2CFAF-8F1E-4631-88A6-0B9DC017452E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04C2CFAF-8F1E-4631-88A6-0B9DC017452E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04C2CFAF-8F1E-4631-88A6-0B9DC017452E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04C2CFAF-8F1E-4631-88A6-0B9DC017452E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D43F407B-1D73-43A6-9711-27F8DB2D188C} = {B9DF1A9E-F1D8-421F-B1F9-7C6EC7A66B94}
+		{04C2CFAF-8F1E-4631-88A6-0B9DC017452E} = {63DD830A-A38B-4997-AF10-6C546DB06083}
+		{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD} = {007002FA-C0CA-4AF8-94B8-D8447EFF8B5A}
+		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5} = {007002FA-C0CA-4AF8-94B8-D8447EFF8B5A}
+	EndGlobalSection
+EndGlobal

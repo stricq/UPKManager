@@ -1,0 +1,156 @@
+﻿<UserControl x:Class="UpkManager.Wpf.Views.HeaderTablesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:v="clr-namespace:UpkManager.Wpf.Views"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
+             mvvm:ViewModelLocator.ComposedViewModel="HeaderTablesViewModel"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="768">
+
+  <TabControl Margin="4,3,4,4" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}">
+    <TabControl.Resources>
+      <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
+    </TabControl.Resources>
+
+    <TabItem Header="Export Table">
+      <Grid>
+        <Grid Visibility="{Binding Path=IsViewCleanData, Converter={StaticResource VisibilityConverter}}">
+          <v:ExportTableCleanView />
+        </Grid>
+        <Grid Visibility="{Binding Path=IsViewRawData,   Converter={StaticResource VisibilityConverter}}">
+          <v:ExportTableRawView />
+        </Grid>
+      </Grid>
+    </TabItem>
+
+    <TabItem Header="Import Table">
+      <v:ImportTableView />
+    </TabItem>
+
+    <TabItem Header="Name Table">
+      <v:NameTableView />
+    </TabItem>
+
+    <TabItem Header="Generations">
+      <ListView Margin="-2" ItemsSource="{Binding Path=Generations}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
+        <ListView.View>
+          <GridView>
+
+            <GridViewColumn Header="Export Count">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=ExportTableCount, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <GridViewColumn Header="Name Count">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=NameTableCount, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <GridViewColumn Header="Net Object Count">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=NetObjectCount, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+          </GridView>
+        </ListView.View>
+
+      </ListView>
+    </TabItem>
+
+    <TabItem Header="Compression">
+      <Grid Margin="4">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" MinHeight="100" />
+          <RowDefinition Height="6" />
+          <RowDefinition Height="*" MinHeight="100" />
+        </Grid.RowDefinitions>
+
+        <HeaderedContentControl Grid.Row="0" Margin="0,0,0,6" Header="Compressed Chunks" Style="{StaticResource TallHeaderedContentStyle}">
+          <ListView ItemsSource="{Binding Path=Chunks}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
+            <ListView.View>
+              <GridView>
+
+                <GridViewColumn Header="Uncompressed Offset">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Path=UncompressedOffset, StringFormat=0x{0:X8}}" TextAlignment="Right" FontFamily="Consolas" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <GridViewColumn Header="Uncompressed Size">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Path=UncompressedSize, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <GridViewColumn Header="Compressed Offset">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Path=CompressedOffset, StringFormat=0x{0:X8}}" TextAlignment="Right" FontFamily="Consolas" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <GridViewColumn Header="Compressed Size">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Path=CompressedSize, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+              </GridView>
+            </ListView.View>
+
+          </ListView>
+        </HeaderedContentControl>
+
+        <GridSplitter Grid.Row="1" Margin="-6,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource GridSplitterGradientUpDown}" />
+
+        <HeaderedContentControl Grid.Row="2" Margin="0,6,0,0" Header="Compressed Blocks" Style="{StaticResource TallHeaderedContentStyle}">
+          <ListView ItemsSource="{Binding Path=Blocks}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
+            <ListView.View>
+              <GridView>
+
+                <GridViewColumn Header="Uncompressed Size">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Path=UncompressedSize, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <GridViewColumn Header="Compressed Size">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Path=CompressedSize, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+              </GridView>
+            </ListView.View>
+
+          </ListView>
+        </HeaderedContentControl>
+
+      </Grid>
+    </TabItem>
+
+  </TabControl>
+
+</UserControl>
