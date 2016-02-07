@@ -46,10 +46,23 @@ namespace UpkManager.Domain.Controllers {
 
       fileRepository = FileRepository;
 
+      registerMessages();
       registerCommands();
     }
 
     #endregion Constructor
+
+    #region Messages
+
+    private void registerMessages() {
+      messenger.RegisterAsync<FileHeaderSelectedMessage>(this, onFileHeaderSelected);
+    }
+
+    private async Task onFileHeaderSelected(FileHeaderSelectedMessage message) {
+      await loadUpkFile(message.FullFilename);
+    }
+
+    #endregion Messages
 
     #region Commands
 
@@ -72,19 +85,7 @@ namespace UpkManager.Domain.Controllers {
         viewModel.Header.ExportTable.ForEach(et => et.PropertyChanged -= onExportTablePropertyChanged);
       }
 
-      messenger.Send(new FileHeaderLoadingMessage { Filename = ofd.FileName });
-
-      viewModel.Header = null;
-
-      viewModel.Header = new DomainHeader { FullFilename = ofd.FileName };
-
-      viewModel.Header = await fileRepository.LoadAndParseUpk(viewModel.Header, menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing, onLoadProgress);
-
-      if (viewModel.Header != null && viewModel.Header.ExportTable.Any()) {
-        viewModel.Header.ExportTable.ForEach(et => et.PropertyChanged += onExportTablePropertyChanged);
-      }
-
-      messenger.Send(new FileHeaderLoadedMessage { FileHeader = viewModel.Header });
+      await loadUpkFile(ofd.FileName);
     }
 
     #endregion Commands
@@ -123,6 +124,22 @@ namespace UpkManager.Domain.Controllers {
 
     private void onLoadProgress(LoadProgressMessage message) {
       messenger.Send(message);
+    }
+
+    private async Task loadUpkFile(string fullFilename) {
+      messenger.Send(new FileHeaderLoadingMessage { Filename = fullFilename });
+
+      viewModel.Header = null;
+
+      viewModel.Header = new DomainHeader { FullFilename = fullFilename };
+
+      viewModel.Header = await fileRepository.LoadAndParseUpk(viewModel.Header, menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing, onLoadProgress);
+
+      if (viewModel.Header != null && viewModel.Header.ExportTable.Any()) {
+        viewModel.Header.ExportTable.ForEach(et => et.PropertyChanged += onExportTablePropertyChanged);
+      }
+
+      messenger.Send(new FileHeaderLoadedMessage { FileHeader = viewModel.Header });
     }
 
     #endregion Private Methods

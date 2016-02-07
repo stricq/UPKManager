@@ -71,9 +71,9 @@
     <TabItem Header="Compression">
       <Grid Margin="4">
         <Grid.RowDefinitions>
-          <RowDefinition Height="*" MinHeight="100" />
+          <RowDefinition Height="2*" MinHeight="100" />
           <RowDefinition Height="6" />
-          <RowDefinition Height="*" MinHeight="100" />
+          <RowDefinition Height="1*" MinHeight="100" />
         </Grid.RowDefinitions>
 
         <HeaderedContentControl Grid.Row="0" Margin="0,0,0,6" Header="Compressed Chunks" Style="{StaticResource TallHeaderedContentStyle}">

@@ -12,13 +12,21 @@ namespace UpkManager.Domain.ViewModels {
 
     #region Private Fields
 
-    private ObservableCollection<UpkFileInfo> files;
+    private ObservableCollection<UpkFileViewModel> files;
 
     #endregion Private Fields
 
+    #region Constructor
+
+    public FileTreeViewModel() {
+      Files = new ObservableCollection<UpkFileViewModel>();
+    }
+
+    #endregion Constructor
+
     #region Properties
 
-    public ObservableCollection<UpkFileInfo> Files {
+    public ObservableCollection<UpkFileViewModel> Files {
       get { return files; }
       set { SetField(ref files, value, () => Files); }
     }

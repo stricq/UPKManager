@@ -65,7 +65,7 @@
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
                 </GridViewHeaderRowPresenter>
               </ScrollViewer>
-              <ScrollContentPresenter Name="PART_ScrollContentPresenter" KeyboardNavigation.DirectionalNavigation="Local" CanContentScroll="True" CanHorizontallyScroll="False" CanVerticallyScroll="False" />
+              <ScrollContentPresenter Name="PART_ScrollContentPresenter" KeyboardNavigation.DirectionalNavigation="Local" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" />
             </DockPanel>
             <ScrollBar Grid.Row="1"    Name="PART_HorizontalScrollBar" Orientation="Horizontal" Maximum="{TemplateBinding ScrollableWidth}"  ViewportSize="{TemplateBinding ViewportWidth}"  Value="{TemplateBinding HorizontalOffset}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
             <ScrollBar Grid.Column="1" Name="PART_VerticalScrollBar"                            Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Value="{TemplateBinding VerticalOffset}"   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />

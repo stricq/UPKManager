@@ -103,6 +103,7 @@
     <Compile Include="Controllers\StatusBarController.cs" />
     <Compile Include="Controllers\UpkManagerController.cs" />
     <Compile Include="Messages\FileHeader\FileHeaderLoadingMessage.cs" />
+    <Compile Include="Messages\FileHeader\FileHeaderSelectedMessage.cs" />
     <Compile Include="Messages\FileHeader\LoadProgressMessage.cs" />
     <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunk.cs" />
@@ -150,7 +151,7 @@
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
-    <Compile Include="ViewModels\UpkFileInfo.cs" />
+    <Compile Include="ViewModels\UpkFileViewModel.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
