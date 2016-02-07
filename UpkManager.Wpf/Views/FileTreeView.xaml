@@ -22,7 +22,10 @@
             </Grid.ColumnDefinitions>
 
             <CheckBox  Grid.Column="0" Content="{x:Null}" IsChecked="{Binding Path=IsChecked}" Focusable="False" />
-            <TextBlock Grid.Column="1" Text="{Binding Path=Filename}" Margin="4,0,0,0" HorizontalAlignment="Left" Foreground="{StaticResource ForegroundColor}" />
+            <TextBlock Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Left" Foreground="{StaticResource ForegroundColor}">
+              <Run Text="{Binding Path=Filename, Mode=OneWay}" />
+              <Run Text="{Binding Path=HasTextures}" />
+            </TextBlock>
 
           </Grid>
         </HierarchicalDataTemplate>

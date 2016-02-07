@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 
+using STR.Common.Extensions;
+
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
@@ -48,13 +50,13 @@ namespace UpkManager.Repository.Services {
     public async Task<DomainHeader> LoadAndParseUpk(DomainHeader Header, bool SkipProperties, bool SkipParsing, Action<LoadProgressMessage> LoadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Loading File..." };
 
-      LoadProgress(message);
+      LoadProgress?.Invoke(message);
 
       byte[] data = await Task.Run(() => File.ReadAllBytes(Header.FullFilename));
 
       message.Text = "Parsing Header...";
 
-      LoadProgress(message);
+      LoadProgress?.Invoke(message);
 
       int index = 0;
 
@@ -66,7 +68,7 @@ namespace UpkManager.Repository.Services {
         if ((upkHeader.CompressionFlags & (CompressionFlag.LZO | CompressionFlag.LZO_ENC)) == 0) {
           message.IsComplete = true;
 
-          LoadProgress(message);
+          LoadProgress?.Invoke(message);
 
           mapper.Map(upkHeader, Header);
 
@@ -85,13 +87,13 @@ namespace UpkManager.Repository.Services {
 
       patchPointers(upkHeader);
 
-      readExportTableObjects(data, upkHeader, SkipProperties, SkipParsing, LoadProgress);
+      await readExportTableObjects(data, upkHeader, SkipProperties, SkipParsing, LoadProgress);
 
       mapper.Map(upkHeader, Header);
 
       message.IsComplete = true;
 
-      LoadProgress(message);
+      LoadProgress?.Invoke(message);
 
       return Header;
     }
@@ -115,7 +117,7 @@ namespace UpkManager.Repository.Services {
     private static void readNameTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Name Table", Current = 0, Total = header.NameTableCount };
 
-      loadProgress(message);
+      loadProgress?.Invoke(message);
 
       int index = header.NameTableOffset;
 
@@ -129,7 +131,7 @@ namespace UpkManager.Repository.Services {
         if (header.NameTableCount > 1000) {
           message.Current += 1;
 
-          loadProgress(message);
+          loadProgress?.Invoke(message);
         }
       }
     }
@@ -137,7 +139,7 @@ namespace UpkManager.Repository.Services {
     private static void readImportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Import Table", Current = 0, Total = header.ImportTableCount };
 
-      loadProgress(message);
+      loadProgress?.Invoke(message);
 
       int index = header.ImportTableOffset;
 
@@ -151,7 +153,7 @@ namespace UpkManager.Repository.Services {
         if (header.ImportTableCount > 1000) {
           message.Current += 1;
 
-          loadProgress(message);
+          loadProgress?.Invoke(message);
         }
       }
     }
@@ -159,7 +161,7 @@ namespace UpkManager.Repository.Services {
     private static void readExportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Export Table", Current = 0, Total = header.ExportTableCount };
 
-      loadProgress(message);
+      loadProgress?.Invoke(message);
 
       int index = header.ExportTableOffset;
 
@@ -173,7 +175,7 @@ namespace UpkManager.Repository.Services {
         if (header.ExportTableCount > 1000) {
           message.Current += 1;
 
-          loadProgress(message);
+          loadProgress?.Invoke(message);
         }
       }
     }
@@ -184,19 +186,19 @@ namespace UpkManager.Repository.Services {
       Array.ConstrainedCopy(data, header.DependsTableOffset, header.DependsTable, 0, header.Size - header.DependsTableOffset);
     }
 
-    private static void readExportTableObjects(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, Action<LoadProgressMessage> loadProgress) {
+    private static async Task readExportTableObjects(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Export Table Objects", Current = 0, Total = header.ExportTableCount };
 
-      loadProgress(message);
+      loadProgress?.Invoke(message);
 
-      header.ExportTable.ForEach(export => {
-        export.ReadObjectType(data, header, skipProperties, skipParse);
-
+      await header.ExportTable.ForEachAsync(export => {
         if (header.ExportTableCount > 1000) {
           message.Current += 1;
 
-          loadProgress(message);
+          loadProgress?.Invoke(message);
         }
+
+        return Task.Run(() => export.ReadObjectType(data, header, skipProperties, skipParse));
       });
     }
 

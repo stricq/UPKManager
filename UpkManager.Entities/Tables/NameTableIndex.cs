@@ -30,7 +30,7 @@ namespace UpkManager.Entities.Tables {
       Index   = BitConverter.ToInt32(data, index); index += sizeof(int);
       Numeric = BitConverter.ToInt32(data, index); index += sizeof(int);
 
-      if (Index > nameTable.Count) Name = "Index Range Error";
+      if (Index < 0 || Index > nameTable.Count) Name = "Index Range Error";
       else Name = Numeric > 0 ? $"{nameTable[Index].Name.String}_{Numeric - 1}" : $"{nameTable[Index].Name.String}";
     }
 

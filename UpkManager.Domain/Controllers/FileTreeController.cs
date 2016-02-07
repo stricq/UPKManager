@@ -10,7 +10,10 @@ using STR.Common.Messages;
 
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
+using UpkManager.Domain.Models;
 using UpkManager.Domain.ViewModels;
 
 
@@ -25,15 +28,19 @@ namespace UpkManager.Domain.Controllers {
 
     private readonly IMessenger messenger;
 
+    private readonly IUpkFileRepository repository;
+
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public FileTreeController(FileTreeViewModel ViewModel, IMessenger Messenger) {
+    public FileTreeController(FileTreeViewModel ViewModel, IMessenger Messenger, IUpkFileRepository Repository) {
       viewModel = ViewModel;
 
       messenger = Messenger;
+
+      repository = Repository;
 
       registerMessages();
     }
@@ -48,6 +55,8 @@ namespace UpkManager.Domain.Controllers {
 
     private async Task onApplicationLoaded(ApplicationLoadedMessage message) {
       await loadDirectoryAsync(null, @"V:\Games\BnS\contents");
+
+//    await scanUpkFiles();
     }
 
     #endregion Messages
@@ -107,7 +116,7 @@ namespace UpkManager.Domain.Controllers {
 
       switch(e.PropertyName) {
         case "IsSelected": {
-          if (upkFile.IsSelected) await messenger.SendAsync(new FileHeaderSelectedMessage { FullFilename = upkFile.FullFilename });
+          if (upkFile.IsSelected && upkFile.FileSize > 0) await messenger.SendAsync(new FileHeaderSelectedMessage { FullFilename = upkFile.FullFilename });
 
           break;
         }
@@ -115,6 +124,28 @@ namespace UpkManager.Domain.Controllers {
           break;
         }
       }
+    }
+
+    private async Task scanUpkFiles() {
+      List<UpkFileViewModel> upkFiles = viewModel.Files.Traverse(f => f.FileSize > 0).ToList();
+
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
+
+      foreach(UpkFileViewModel upkFile in upkFiles) {
+        DomainHeader header = new DomainHeader { FullFilename = upkFile.FullFilename };
+
+        await repository.LoadAndParseUpk(header, true, true, null);
+
+        if (header.ExportTable.Any(e => e.TypeName == ObjectType.Texture2D.ToString())) upkFile.HasTextures = "\u2713";
+
+        message.Current += 1;
+
+        messenger.Send(message);
+      }
+
+      message.IsComplete = true;
+
+      messenger.Send(message);
     }
 
     #endregion Private Methods

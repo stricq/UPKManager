@@ -64,7 +64,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="STR.TreeListView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\STR.TreeListView.1.0.16037.4\lib\net45\STR.TreeListView.dll</HintPath>
+      <HintPath>..\packages\STR.TreeListView.1.0.16037.5\lib\net45\STR.TreeListView.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

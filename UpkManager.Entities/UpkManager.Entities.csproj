@@ -35,8 +35,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSharpImageLibrary, Version=2.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSharpImageLibrary.2.1.5.0\lib\net45\CSharpImageLibrary.exe</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.1.1.0.0\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="UsefulThings, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UsefulCSharpThings.1.5.3.0\lib\net45\UsefulThings.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compression\CompressedChunkBulkData.cs" />
@@ -50,8 +62,6 @@
     <Compile Include="ObjectTypes\ObjectDistributionFloatUniform.cs" />
     <Compile Include="ObjectTypes\ObjectObjectRedirector.cs" />
     <Compile Include="ObjectTypes\ObjectTexture2D.cs" />
-    <Compile Include="ObjectTypes\Texture2D\DdsHeader.cs" />
-    <Compile Include="ObjectTypes\Texture2D\DdsPixelFormat.cs" />
     <Compile Include="ObjectTypes\Texture2D\MipMap.cs" />
     <Compile Include="Tables\ExportTableEntry.cs" />
     <Compile Include="Tables\GenerationTableEntry.cs" />
@@ -83,6 +93,7 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="EntityDiagram.cd" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
