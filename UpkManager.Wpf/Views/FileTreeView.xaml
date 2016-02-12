@@ -1,98 +1,59 @@
 ﻿<UserControl x:Class="UpkManager.Wpf.Views.FileTreeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:vm="clr-namespace:UpkManager.Domain.ViewModels;assembly=UpkManager.Domain"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:tv="http://schemas.stricq.com/treelistview/"
              xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
              mvvm:ViewModelLocator.ComposedViewModel="FileTreeViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
   <Grid Margin="-2">
 
-    <TreeView ItemsSource="{Binding Path=Files}" BorderThickness="0" Background="{StaticResource BackgroundColor}" FontFamily="Tahoma" FontSize="12"
+    <ListView ItemsSource="{Binding Path=Files}" BorderThickness="0" BorderBrush="{StaticResource ContentControlBorderColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
               VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
-      <TreeView.Resources>
-        <HierarchicalDataTemplate DataType="{x:Type vm:UpkFileViewModel}" ItemsSource="{Binding Path=Children}">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
 
-            <CheckBox  Grid.Column="0" Content="{x:Null}" IsChecked="{Binding Path=IsChecked}" Focusable="False" />
-            <TextBlock Grid.Column="1" Margin="4,0,0,0" HorizontalAlignment="Left" Foreground="{StaticResource ForegroundColor}">
-              <Run Text="{Binding Path=Filename, Mode=OneWay}" />
-              <Run Text="{Binding Path=HasTextures}" />
-            </TextBlock>
+      <ListView.View>
+        <GridView>
 
-          </Grid>
-        </HierarchicalDataTemplate>
-      </TreeView.Resources>
+           <GridViewColumn Header="File Name">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
 
+                  <CheckBox  Grid.Column="0" Content="{x:Null}" IsChecked="{Binding Path=IsChecked}" Focusable="False" />
+                  <TextBlock Grid.Column="1" Text="{Binding Path=Filename}" ToolTip="{Binding Path=FullFilename}" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
 
-    </TreeView>
-    <!--
-    <tv:TreeListView ItemsSource="{Binding Path=Files}" BorderThickness="0" BorderBrush="{StaticResource ContentControlBorderColor}" Background="{StaticResource BackgroundColor}" FontFamily="Tahoma" FontSize="12"
-                     VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                </Grid>
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
 
-      <tv:TreeListView.Resources>
-        <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeListViewItemStyle}" />
-      </tv:TreeListView.Resources>
+          <GridViewColumn Header="Textures">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=SelectedType}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
 
-      <tv:TreeListView.ItemsPanel>
-        <ItemsPanelTemplate>
-          <VirtualizingStackPanel />
-        </ItemsPanelTemplate>
-      </tv:TreeListView.ItemsPanel>
+          <GridViewColumn Header="File Size">
+            <GridViewColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Path=FileSize, StringFormat={}{0:N0}}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
+              </DataTemplate>
+            </GridViewColumn.CellTemplate>
+          </GridViewColumn>
 
-      <tv:TreeListView.ItemTemplate>
-        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}" />
-      </tv:TreeListView.ItemTemplate>
+        </GridView>
+      </ListView.View>
+    </ListView>
 
-      <tv:TreeListView.Columns>
-
-        <GridViewColumn Header="File Name">
-          <GridViewColumn.CellTemplate>
-            <DataTemplate>
-              <Grid>
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <tv:TreeListViewExpander Grid.Column="0" Focusable="False" />
-
-                <CheckBox  Grid.Column="1" Content="{x:Null}" IsChecked="{Binding Path=IsChecked}" Focusable="False" />
-                <TextBlock Grid.Column="2" Text="{Binding Path=Filename}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
-
-              </Grid>
-            </DataTemplate>
-          </GridViewColumn.CellTemplate>
-        </GridViewColumn>
-
-        <GridViewColumn Header="Textures">
-          <GridViewColumn.CellTemplate>
-            <DataTemplate>
-              <TextBlock Text="{Binding Path=HasTextures}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
-            </DataTemplate>
-          </GridViewColumn.CellTemplate>
-        </GridViewColumn>
-
-        <GridViewColumn Header="File Size">
-          <GridViewColumn.CellTemplate>
-            <DataTemplate>
-              <TextBlock Text="{Binding Path=FileSize, StringFormat={}{0:N0}}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
-            </DataTemplate>
-          </GridViewColumn.CellTemplate>
-        </GridViewColumn>
-
-      </tv:TreeListView.Columns>
-
-    </tv:TreeListView>
-    -->
   </Grid>
 
 </UserControl>
+

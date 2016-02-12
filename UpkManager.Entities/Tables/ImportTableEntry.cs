@@ -20,7 +20,7 @@ namespace UpkManager.Entities.Tables {
 
     #region Public Methods
 
-    public void ReadImportTableEntry(byte[] data, ref int index, List<NameTableEntry> nameTable) {
+    public int ReadImportTableEntry(byte[] data, int index, List<NameTableEntry> nameTable) {
       PackageNameIndex = new NameTableIndex();
       TypeNameIndex    = new NameTableIndex();
       NameIndex        = new NameTableIndex();
@@ -32,6 +32,8 @@ namespace UpkManager.Entities.Tables {
       OwnerReference = BitConverter.ToInt32(data, index); index += sizeof(int);
 
       NameIndex.ReadNameTableIndex(data, ref index, nameTable);
+
+      return index;
     }
 
     #endregion Public Methods

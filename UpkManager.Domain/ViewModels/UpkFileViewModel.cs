@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 
-using STR.Common.Contracts;
 using STR.MvvmCommon;
 
 
@@ -9,7 +8,7 @@ namespace UpkManager.Domain.ViewModels {
 
   [Export]
   [PartCreationPolicy(CreationPolicy.NonShared)]
-  public class UpkFileViewModel : ObservableObject, ITraversable<UpkFileViewModel> {
+  public class UpkFileViewModel : ObservableObject {
 
     #region Private Fields
 
@@ -19,31 +18,21 @@ namespace UpkManager.Domain.ViewModels {
     private long fileSize;
 
     private string fullFilename;
-    private string hasTextures;
+    private string selectedType;
 
-    private ObservableCollection<UpkFileViewModel> children;
+    private ObservableCollection<string> exportTypes;
 
     #endregion Private Fields
 
     #region Constructor
 
     public UpkFileViewModel() {
-      Children = new ObservableCollection<UpkFileViewModel>();
+      exportTypes = new ObservableCollection<string>();
     }
 
     #endregion Constructor
 
     #region Properties
-
-    public bool IsChecked {
-      get { return isChecked; }
-      set { SetField(ref isChecked, value, () => IsChecked); }
-    }
-
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
-    }
 
     public long FileSize {
       get { return fileSize; }
@@ -55,19 +44,29 @@ namespace UpkManager.Domain.ViewModels {
       set { SetField(ref fullFilename, value, () => FullFilename); }
     }
 
-    public string HasTextures {
-      get { return hasTextures; }
-      set { SetField(ref hasTextures, value, () => HasTextures); }
-    }
-
-    public ObservableCollection<UpkFileViewModel> Children {
-      get { return children; }
-      set { SetField(ref children, value, () => Children); }
+    public ObservableCollection<string> ExportTypes {
+      get { return exportTypes; }
+      set { SetField(ref exportTypes, value, () => ExportTypes); }
     }
 
     #endregion Properties
 
     #region Domain Properties
+
+    public bool IsSelected {
+      get { return isSelected; }
+      set { SetField(ref isSelected, value, () => IsSelected); }
+    }
+
+    public bool IsChecked {
+      get { return isChecked; }
+      set { SetField(ref isChecked, value, () => IsChecked); }
+    }
+
+    public string SelectedType {
+      get { return selectedType; }
+      set { SetField(ref selectedType, value, () => SelectedType); }
+    }
 
     public string Filename => fullFilename.Substring(fullFilename.LastIndexOf(@"\") + 1);
 

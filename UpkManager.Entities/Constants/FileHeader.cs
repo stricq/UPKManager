@@ -1,6 +1,6 @@
 ﻿
 
-namespace UpkManager.Repository.Constants {
+namespace UpkManager.Entities.Constants {
 
   public static class FileHeader {
 

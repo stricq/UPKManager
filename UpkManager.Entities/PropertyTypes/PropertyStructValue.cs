@@ -10,7 +10,9 @@ namespace UpkManager.Entities.PropertyTypes {
 
     #region Properties
 
-    public NameTableIndex StructNameIndex;
+    public NameTableIndex StructNameIndex { get; set; }
+
+    public List<Property> Properties { get; set; }
 
     #endregion Properties
 
@@ -22,6 +24,18 @@ namespace UpkManager.Entities.PropertyTypes {
       StructNameIndex = new NameTableIndex();
 
       StructNameIndex.ReadNameTableIndex(Data, ref Index, nameTable);
+
+      //Properties = new List<Property>();
+
+      //do {
+      //  Property prop = new Property();
+
+      //  prop.ReadProperty(Data, ref Index, nameTable);
+
+      //  Properties.Add(prop);
+
+      //  if (prop.NameIndex.Name == ObjectType.None.ToString()) break;
+      //} while(true);
 
       base.ReadPropertyValue(Data, ref Index, nameTable);
     }

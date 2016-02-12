@@ -6,7 +6,15 @@ namespace UpkManager.Entities.Constants {
 
     Unknown,
 
+    DistributionFloatConstant,
+    DistributionFloatConstantCurve,
+    DistributionFloatParticleParameter,
     DistributionFloatUniform,
+    DistributionFloatUniformCurve,
+    DistributionVectorConstant,
+    DistributionVectorConstantCurve,
+    DistributionVectorUniform,
+    DistributionVectorUniformCurve,
 
     None,
 

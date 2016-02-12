@@ -7,7 +7,6 @@ using CSharpImageLibrary.General;
 
 using UpkManager.Entities.Compression;
 using UpkManager.Entities.Constants;
-using UpkManager.Entities.ObjectTypes.Texture2D;
 using UpkManager.Entities.PropertyTypes;
 using UpkManager.Entities.Tables;
 

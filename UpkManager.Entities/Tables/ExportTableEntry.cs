@@ -51,7 +51,7 @@ namespace UpkManager.Entities.Tables {
 
     #region Public Methods
 
-    public void ReadExportTableEntry(byte[] data, ref int index, List<NameTableEntry> nameTable) {
+    public int ReadExportTableEntry(byte[] data, int index, List<NameTableEntry> nameTable) {
       TypeReference   = BitConverter.ToInt32(data, index); index += sizeof(int);
       ParentReference = BitConverter.ToInt32(data, index); index += sizeof(int);
       OwnerReference  = BitConverter.ToInt32(data, index); index += sizeof(int);
@@ -83,6 +83,8 @@ namespace UpkManager.Entities.Tables {
       Unknown2 = new byte[size];
 
       Array.ConstrainedCopy(data, index, Unknown2, 0, size); index += size;
+
+      return index;
     }
 
     public void ReadObjectType(byte[] data, UpkHeader header, bool skipProperties, bool skipParse) {
@@ -105,9 +107,17 @@ namespace UpkManager.Entities.Tables {
       Enum.TryParse(TypeNameIndex?.Name, out type);
 
       switch(type) {
-        case ObjectType.DistributionFloatUniform: return new ObjectDistributionFloatUniform();
-        case ObjectType.ObjectRedirector:         return new ObjectObjectRedirector();
-        case ObjectType.Texture2D:                return new ObjectTexture2D();
+        case ObjectType.DistributionFloatConstant:          return new ObjectDistributionFloatConstant();
+        case ObjectType.DistributionFloatConstantCurve:     return new ObjectDistributionFloatConstantCurve();
+        case ObjectType.DistributionFloatParticleParameter: return new ObjectDistributionFloatParticleParameter();
+        case ObjectType.DistributionFloatUniform:           return new ObjectDistributionFloatUniform();
+        case ObjectType.DistributionFloatUniformCurve:      return new ObjectDistributionFloatUniformCurve();
+        case ObjectType.DistributionVectorConstant:         return new ObjectDistributionVectorConstant();
+        case ObjectType.DistributionVectorConstantCurve:    return new ObjectDistributionVectorConstantCurve();
+        case ObjectType.DistributionVectorUniform:          return new ObjectDistributionVectorUniform();
+        case ObjectType.DistributionVectorUniformCurve:     return new ObjectDistributionVectorUniformCurve();
+        case ObjectType.ObjectRedirector:                   return new ObjectObjectRedirector();
+        case ObjectType.Texture2D:                          return new ObjectTexture2D();
 
         default: return new ObjectBase();
       }

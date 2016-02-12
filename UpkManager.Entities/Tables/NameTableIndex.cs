@@ -30,8 +30,9 @@ namespace UpkManager.Entities.Tables {
       Index   = BitConverter.ToInt32(data, index); index += sizeof(int);
       Numeric = BitConverter.ToInt32(data, index); index += sizeof(int);
 
-      if (Index < 0 || Index > nameTable.Count) Name = "Index Range Error";
-      else Name = Numeric > 0 ? $"{nameTable[Index].Name.String}_{Numeric - 1}" : $"{nameTable[Index].Name.String}";
+      if (Index < 0 || Index > nameTable.Count) throw new Exception($"Index ({Index:X8}) is out of range of the NameTable size.  Current offset is {index:X8}");
+
+      Name = Numeric > 0 ? $"{nameTable[Index].Name.String}_{Numeric - 1}" : $"{nameTable[Index].Name.String}";
     }
 
     #endregion Public Methods

@@ -72,6 +72,8 @@ namespace UpkManager.Domain.Controllers {
       viewModel.JobProgressText       = message.Total > 0 ? $"{message.Text} [{message.Current} / {message.Total}]" : message.Text;
 
       if (message.Current > 0 && message.Total > 0) viewModel.JobProgress = message.Current / message.Total * 100.0;
+
+      if (message.StatusText != null) viewModel.StatusText = message.StatusText;
     }
 
     #endregion Messages

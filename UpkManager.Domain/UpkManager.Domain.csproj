@@ -113,8 +113,16 @@
     <Compile Include="Messages\FileHeader\ExportObjectSelectedMessage.cs" />
     <Compile Include="Messages\FileHeader\FileHeaderLoadedMessage.cs" />
     <Compile Include="Messages\HeaderTables\CompressedBlockSelectedMessage.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionFloatConstant.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionFloatConstantCurve.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionFloatParticleParameter.cs" />
     <Compile Include="Models\Objects\DomainObjectDistributionFloatUniform.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionFloatUniformCurve.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionVectorConstant.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionVectorConstantCurve.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionVectorUniform.cs" />
+    <Compile Include="Models\Objects\DomainObjectDistributionVectorUniformCurve.cs" />
     <Compile Include="Models\Objects\DomainObjectObjectRedirector.cs" />
     <Compile Include="Models\Objects\DomainObjectTexture2D.cs" />
     <Compile Include="Models\Objects\Texture2D\DomainMipMap.cs" />

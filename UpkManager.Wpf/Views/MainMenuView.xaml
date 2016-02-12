@@ -15,6 +15,10 @@
 
       <Separator />
 
+      <MenuItem Header="_Scan UPK Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ScanUpkFiles}" />
+
+      <Separator />
+
       <MenuItem Header="O_bject" Foreground="{StaticResource BackgroundColor}">
         <MenuItem Header="Save Object _As..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=SaveObjectAs}" />
       </MenuItem>

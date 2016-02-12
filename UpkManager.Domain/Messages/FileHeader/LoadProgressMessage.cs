@@ -11,6 +11,8 @@ namespace UpkManager.Domain.Messages.FileHeader {
 
     public double Total { get; set; }
 
+    public string StatusText { get; set; }
+
     public bool IsComplete { get; set; }
 
   }

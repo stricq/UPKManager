@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UpkManager.Entities.Compression;
+using UpkManager.Entities.Constants;
 using UpkManager.Entities.Tables;
 
 
@@ -82,8 +83,12 @@ namespace UpkManager.Entities {
 
     #region Public Methods
 
-    public void ReadUpkHeader(byte[] data, ref int index) {
+    public void ReadUpkHeader(byte[] data) {
+      int index = 0;
+
       Signature = BitConverter.ToUInt32(data, index); index += sizeof(uint);
+
+      if (Signature != FileHeader.Signature) throw new Exception("Missing signature.  File is not a properly formatted UPK file.");
 
       Version   = BitConverter.ToUInt16(data, index); index += sizeof(ushort);
       Licensee  = BitConverter.ToUInt16(data, index); index += sizeof(ushort);
@@ -124,7 +129,9 @@ namespace UpkManager.Entities {
       if (reference < 0 && -reference - 1 < ImportTableCount) return ImportTable[-reference - 1];
       if (reference > 0 &&  reference - 1 < ExportTableCount) return ExportTable[reference - 1];
 
-      return null;
+      if (reference == 0) return null;
+
+      throw new Exception($"Object reference ({reference:X8}) is out of range of both the Import and Export Tables.");
     }
 
     #endregion Public Methods

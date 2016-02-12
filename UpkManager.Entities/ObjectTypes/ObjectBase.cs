@@ -36,7 +36,7 @@ namespace UpkManager.Entities.ObjectTypes {
 
       if (remaining == 0) return;
 
-      if (remaining < 0) throw new Exception($"Offset error after parsing Properties.  Remaining bytes is negative. ({remaining})");
+      if (remaining < 0) throw new Exception($"Offset error after parsing Properties.  Remaining bytes is negative ({remaining}).  Index is 0x{index:X8}");
 
       AdditionalDataOffset = index;
 

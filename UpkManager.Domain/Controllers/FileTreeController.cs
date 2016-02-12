@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using STR.Common.Extensions;
 using STR.Common.Messages;
 
+using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
@@ -25,6 +26,7 @@ namespace UpkManager.Domain.Controllers {
     #region Private Fields
 
     private readonly FileTreeViewModel viewModel;
+    private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
 
@@ -35,14 +37,16 @@ namespace UpkManager.Domain.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public FileTreeController(FileTreeViewModel ViewModel, IMessenger Messenger, IUpkFileRepository Repository) {
-      viewModel = ViewModel;
+    public FileTreeController(FileTreeViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository Repository) {
+          viewModel = ViewModel;
+      menuViewModel = MenuViewModel;
 
       messenger = Messenger;
 
       repository = Repository;
 
       registerMessages();
+      registerCommands();
     }
 
     #endregion Constructor
@@ -54,16 +58,32 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task onApplicationLoaded(ApplicationLoadedMessage message) {
-      await loadDirectoryAsync(null, @"V:\Games\BnS\contents");
+      List<UpkFileViewModel> files = new List<UpkFileViewModel>();
 
-//    await scanUpkFiles();
+      await loadDirectoryAsync(files, @"V:\Games\BnS\contents");
+
+      viewModel.Files.Clear();
+
+      viewModel.Files.AddRange(files.OrderBy(f => f.FullFilename));
     }
 
     #endregion Messages
 
+    #region Commands
+
+    private void registerCommands() {
+      menuViewModel.ScanUpkFiles = new RelayCommandAsync(onScanUpkFilesExecute);
+    }
+
+    private async Task onScanUpkFilesExecute() {
+      await scanUpkFiles();
+    }
+
+    #endregion Commands
+
     #region Private Methods
 
-    private async Task loadDirectoryAsync(UpkFileViewModel parent, string path) {
+    private async Task loadDirectoryAsync(List<UpkFileViewModel> parent, string path) {
       DirectoryInfo   dirInfo;
       DirectoryInfo[] dirInfos;
 
@@ -79,16 +99,12 @@ namespace UpkManager.Domain.Controllers {
         List<UpkFileViewModel> dirs = dirInfos.Select(dir => new UpkFileViewModel { FullFilename = dir.FullName }).ToList();
 
         foreach(UpkFileViewModel upkFile in dirs.ToList()) {
-          await loadDirectoryAsync(upkFile, upkFile.FullFilename);
+          List<UpkFileViewModel> children = new List<UpkFileViewModel>();
 
-          if (upkFile.Children.Count == 0) dirs.Remove(upkFile);
-        }
+          await loadDirectoryAsync(children, upkFile.FullFilename);
 
-        if (dirs.Count > 0) {
-          dirs.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
-
-          if (parent !=  null) parent.Children.AddRange(dirs.OrderBy(d => d.Filename));
-          else viewModel.Files.AddRange(dirs.OrderBy(d => d.Filename));
+          if (children.Count == 0) dirs.Remove(upkFile);
+          else parent.AddRange(children);
         }
       }
 
@@ -100,8 +116,7 @@ namespace UpkManager.Domain.Controllers {
 
           upkFiles.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
 
-          if (parent != null) parent.Children.AddRange(upkFiles.OrderBy(d => d.Filename));
-          else viewModel.Files.AddRange(upkFiles.OrderBy(d => d.Filename));
+          parent.AddRange(upkFiles);
         }
       }
       catch(Exception ex) {
@@ -127,20 +142,28 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task scanUpkFiles() {
-      List<UpkFileViewModel> upkFiles = viewModel.Files.Traverse(f => f.FileSize > 0).ToList();
+      List<UpkFileViewModel> upkFiles = viewModel.Files.ToList();
 
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
       foreach(UpkFileViewModel upkFile in upkFiles) {
         DomainHeader header = new DomainHeader { FullFilename = upkFile.FullFilename };
 
-        await repository.LoadAndParseUpk(header, true, true, null);
-
-        if (header.ExportTable.Any(e => e.TypeName == ObjectType.Texture2D.ToString())) upkFile.HasTextures = "\u2713";
-
-        message.Current += 1;
+        message.Current   += 1;
+        message.StatusText = upkFile.FullFilename;
 
         messenger.Send(message);
+
+        try {
+          await repository.LoadAndParseUpk(header, true, true, null);
+        }
+        catch(Exception ex) {
+          messenger.Send(new ApplicationErrorMessage { ErrorMessage = "Error Scanning UPK File.", Exception = ex, HeaderText = "Scan Error" });
+        }
+
+        upkFile.ExportTypes.AddRange(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
+
+        if (upkFile.ExportTypes.Any(t => t == ObjectType.Texture2D.ToString())) upkFile.SelectedType = ObjectType.Texture2D.ToString();
       }
 
       message.IsComplete = true;

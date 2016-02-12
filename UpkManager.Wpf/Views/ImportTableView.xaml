@@ -9,8 +9,8 @@
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="768">
 
   <Grid Margin="-2">
-    <ListView ItemsSource="{Binding Path=Header.ImportTable}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}"
-               b:GridViewBehaviors.AutoResizeColumns="True">
+    <ListView ItemsSource="{Binding Path=Header.ImportTable}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
+              VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
       <ListView.View>
         <GridView>
 

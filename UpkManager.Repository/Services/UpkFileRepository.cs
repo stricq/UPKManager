@@ -58,11 +58,11 @@ namespace UpkManager.Repository.Services {
 
       LoadProgress?.Invoke(message);
 
-      int index = 0;
-
       UpkHeader upkHeader = new UpkHeader();
 
-      upkHeader.ReadUpkHeader(data, ref index);
+      byte[] data1 = data;
+
+      await Task.Run(() => upkHeader.ReadUpkHeader(data1));
 
       if (upkHeader.CompressedChunks.Count > 0) {
         if ((upkHeader.CompressionFlags & (CompressionFlag.LZO | CompressionFlag.LZO_ENC)) == 0) {
@@ -78,18 +78,18 @@ namespace UpkManager.Repository.Services {
         data = await decompressChunksAsync(upkHeader.CompressedChunks, upkHeader.CompressionFlags, LoadProgress);
       }
 
-      readNameTable(data, upkHeader, LoadProgress);
+      await readNameTable(data, upkHeader, LoadProgress);
 
-      readImportTable(data, upkHeader, LoadProgress);
-      readExportTable(data, upkHeader, LoadProgress);
+      await readImportTable(data, upkHeader, LoadProgress);
+      await readExportTable(data, upkHeader, LoadProgress);
 
-      readDependsTable(data, upkHeader);
+      await Task.Run(() => readDependsTable(data, upkHeader));
 
-      patchPointers(upkHeader);
+      await Task.Run(() => patchPointers(upkHeader));
 
       await readExportTableObjects(data, upkHeader, SkipProperties, SkipParsing, LoadProgress);
 
-      mapper.Map(upkHeader, Header);
+      mapper.Map(upkHeader, Header); // Can't throw this on the background as Header is being observed.  Need to fix.
 
       message.IsComplete = true;
 
@@ -114,7 +114,7 @@ namespace UpkManager.Repository.Services {
 
     #region Private Methods
 
-    private static void readNameTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
+    private static async Task readNameTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Name Table", Current = 0, Total = header.NameTableCount };
 
       loadProgress?.Invoke(message);
@@ -124,7 +124,7 @@ namespace UpkManager.Repository.Services {
       for(int i = 0; i < header.NameTableCount; ++i) {
         NameTableEntry name = new NameTableEntry { Index = i };
 
-        name.ReadNameTableEntry(data, ref index);
+        await Task.Run(() => name.ReadNameTableEntry(data, ref index));
 
         header.NameTable.Add(name);
 
@@ -136,7 +136,7 @@ namespace UpkManager.Repository.Services {
       }
     }
 
-    private static void readImportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
+    private static async Task readImportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Import Table", Current = 0, Total = header.ImportTableCount };
 
       loadProgress?.Invoke(message);
@@ -146,7 +146,9 @@ namespace UpkManager.Repository.Services {
       for(int i = 0; i < header.ImportTableCount; ++i) {
         ImportTableEntry import = new ImportTableEntry { TableIndex = -(i + 1) };
 
-        import.ReadImportTableEntry(data, ref index, header.NameTable);
+        int index1 = index;
+
+        index = await Task.Run(() => import.ReadImportTableEntry(data, index1, header.NameTable));
 
         header.ImportTable.Add(import);
 
@@ -158,7 +160,7 @@ namespace UpkManager.Repository.Services {
       }
     }
 
-    private static void readExportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
+    private static async Task readExportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Export Table", Current = 0, Total = header.ExportTableCount };
 
       loadProgress?.Invoke(message);
@@ -168,7 +170,9 @@ namespace UpkManager.Repository.Services {
       for(int i = 0; i < header.ExportTableCount; ++i) {
         ExportTableEntry export = new ExportTableEntry { TableIndex = i + 1 };
 
-        export.ReadExportTableEntry(data, ref index, header.NameTable);
+        int index1 = index;
+
+        index = await Task.Run(() => export.ReadExportTableEntry(data, index1, header.NameTable));
 
         header.ExportTable.Add(export);
 

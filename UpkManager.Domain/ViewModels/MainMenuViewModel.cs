@@ -17,6 +17,7 @@ namespace UpkManager.Domain.ViewModels {
 
     private RelayCommandAsync openDirectory;
     private RelayCommandAsync openFile;
+    private RelayCommandAsync scanUpkFiles;
 
     private RelayCommandAsync saveObjectAs;
 
@@ -49,6 +50,11 @@ namespace UpkManager.Domain.ViewModels {
     public RelayCommandAsync OpenFile {
       get { return openFile; }
       set { SetField(ref openFile, value, () => OpenFile); }
+    }
+
+    public RelayCommandAsync ScanUpkFiles {
+      get { return scanUpkFiles; }
+      set { SetField(ref scanUpkFiles, value, () => ScanUpkFiles); }
     }
 
     public RelayCommandAsync SaveObjectAs {

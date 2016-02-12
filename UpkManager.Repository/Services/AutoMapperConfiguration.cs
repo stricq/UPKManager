@@ -84,16 +84,55 @@ namespace UpkManager.Repository.Services {
 
       #region Objects
 
-      config.CreateMap<ObjectBase, DomainObjectBase>().Include<ObjectDistributionFloatUniform, DomainObjectDistributionFloatUniform>()
+      config.CreateMap<ObjectBase, DomainObjectBase>().Include<ObjectDistributionFloatConstant, DomainObjectDistributionFloatConstant>()
+                                                      .Include<ObjectDistributionFloatConstantCurve, DomainObjectDistributionFloatConstantCurve>()
+                                                      .Include<ObjectDistributionFloatParticleParameter, DomainObjectDistributionFloatParticleParameter>()
+                                                      .Include<ObjectDistributionFloatUniform, DomainObjectDistributionFloatUniform>()
+                                                      .Include<ObjectDistributionFloatUniformCurve, DomainObjectDistributionFloatUniformCurve>()
+                                                      .Include<ObjectDistributionVectorConstantCurve, DomainObjectDistributionVectorConstantCurve>()
+                                                      .Include<ObjectDistributionVectorUniform, DomainObjectDistributionVectorUniform>()
+                                                      .Include<ObjectDistributionVectorUniformCurve, DomainObjectDistributionVectorUniformCurve>()
                                                       .Include<ObjectObjectRedirector, DomainObjectObjectRedirector>()
                                                       .Include<ObjectTexture2D, DomainObjectTexture2D>()
                                                       .ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                       .ReverseMap()
                                                       .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
 
+      config.CreateMap<ObjectDistributionFloatConstant, DomainObjectDistributionFloatConstant>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                .ReverseMap()
+                                                                                                .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionFloatConstantCurve, DomainObjectDistributionFloatConstantCurve>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                          .ReverseMap()
+                                                                                                          .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionFloatParticleParameter, DomainObjectDistributionFloatParticleParameter>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                                  .ReverseMap()
+                                                                                                                  .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
       config.CreateMap<ObjectDistributionFloatUniform, DomainObjectDistributionFloatUniform>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                                                               .ReverseMap()
                                                                                               .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionFloatUniformCurve, DomainObjectDistributionFloatUniformCurve>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                        .ReverseMap()
+                                                                                                        .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionVectorConstant, DomainObjectDistributionVectorConstant>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                  .ReverseMap()
+                                                                                                  .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionVectorConstantCurve, DomainObjectDistributionVectorConstantCurve>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                            .ReverseMap()
+                                                                                                            .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionVectorUniform, DomainObjectDistributionVectorUniform>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                .ReverseMap()
+                                                                                                .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+
+      config.CreateMap<ObjectDistributionVectorUniformCurve, DomainObjectDistributionVectorUniformCurve>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
+                                                                                                          .ReverseMap()
+                                                                                                          .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
 
       config.CreateMap<ObjectObjectRedirector, DomainObjectObjectRedirector>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                                               .ReverseMap()
