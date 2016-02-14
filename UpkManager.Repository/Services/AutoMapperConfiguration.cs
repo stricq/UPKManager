@@ -27,6 +27,12 @@ namespace UpkManager.Repository.Services {
 
     public void RegisterMappings(IMapperConfiguration config) {
 
+      #region Settings
+
+      config.CreateMap<UpkManagerSettings, DomainUpkManagerSettings>().ReverseMap();
+
+      #endregion Settings
+
       #region Top Level
 
       config.CreateMap<UpkHeader, DomainHeader>().ForMember(dest => dest.FullFilename, opt => opt.Ignore())

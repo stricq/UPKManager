@@ -40,7 +40,7 @@
 
       <Separator />
 
-      <MenuItem Header="S_ettings..." Foreground="{StaticResource BackgroundColor}" />
+      <MenuItem Header="S_ettings..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=Settings}" />
     </MenuItem>
 
   </Menu>

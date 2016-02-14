@@ -39,9 +39,9 @@ namespace UpkManager.Domain.ViewModels {
       set { SetField(ref fileSize, value, () => FileSize); }
     }
 
-    public string FullFilename {
+    public string GameFilename {
       get { return fullFilename; }
-      set { SetField(ref fullFilename, value, () => FullFilename); }
+      set { SetField(ref fullFilename, value, () => GameFilename); }
     }
 
     public ObservableCollection<string> ExportTypes {

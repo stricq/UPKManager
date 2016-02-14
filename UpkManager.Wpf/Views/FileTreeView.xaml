@@ -26,7 +26,7 @@
                   </Grid.ColumnDefinitions>
 
                   <CheckBox  Grid.Column="0" Content="{x:Null}" IsChecked="{Binding Path=IsChecked}" Focusable="False" />
-                  <TextBlock Grid.Column="1" Text="{Binding Path=Filename}" ToolTip="{Binding Path=FullFilename}" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Path=Filename}" ToolTip="{Binding Path=GameFilename}" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
 
                 </Grid>
               </DataTemplate>

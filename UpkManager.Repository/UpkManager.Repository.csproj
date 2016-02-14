@@ -40,6 +40,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="STR.Common, Version=1.0.5720.30248, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\STR.Common.1.0.15242.1\lib\net45\STR.Common.dll</HintPath>
       <Private>True</Private>
@@ -62,6 +66,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AutoMapperConfiguration.cs" />
     <Compile Include="Services\LzoCompressor.cs" />
+    <Compile Include="Services\SettingsRepository.cs" />
     <Compile Include="Services\UpkFileRepository.cs" />
   </ItemGroup>
   <ItemGroup>

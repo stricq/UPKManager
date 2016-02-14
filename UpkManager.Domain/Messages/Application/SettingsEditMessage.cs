@@ -1,0 +1,20 @@
+﻿using System;
+
+using STR.Common.Messages;
+
+using UpkManager.Domain.Models;
+
+
+namespace UpkManager.Domain.Messages.Application {
+
+  public class SettingsEditMessage : MessageBase {
+
+    public bool IsCancel { get; set; }
+
+    public DomainUpkManagerSettings Settings { get; set; }
+
+    public Action<SettingsEditMessage> Callback { get; set; }
+
+  }
+
+}

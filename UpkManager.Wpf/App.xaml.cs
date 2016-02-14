@@ -25,7 +25,8 @@ namespace UpkManager.Wpf {
     public App() {
       container = new MvvmContainer();
 
-      container.Initialize(() => new AggregateCatalog(new DirectoryCatalog(Directory.GetCurrentDirectory(), "UpkManager.*.dll"),
+      container.Initialize(() => new AggregateCatalog(new DirectoryCatalog(Directory.GetCurrentDirectory(), "UpkManager.Wpf.exe"),
+                                                      new DirectoryCatalog(Directory.GetCurrentDirectory(), "UpkManager.*.dll"),
                                                       new DirectoryCatalog(Directory.GetCurrentDirectory(), "STR.*.dll")));
     }
 

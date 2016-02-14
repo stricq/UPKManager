@@ -21,6 +21,8 @@ namespace UpkManager.Domain.ViewModels {
 
     private RelayCommandAsync saveObjectAs;
 
+    private RelayCommand settings;
+
     private RelayCommand exit;
 
     #endregion Private Fields
@@ -60,6 +62,11 @@ namespace UpkManager.Domain.ViewModels {
     public RelayCommandAsync SaveObjectAs {
       get { return saveObjectAs; }
       set { SetField(ref saveObjectAs, value, () => SaveObjectAs); }
+    }
+
+    public RelayCommand Settings {
+      get { return settings; }
+      set { SetField(ref settings, value, () => Settings); }
     }
 
     public RelayCommand Exit {

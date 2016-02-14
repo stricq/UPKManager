@@ -13,6 +13,7 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.ViewModels;
@@ -24,6 +25,8 @@ namespace UpkManager.Domain.Controllers {
   public class FileTreeController : IController {
 
     #region Private Fields
+
+    private DomainUpkManagerSettings settings;
 
     private readonly FileTreeViewModel viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -54,17 +57,21 @@ namespace UpkManager.Domain.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.RegisterAsync<ApplicationLoadedMessage>(this, onApplicationLoaded);
+      messenger.RegisterAsync<AppLoadedMessage>(this, onApplicationLoaded);
+
+      messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
     }
 
-    private async Task onApplicationLoaded(ApplicationLoadedMessage message) {
-      List<UpkFileViewModel> files = new List<UpkFileViewModel>();
+    private async Task onApplicationLoaded(AppLoadedMessage message) {
+      settings = message.Settings;
 
-      await loadDirectoryAsync(files, @"V:\Games\BnS\contents");
+      await loadGameFiles();
+    }
 
-      viewModel.Files.Clear();
+    private async void onSettingsChanged(SettingsChangedMessage message) {
+      settings = message.Settings;
 
-      viewModel.Files.AddRange(files.OrderBy(f => f.FullFilename));
+      await loadGameFiles();
     }
 
     #endregion Messages
@@ -72,16 +79,32 @@ namespace UpkManager.Domain.Controllers {
     #region Commands
 
     private void registerCommands() {
-      menuViewModel.ScanUpkFiles = new RelayCommandAsync(onScanUpkFilesExecute);
+      menuViewModel.ScanUpkFiles = new RelayCommandAsync(onScanUpkFilesExecute, canScanUpkFilesExecute);
     }
 
     private async Task onScanUpkFilesExecute() {
       await scanUpkFiles();
     }
 
+    private bool canScanUpkFilesExecute() {
+      return viewModel.Files.Any();
+    }
+
     #endregion Commands
 
     #region Private Methods
+
+    private async Task loadGameFiles() {
+      List<UpkFileViewModel> files = new List<UpkFileViewModel>();
+
+      if (String.IsNullOrEmpty(settings.PathToGame)) return;
+
+      await loadDirectoryAsync(files, settings.PathToGame);
+
+      viewModel.Files.Clear();
+
+      viewModel.Files.AddRange(files.OrderBy(f => f.GameFilename));
+    }
 
     private async Task loadDirectoryAsync(List<UpkFileViewModel> parent, string path) {
       DirectoryInfo   dirInfo;
@@ -96,12 +119,12 @@ namespace UpkManager.Domain.Controllers {
       }
 
       if (dirInfos.Length > 0) {
-        List<UpkFileViewModel> dirs = dirInfos.Select(dir => new UpkFileViewModel { FullFilename = dir.FullName }).ToList();
+        List<UpkFileViewModel> dirs = dirInfos.Select(dir => new UpkFileViewModel { GameFilename = dir.FullName.Replace(settings.PathToGame, null) }).ToList();
 
         foreach(UpkFileViewModel upkFile in dirs.ToList()) {
           List<UpkFileViewModel> children = new List<UpkFileViewModel>();
 
-          await loadDirectoryAsync(children, upkFile.FullFilename);
+          await loadDirectoryAsync(children, Path.Combine(settings.PathToGame, upkFile.GameFilename));
 
           if (children.Count == 0) dirs.Remove(upkFile);
           else parent.AddRange(children);
@@ -112,7 +135,7 @@ namespace UpkManager.Domain.Controllers {
         FileInfo[] files = await Task.Run(() => dirInfo.GetFiles("*.upk"));
 
         if (files.Length > 0) {
-          List<UpkFileViewModel> upkFiles = files.Select(f => new UpkFileViewModel { FullFilename = f.FullName, FileSize = f.Length }).ToList();
+          List<UpkFileViewModel> upkFiles = files.Select(f => new UpkFileViewModel { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length }).ToList();
 
           upkFiles.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
 
@@ -131,7 +154,7 @@ namespace UpkManager.Domain.Controllers {
 
       switch(e.PropertyName) {
         case "IsSelected": {
-          if (upkFile.IsSelected && upkFile.FileSize > 0) await messenger.SendAsync(new FileHeaderSelectedMessage { FullFilename = upkFile.FullFilename });
+          if (upkFile.IsSelected && upkFile.FileSize > 0) await messenger.SendAsync(new FileHeaderSelectedMessage { FullFilename = Path.Combine(settings.PathToGame, upkFile.GameFilename) });
 
           break;
         }
@@ -147,10 +170,10 @@ namespace UpkManager.Domain.Controllers {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
       foreach(UpkFileViewModel upkFile in upkFiles) {
-        DomainHeader header = new DomainHeader { FullFilename = upkFile.FullFilename };
+        DomainHeader header = new DomainHeader { FullFilename = Path.Combine(settings.PathToGame, upkFile.GameFilename) };
 
         message.Current   += 1;
-        message.StatusText = upkFile.FullFilename;
+        message.StatusText = Path.Combine(settings.PathToGame, upkFile.GameFilename);
 
         messenger.Send(message);
 

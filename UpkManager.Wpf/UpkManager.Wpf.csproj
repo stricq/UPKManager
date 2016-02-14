@@ -93,6 +93,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Behaviors\GridViewBehaviors.cs" />
+    <Compile Include="Views\Dialogs\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ExportTableCleanView.xaml.cs">
       <DependentUpon>ExportTableCleanView.xaml</DependentUpon>
     </Compile>
@@ -187,6 +190,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\TreeViewItemStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

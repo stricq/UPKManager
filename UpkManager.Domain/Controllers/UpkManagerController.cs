@@ -11,6 +11,9 @@ using STR.Common.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Messages.Application;
+using UpkManager.Domain.Models;
 using UpkManager.Domain.ViewModels;
 
 
@@ -23,17 +26,21 @@ namespace UpkManager.Domain.Controllers {
 
     private bool isStartupComplete;
 
+    private DomainUpkManagerSettings settings;
+
     private readonly UpkManagerViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
+
+    private readonly ISettingsRepository settingsRepository;
 
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public UpkManagerController(UpkManagerViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger) {
+    public UpkManagerController(UpkManagerViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, ISettingsRepository SettingsRepository) {
       if (Application.Current != null) Application.Current.DispatcherUnhandledException += onCurrentDispatcherUnhandledException;
 
       AppDomain.CurrentDomain.UnhandledException += onDomainUnhandledException;
@@ -49,6 +56,10 @@ namespace UpkManager.Domain.Controllers {
 
       messenger = Messenger;
 
+      settingsRepository = SettingsRepository;
+
+      settings = Task.Run(() => settingsRepository.LoadSettingsAsync()).Result;
+
       registerCommands();
     }
 
@@ -61,13 +72,15 @@ namespace UpkManager.Domain.Controllers {
 
       viewModel.Closing = new RelayCommand<CancelEventArgs>(onClosingExecute);
 
+      menuViewModel.Settings = new RelayCommand(onSettingsExecute);
+
       menuViewModel.Exit = new RelayCommand(onExitExecute);
     }
 
     private async Task onLoadedExecuteAsync(RoutedEventArgs args) {
       isStartupComplete = true;
 
-      await messenger.SendAsync(new ApplicationLoadedMessage());
+      await messenger.SendAsync(new AppLoadedMessage { Settings = settings });
     }
 
     private void onClosingExecute(CancelEventArgs args) {
@@ -76,6 +89,10 @@ namespace UpkManager.Domain.Controllers {
       messenger.Send(message);
 
       args.Cancel = message.Cancel;
+    }
+
+    private void onSettingsExecute() {
+      messenger.Send(new SettingsEditMessage { Settings = settings, Callback = onSettingsEditResponse });
     }
 
     private void onExitExecute() {
@@ -89,6 +106,16 @@ namespace UpkManager.Domain.Controllers {
     #endregion Commands
 
     #region Private Methods
+
+    private void onSettingsEditResponse(SettingsEditMessage message) {
+      if (message.IsCancel) return;
+
+      settings = message.Settings;
+
+      messenger.Send(new SettingsChangedMessage { Settings = settings });
+
+      settingsRepository.SaveSettings(settings);
+    }
 
     private void onDomainUnhandledException(object sender, UnhandledExceptionEventArgs e) {
       Exception ex = e.ExceptionObject as Exception;
