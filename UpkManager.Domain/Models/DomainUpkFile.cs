@@ -4,11 +4,11 @@ using System.ComponentModel.Composition;
 using STR.MvvmCommon;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Domain.Models {
 
   [Export]
   [PartCreationPolicy(CreationPolicy.NonShared)]
-  public class UpkFileViewModel : ObservableObject {
+  public class DomainUpkFile : ObservableObject {
 
     #region Private Fields
 
@@ -16,6 +16,8 @@ namespace UpkManager.Domain.ViewModels {
     private bool isSelected;
 
     private long fileSize;
+
+    private string id;
 
     private string fullFilename;
     private string selectedType;
@@ -26,7 +28,7 @@ namespace UpkManager.Domain.ViewModels {
 
     #region Constructor
 
-    public UpkFileViewModel() {
+    public DomainUpkFile() {
       exportTypes = new ObservableCollection<string>();
     }
 
@@ -37,6 +39,11 @@ namespace UpkManager.Domain.ViewModels {
     public long FileSize {
       get { return fileSize; }
       set { SetField(ref fileSize, value, () => FileSize); }
+    }
+
+    public string Id {
+      get { return id; }
+      set { SetField(ref id, value, () => Id); }
     }
 
     public string GameFilename {

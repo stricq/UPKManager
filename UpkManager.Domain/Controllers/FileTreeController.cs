@@ -35,18 +35,22 @@ namespace UpkManager.Domain.Controllers {
 
     private readonly IUpkFileRepository repository;
 
+    private readonly IUpkFileRemoteRepository remoteRepository;
+
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public FileTreeController(FileTreeViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository Repository) {
+    public FileTreeController(FileTreeViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
           viewModel = ViewModel;
       menuViewModel = MenuViewModel;
 
       messenger = Messenger;
 
       repository = Repository;
+
+      remoteRepository = RemoteRepository;
 
       registerMessages();
       registerCommands();
@@ -66,6 +70,8 @@ namespace UpkManager.Domain.Controllers {
       settings = message.Settings;
 
       await loadGameFiles();
+
+      await remoteRepository.LoadUpkFiles();
     }
 
     private async void onSettingsChanged(SettingsChangedMessage message) {
@@ -95,7 +101,7 @@ namespace UpkManager.Domain.Controllers {
     #region Private Methods
 
     private async Task loadGameFiles() {
-      List<UpkFileViewModel> files = new List<UpkFileViewModel>();
+      List<DomainUpkFile> files = new List<DomainUpkFile>();
 
       if (String.IsNullOrEmpty(settings.PathToGame)) return;
 
@@ -106,7 +112,7 @@ namespace UpkManager.Domain.Controllers {
       viewModel.Files.AddRange(files.OrderBy(f => f.GameFilename));
     }
 
-    private async Task loadDirectoryAsync(List<UpkFileViewModel> parent, string path) {
+    private async Task loadDirectoryAsync(List<DomainUpkFile> parent, string path) {
       DirectoryInfo   dirInfo;
       DirectoryInfo[] dirInfos;
 
@@ -119,10 +125,10 @@ namespace UpkManager.Domain.Controllers {
       }
 
       if (dirInfos.Length > 0) {
-        List<UpkFileViewModel> dirs = dirInfos.Select(dir => new UpkFileViewModel { GameFilename = dir.FullName.Replace(settings.PathToGame, null) }).ToList();
+        List<DomainUpkFile> dirs = dirInfos.Select(dir => new DomainUpkFile { GameFilename = dir.FullName.Replace(settings.PathToGame, null) }).ToList();
 
-        foreach(UpkFileViewModel upkFile in dirs.ToList()) {
-          List<UpkFileViewModel> children = new List<UpkFileViewModel>();
+        foreach(DomainUpkFile upkFile in dirs.ToList()) {
+          List<DomainUpkFile> children = new List<DomainUpkFile>();
 
           await loadDirectoryAsync(children, Path.Combine(settings.PathToGame, upkFile.GameFilename));
 
@@ -135,7 +141,7 @@ namespace UpkManager.Domain.Controllers {
         FileInfo[] files = await Task.Run(() => dirInfo.GetFiles("*.upk"));
 
         if (files.Length > 0) {
-          List<UpkFileViewModel> upkFiles = files.Select(f => new UpkFileViewModel { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length }).ToList();
+          List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length }).ToList();
 
           upkFiles.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
 
@@ -148,7 +154,7 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async void onUpkFileViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-      UpkFileViewModel upkFile = sender as UpkFileViewModel;
+      DomainUpkFile upkFile = sender as DomainUpkFile;
 
       if (upkFile == null) return;
 
@@ -165,11 +171,11 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task scanUpkFiles() {
-      List<UpkFileViewModel> upkFiles = viewModel.Files.ToList();
+      List<DomainUpkFile> upkFiles = viewModel.Files.ToList();
 
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
-      foreach(UpkFileViewModel upkFile in upkFiles) {
+      foreach(DomainUpkFile upkFile in upkFiles) {
         DomainHeader header = new DomainHeader { FullFilename = Path.Combine(settings.PathToGame, upkFile.GameFilename) };
 
         message.Current   += 1;

@@ -44,6 +44,10 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="STR.Common, Version=1.0.5720.30248, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\STR.Common.1.0.15242.1\lib\net45\STR.Common.dll</HintPath>
       <Private>True</Private>
@@ -58,6 +62,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +72,7 @@
     <Compile Include="Services\AutoMapperConfiguration.cs" />
     <Compile Include="Services\LzoCompressor.cs" />
     <Compile Include="Services\SettingsRepository.cs" />
+    <Compile Include="Services\UpkFileRemoteRepository.cs" />
     <Compile Include="Services\UpkFileRepository.cs" />
   </ItemGroup>
   <ItemGroup>

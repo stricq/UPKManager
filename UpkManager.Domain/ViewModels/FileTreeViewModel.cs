@@ -3,6 +3,8 @@ using System.ComponentModel.Composition;
 
 using STR.MvvmCommon;
 
+using UpkManager.Domain.Models;
+
 
 namespace UpkManager.Domain.ViewModels {
 
@@ -12,21 +14,21 @@ namespace UpkManager.Domain.ViewModels {
 
     #region Private Fields
 
-    private ObservableCollection<UpkFileViewModel> files;
+    private ObservableCollection<DomainUpkFile> files;
 
     #endregion Private Fields
 
     #region Constructor
 
     public FileTreeViewModel() {
-      Files = new ObservableCollection<UpkFileViewModel>();
+      Files = new ObservableCollection<DomainUpkFile>();
     }
 
     #endregion Constructor
 
     #region Properties
 
-    public ObservableCollection<UpkFileViewModel> Files {
+    public ObservableCollection<DomainUpkFile> Files {
       get { return files; }
       set { SetField(ref files, value, () => Files); }
     }

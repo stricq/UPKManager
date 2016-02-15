@@ -95,6 +95,7 @@
     <Compile Include="Constants\PropertyType.cs" />
     <Compile Include="Contracts\IAutoMapperConfiguration.cs" />
     <Compile Include="Contracts\ISettingsRepository.cs" />
+    <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
     <Compile Include="Controllers\Dialogs\SettingsController.cs" />
     <Compile Include="Controllers\FileHeaderController.cs" />
@@ -167,7 +168,7 @@
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
-    <Compile Include="ViewModels\UpkFileViewModel.cs" />
+    <Compile Include="Models\DomainUpkFile.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
