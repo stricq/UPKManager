@@ -20,10 +20,10 @@ namespace UpkManager.Entities.PropertyTypes {
 
     public override PropertyType PropertyType => PropertyType.StructProperty;
 
-    public override void ReadPropertyValue(byte[] Data, ref int Index, List<NameTableEntry> nameTable) {
+    public override void ReadPropertyValue(byte[] Data, ref int Index, UpkHeader header, out string message) {
       StructNameIndex = new NameTableIndex();
 
-      StructNameIndex.ReadNameTableIndex(Data, ref Index, nameTable);
+      if (!StructNameIndex.ReadNameTableIndex(Data, ref Index, header.NameTable, out message)) return;
 
       //Properties = new List<Property>();
 
@@ -37,7 +37,7 @@ namespace UpkManager.Entities.PropertyTypes {
       //  if (prop.NameIndex.Name == ObjectType.None.ToString()) break;
       //} while(true);
 
-      base.ReadPropertyValue(Data, ref Index, nameTable);
+      base.ReadPropertyValue(Data, ref Index, header, out message);
     }
 
     public override string ToString() {

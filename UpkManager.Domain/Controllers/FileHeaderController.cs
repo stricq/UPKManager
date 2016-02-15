@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
@@ -23,6 +25,8 @@ namespace UpkManager.Domain.Controllers {
   public class FileHeaderController : IController {
 
     #region Private Fields
+
+    private DomainUpkManagerSettings settings;
 
     private readonly FileHeaderViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -55,11 +59,31 @@ namespace UpkManager.Domain.Controllers {
     #region Messages
 
     private void registerMessages() {
+      messenger.Register<AppLoadedMessage>(this, onAppLoaded);
+
+      messenger.Register<FileHeaderLoadingMessage>(this, onFileHeaderLoading);
+
       messenger.RegisterAsync<FileHeaderSelectedMessage>(this, onFileHeaderSelected);
+
+      messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
+    }
+
+    private void onAppLoaded(AppLoadedMessage message) {
+      settings = message.Settings;
+    }
+
+    private void onFileHeaderLoading(FileHeaderLoadingMessage message) {
+      viewModel.Header = null;
     }
 
     private async Task onFileHeaderSelected(FileHeaderSelectedMessage message) {
-      await loadUpkFile(message.FullFilename);
+      await loadUpkFile(Path.Combine(settings.PathToGame, message.File.GameFilename));
+
+      message.File.IsErrored = viewModel.Header.IsErrored;
+    }
+
+    private void onSettingsChanged(SettingsChangedMessage message) {
+      settings = message.Settings;
     }
 
     #endregion Messages

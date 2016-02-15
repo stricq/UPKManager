@@ -65,15 +65,7 @@
     <Compile Include="Constants\ObjectType.cs" />
     <Compile Include="Constants\PropertyType.cs" />
     <Compile Include="Helpers\MiniLZO.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionFloatConstant.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionFloatConstantCurve.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionFloatParticleParameter.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionFloatUniform.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionFloatUniformCurve.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionVectorConstant.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionVectorConstantCurve.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionVectorUniform.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionVectorUniformCurve.cs" />
+    <Compile Include="ObjectTypes\ObjectDistributionBase.cs" />
     <Compile Include="ObjectTypes\ObjectObjectRedirector.cs" />
     <Compile Include="ObjectTypes\ObjectTexture2D.cs" />
     <Compile Include="ObjectTypes\Texture2D\MipMap.cs" />

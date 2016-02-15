@@ -78,6 +78,10 @@ namespace UpkManager.Entities {
     public List<ImportTableEntry> ImportTable { get; set; }
 
     public byte[] DependsTable { get; set; } // (Size - DependsOffset) bytes of data
+    //
+    // Additional Properties
+    //
+    public bool IsErrored { get; set; }
 
     #endregion Properties
 

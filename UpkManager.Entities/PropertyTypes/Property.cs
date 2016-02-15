@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using UpkManager.Entities.Constants;
 using UpkManager.Entities.Tables;
@@ -33,23 +32,23 @@ namespace UpkManager.Entities.PropertyTypes {
 
     #region Public Methods
 
-    public void ReadProperty(byte[] data, ref int index, List<NameTableEntry> nameTable) {
+    public void ReadProperty(byte[] data, ref int index, UpkHeader header, out string message) {
       NameIndex = new NameTableIndex();
 
-      NameIndex.ReadNameTableIndex(data, ref index, nameTable);
+      if (!NameIndex.ReadNameTableIndex(data, ref index, header.NameTable, out message)) return;
 
       if (NameIndex.Name == ObjectType.None.ToString()) return;
 
       TypeNameIndex = new NameTableIndex();
 
-      TypeNameIndex.ReadNameTableIndex(data, ref index, nameTable);
+      if (!TypeNameIndex.ReadNameTableIndex(data, ref index, header.NameTable, out message)) return;
 
       Size       = BitConverter.ToInt32(data, index); index += sizeof(int);
       ArrayIndex = BitConverter.ToInt32(data, index); index += sizeof(int);
 
       Value = propertyValueFactory();
 
-      Value.ReadPropertyValue(data, ref index, nameTable);
+      Value.ReadPropertyValue(data, ref index, header, out message);
     }
 
     #endregion Public Methods

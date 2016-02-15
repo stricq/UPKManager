@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-using UpkManager.Entities.Constants;
-using UpkManager.Entities.Tables;
+﻿using UpkManager.Entities.Constants;
 
 
 namespace UpkManager.Entities.PropertyTypes {
@@ -23,7 +20,9 @@ namespace UpkManager.Entities.PropertyTypes {
       set { data = (UpkString)value; }
     }
 
-    public override void ReadPropertyValue(byte[] Data, ref int Index, List<NameTableEntry> nameTable) {
+    public override void ReadPropertyValue(byte[] Data, ref int Index, UpkHeader header, out string message) {
+      message = null;
+
       data = new UpkString();
 
       data.ReadUpkStr(Data, ref Index);

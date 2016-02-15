@@ -21,17 +21,19 @@ namespace UpkManager.Entities.Tables {
     #region Public Methods
 
     public int ReadImportTableEntry(byte[] data, int index, List<NameTableEntry> nameTable) {
+      string message;
+
       PackageNameIndex = new NameTableIndex();
       TypeNameIndex    = new NameTableIndex();
       NameIndex        = new NameTableIndex();
 
-      PackageNameIndex.ReadNameTableIndex(data, ref index, nameTable);
+      PackageNameIndex.ReadNameTableIndex(data, ref index, nameTable, out message);
 
-      TypeNameIndex.ReadNameTableIndex(data, ref index, nameTable);
+      TypeNameIndex.ReadNameTableIndex(data, ref index, nameTable, out message);
 
       OwnerReference = BitConverter.ToInt32(data, index); index += sizeof(int);
 
-      NameIndex.ReadNameTableIndex(data, ref index, nameTable);
+      NameIndex.ReadNameTableIndex(data, ref index, nameTable, out message);
 
       return index;
     }

@@ -1,11 +1,9 @@
-﻿
-
-using UpkManager.Domain.Constants;
+﻿using UpkManager.Domain.Constants;
 
 
 namespace UpkManager.Domain.Models.Objects {
 
-  public class DomainObjectDistributionFloatUniform : DomainObjectBase {
+  public class DomainObjectDistributionBase : DomainObjectBase {
 
     #region Private Fields
 

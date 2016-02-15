@@ -13,6 +13,7 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
+
 using UpkManager.Entities;
 using UpkManager.Entities.Compression;
 using UpkManager.Entities.Tables;
@@ -87,7 +88,7 @@ namespace UpkManager.Repository.Services {
 
       await Task.Run(() => patchPointers(upkHeader));
 
-      await readExportTableObjects(data, upkHeader, SkipProperties, SkipParsing, LoadProgress);
+      await parseExportTableObjects(data, upkHeader, SkipProperties, SkipParsing, LoadProgress);
 
       mapper.Map(upkHeader, Header); // Can't throw this on the background as Header is being observed.  Need to fix.
 
@@ -115,7 +116,7 @@ namespace UpkManager.Repository.Services {
     #region Private Methods
 
     private static async Task readNameTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Name Table", Current = 0, Total = header.NameTableCount };
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Reading Name Table", Current = 0, Total = header.NameTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -137,7 +138,7 @@ namespace UpkManager.Repository.Services {
     }
 
     private static async Task readImportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Import Table", Current = 0, Total = header.ImportTableCount };
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Reading Import Table", Current = 0, Total = header.ImportTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -161,7 +162,7 @@ namespace UpkManager.Repository.Services {
     }
 
     private static async Task readExportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Export Table", Current = 0, Total = header.ExportTableCount };
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Reading Export Table", Current = 0, Total = header.ExportTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -190,19 +191,42 @@ namespace UpkManager.Repository.Services {
       Array.ConstrainedCopy(data, header.DependsTableOffset, header.DependsTable, 0, header.Size - header.DependsTableOffset);
     }
 
-    private static async Task readExportTableObjects(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, Action<LoadProgressMessage> loadProgress) {
+    private static async Task parseExportTableObjects(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, Action<LoadProgressMessage> loadProgress) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Export Table Objects", Current = 0, Total = header.ExportTableCount };
 
       loadProgress?.Invoke(message);
 
+      string msg;
+
       await header.ExportTable.ForEachAsync(export => {
-        if (header.ExportTableCount > 1000) {
-          message.Current += 1;
+        return Task.Run(() => {
+          try {
+            export.ReadObjectType(data, header, skipProperties, skipParse, out msg);
 
-          loadProgress?.Invoke(message);
-        }
+            if (!String.IsNullOrEmpty(msg)) {
+              export.IsErrored             = true;
+              export.ParseExceptionMessage = msg;
 
-        return Task.Run(() => export.ReadObjectType(data, header, skipProperties, skipParse));
+              header.IsErrored = true;
+
+              export.ReadObjectType(data, header, true, true, out msg);
+            }
+          }
+          catch(Exception ex) {
+            export.IsErrored             = true;
+            export.ParseExceptionMessage = ex.Message;
+
+            header.IsErrored = true;
+
+            export.ReadObjectType(data, header, true, true, out msg);
+          }
+        }).ContinueWith(task => {
+          if (header.ExportTableCount > 1000) {
+            message.Current += 1;
+
+            loadProgress?.Invoke(message);
+          }
+        });
       });
     }
 

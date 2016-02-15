@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 
 using STR.MvvmCommon;
+
+using UpkManager.Domain.Constants;
 
 
 namespace UpkManager.Domain.Models {
@@ -15,13 +18,14 @@ namespace UpkManager.Domain.Models {
     #region Private Fields
 
     private bool isChecked;
+    private bool isErrored;
     private bool isSelected;
 
     private long fileSize;
 
     private string id;
 
-    private string fullFilename;
+    private string gameFilename;
 
     private ObservableCollection<string> exportTypes;
 
@@ -48,8 +52,8 @@ namespace UpkManager.Domain.Models {
     }
 
     public string GameFilename {
-      get { return fullFilename; }
-      set { SetField(ref fullFilename, value, () => GameFilename); }
+      get { return gameFilename; }
+      set { SetField(ref gameFilename, value, () => GameFilename); }
     }
 
     public ObservableCollection<string> ExportTypes {
@@ -66,14 +70,19 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref isSelected, value, () => IsSelected); }
     }
 
+    public bool IsErrored {
+      get { return isErrored; }
+      set { SetField(ref isErrored, value, () => IsErrored); }
+    }
+
     public bool IsChecked {
       get { return isChecked; }
       set { SetField(ref isChecked, value, () => IsChecked); }
     }
 
-    public string SelectedType => ExportTypes.Any(et => et.Equals("Texture2D", StringComparison.InvariantCultureIgnoreCase)) ? "\u2713" : String.Empty;
+    public string SelectedType => ExportTypes.Any(et => et.Equals(ObjectType.Texture2D.ToString(), StringComparison.InvariantCultureIgnoreCase)) ? "\u2713" : String.Empty;
 
-    public string Filename => fullFilename.Substring(fullFilename.LastIndexOf(@"\") + 1);
+    public string Filename => Path.GetFileName(gameFilename);
 
     #endregion Domain Properties
 

@@ -1,5 +1,7 @@
 ﻿using STR.Common.Messages;
 
+using UpkManager.Domain.Models;
+
 
 namespace UpkManager.Domain.Messages.FileHeader {
 
@@ -7,7 +9,7 @@ namespace UpkManager.Domain.Messages.FileHeader {
 
     public FileHeaderSelectedMessage() : base(true) { }
 
-    public string FullFilename { get; set; }
+    public DomainUpkFile File { get; set; }
 
   }
 

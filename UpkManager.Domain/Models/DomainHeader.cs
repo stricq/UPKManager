@@ -63,6 +63,8 @@ namespace UpkManager.Domain.Models {
     //
     // Domain Fields
     //
+    private bool isErrored;
+
     private string fullFilename;
 
     #endregion Private Fields
@@ -218,6 +220,11 @@ namespace UpkManager.Domain.Models {
     public string FullFilename {
       get { return fullFilename; }
       set { SetField(ref fullFilename, value, () => FullFilename, () => Filename); }
+    }
+
+    public bool IsErrored {
+      get { return isErrored; }
+      set { SetField(ref isErrored, value, () => IsErrored); }
     }
 
     public string Filename => fullFilename.Substring(fullFilename.LastIndexOf(@"\") + 1);

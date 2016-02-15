@@ -47,18 +47,24 @@ namespace UpkManager.Entities.Tables {
 
     public NameTableIndex TypeNameIndex { get; set; }
 
+    public bool IsErrored { get; set; }
+
+    public string ParseExceptionMessage { get; set; }
+
     #endregion Properties
 
     #region Public Methods
 
     public int ReadExportTableEntry(byte[] data, int index, List<NameTableEntry> nameTable) {
+      string message;
+
       TypeReference   = BitConverter.ToInt32(data, index); index += sizeof(int);
       ParentReference = BitConverter.ToInt32(data, index); index += sizeof(int);
       OwnerReference  = BitConverter.ToInt32(data, index); index += sizeof(int);
 
       NameIndex = new NameTableIndex();
 
-      NameIndex.ReadNameTableIndex(data, ref index, nameTable);
+      NameIndex.ReadNameTableIndex(data, ref index, nameTable, out message);
 
       OwnerReference = BitConverter.ToInt32(data, index); index += sizeof(int);
 
@@ -87,14 +93,14 @@ namespace UpkManager.Entities.Tables {
       return index;
     }
 
-    public void ReadObjectType(byte[] data, UpkHeader header, bool skipProperties, bool skipParse) {
+    public void ReadObjectType(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, out string message) {
       TypeNameIndex = header.GetObjectTableEntry(TypeReference)?.NameIndex;
 
       UpkObject = objectTypeFactory();
 
       int index = SerialDataOffset;
 
-      UpkObject.ReadUpkObject(data, ref index, SerialDataOffset + SerialDataSize, skipProperties, skipParse, header.NameTable);
+      UpkObject.ReadUpkObject(data, ref index, SerialDataOffset + SerialDataSize, skipProperties, skipParse, header, out message);
     }
 
     #endregion Public Methods
@@ -107,17 +113,17 @@ namespace UpkManager.Entities.Tables {
       Enum.TryParse(TypeNameIndex?.Name, out type);
 
       switch(type) {
-        case ObjectType.DistributionFloatConstant:          return new ObjectDistributionFloatConstant();
-        case ObjectType.DistributionFloatConstantCurve:     return new ObjectDistributionFloatConstantCurve();
-        case ObjectType.DistributionFloatParticleParameter: return new ObjectDistributionFloatParticleParameter();
-        case ObjectType.DistributionFloatUniform:           return new ObjectDistributionFloatUniform();
-        case ObjectType.DistributionFloatUniformCurve:      return new ObjectDistributionFloatUniformCurve();
-        case ObjectType.DistributionVectorConstant:         return new ObjectDistributionVectorConstant();
-        case ObjectType.DistributionVectorConstantCurve:    return new ObjectDistributionVectorConstantCurve();
-        case ObjectType.DistributionVectorUniform:          return new ObjectDistributionVectorUniform();
-        case ObjectType.DistributionVectorUniformCurve:     return new ObjectDistributionVectorUniformCurve();
-        case ObjectType.ObjectRedirector:                   return new ObjectObjectRedirector();
-        case ObjectType.Texture2D:                          return new ObjectTexture2D();
+        case ObjectType.DistributionFloatConstant:
+        case ObjectType.DistributionFloatConstantCurve:
+        case ObjectType.DistributionFloatParticleParameter:
+        case ObjectType.DistributionFloatUniform:
+        case ObjectType.DistributionFloatUniformCurve:
+        case ObjectType.DistributionVectorConstant:
+        case ObjectType.DistributionVectorConstantCurve:
+        case ObjectType.DistributionVectorUniform:
+        case ObjectType.DistributionVectorUniformCurve: return new ObjectDistributionBase(type);
+        case ObjectType.ObjectRedirector:               return new ObjectObjectRedirector();
+        case ObjectType.Texture2D:                      return new ObjectTexture2D();
 
         default: return new ObjectBase();
       }

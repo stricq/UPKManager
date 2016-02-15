@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using UpkManager.Entities.Constants;
-using UpkManager.Entities.Tables;
 
 
 namespace UpkManager.Entities.PropertyTypes {
@@ -13,7 +11,9 @@ namespace UpkManager.Entities.PropertyTypes {
 
     public override PropertyType PropertyType => PropertyType.GuidProperty;
 
-    public override void ReadPropertyValue(byte[] Data, ref int Index, List<NameTableEntry> nameTable) {
+    public override void ReadPropertyValue(byte[] Data, ref int Index, UpkHeader header, out string message) {
+      message = null;
+
       data = new byte[16];
 
       Array.ConstrainedCopy(Data, Index, data, 0, 16);

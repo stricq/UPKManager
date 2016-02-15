@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using UpkManager.Entities.Constants;
-using UpkManager.Entities.Tables;
 
 
 namespace UpkManager.Entities.PropertyTypes {
@@ -36,7 +34,9 @@ namespace UpkManager.Entities.PropertyTypes {
 
     #region Virtual Methods
 
-    public virtual void ReadPropertyValue(byte[] Data, ref int Index, List<NameTableEntry> nameTable) {
+    public virtual void ReadPropertyValue(byte[] Data, ref int Index, UpkHeader header, out string message) {
+      message = null;
+
       data = new byte[Size];
 
       Array.ConstrainedCopy(Data, Index, data, 0, Size);

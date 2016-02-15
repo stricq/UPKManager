@@ -153,13 +153,20 @@
             <GridViewRowPresenter Margin="0,0,0,1" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
           </Border>
           <ControlTemplate.Triggers>
+
             <Trigger Property="IsMouseOver" Value="True">
               <Setter Property="Background" Value="#300000FF" />
             </Trigger>
+
             <Trigger Property="IsSelected" Value="True">
               <Setter Property="Background" Value="#FF363EF8" />
               <Setter Property="Foreground" Value="White"/>
             </Trigger>
+
+            <DataTrigger Binding="{Binding Path=IsErrored}" Value="True">
+              <Setter Property="Foreground" Value="{StaticResource ListItemErrorColor}" />
+            </DataTrigger>
+
             <!--
             <MultiTrigger>
               <MultiTrigger.Conditions>

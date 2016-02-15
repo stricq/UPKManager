@@ -25,10 +25,10 @@ namespace UpkManager.Entities.PropertyTypes {
       set { data = (NameTableIndex)value; }
     }
 
-    public override void ReadPropertyValue(byte[] Data, ref int Index, List<NameTableEntry> nameTable) {
+    public override void ReadPropertyValue(byte[] Data, ref int Index, UpkHeader header, out string message) {
       data = new NameTableIndex();
 
-      data.ReadNameTableIndex(Data, ref Index, nameTable);
+      data.ReadNameTableIndex(Data, ref Index, header.NameTable, out message);
     }
 
     public override string ToString() {

@@ -42,6 +42,7 @@ namespace UpkManager.Domain.Models.Tables {
     // Domain Fields
     //
     private bool isSelected;
+    private bool isErrored;
 
     #endregion Private Fields
 
@@ -132,6 +133,11 @@ namespace UpkManager.Domain.Models.Tables {
     public bool IsSelected {
       get { return isSelected; }
       set { SetField(ref isSelected, value, () => IsSelected); }
+    }
+
+    public bool IsErrored {
+      get { return isErrored; }
+      set { SetField(ref isErrored, value, () => IsErrored); }
     }
 
     public string GuidString => new Guid(guid).ToString("B");

@@ -8,7 +8,6 @@ using CSharpImageLibrary.General;
 using UpkManager.Entities.Compression;
 using UpkManager.Entities.Constants;
 using UpkManager.Entities.PropertyTypes;
-using UpkManager.Entities.Tables;
 
 using MipMap = UpkManager.Entities.ObjectTypes.Texture2D.MipMap;
 
@@ -37,8 +36,8 @@ namespace UpkManager.Entities.ObjectTypes {
 
     public override bool CanObjectSave => true;
 
-    public override void ReadUpkObject(byte[] data, ref int index, int endOffset, bool skipProperties, bool skipParse, List<NameTableEntry> nameTable) {
-      base.ReadUpkObject(data, ref index, endOffset, skipProperties, skipParse, nameTable);
+    public override void ReadUpkObject(byte[] data, ref int index, int endOffset, bool skipProperties, bool skipParse, UpkHeader header, out string message) {
+      base.ReadUpkObject(data, ref index, endOffset, skipProperties, skipParse, header, out message);
 
       if (skipParse) return;
 
@@ -78,7 +77,7 @@ namespace UpkManager.Entities.ObjectTypes {
     public override void SaveObject(string filename) {
       if (MipMaps == null || !MipMaps.Any()) return;
 
-      MemoryStream memory = buildHeader();
+      MemoryStream memory = buildDdsImage();
 
       if (memory == null) return;
 
@@ -94,14 +93,14 @@ namespace UpkManager.Entities.ObjectTypes {
     public override Stream GetObjectStream() {
       if (MipMaps == null || !MipMaps.Any()) return null;
 
-      return buildHeader();
+      return buildDdsImage();
     }
 
     #endregion Overrides
 
     #region Private Methods
 
-    private MemoryStream buildHeader() {
+    private MemoryStream buildDdsImage() {
       PropertyByteValue formatProp = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as PropertyByteValue;
 
       if (formatProp == null) return null;

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using UpkManager.Entities.Constants;
-using UpkManager.Entities.Tables;
 
 
 namespace UpkManager.Entities.PropertyTypes {
@@ -26,7 +24,9 @@ namespace UpkManager.Entities.PropertyTypes {
       set { data = (int)value; }
     }
 
-    public override void ReadPropertyValue(byte[] Data, ref int Index, List<NameTableEntry> nameTable) {
+    public override void ReadPropertyValue(byte[] Data, ref int Index, UpkHeader header, out string message) {
+      message = null;
+
       data = BitConverter.ToInt32(Data, Index);
 
       Index += sizeof(uint);

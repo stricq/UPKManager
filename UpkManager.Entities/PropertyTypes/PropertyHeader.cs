@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UpkManager.Entities.Constants;
-using UpkManager.Entities.Tables;
 
 
 namespace UpkManager.Entities.PropertyTypes {
@@ -20,7 +19,7 @@ namespace UpkManager.Entities.PropertyTypes {
 
     #region Public Methods
 
-    public void ReadPropertyHeader(byte[] data, ref int index, List<NameTableEntry> nameTable) {
+    public void ReadPropertyHeader(byte[] data, ref int index, UpkHeader header, out string message) {
       Index = BitConverter.ToUInt32(data, index); index += sizeof(uint);
 
       Properties = new List<Property>();
@@ -28,7 +27,9 @@ namespace UpkManager.Entities.PropertyTypes {
       do {
         Property prop = new Property();
 
-        prop.ReadProperty(data, ref index, nameTable);
+        prop.ReadProperty(data, ref index, header, out message);
+
+        if (!String.IsNullOrEmpty(message)) return;
 
         Properties.Add(prop);
 

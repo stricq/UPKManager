@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using UpkManager.Entities.Constants;
-using UpkManager.Entities.Tables;
 
 
 namespace UpkManager.Entities.ObjectTypes {
@@ -19,8 +17,8 @@ namespace UpkManager.Entities.ObjectTypes {
 
     public override ObjectType ObjectType => ObjectType.ObjectRedirector;
 
-    public override void ReadUpkObject(byte[] data, ref int index, int endOffset, bool skipProperties, bool skipParse, List<NameTableEntry> nameTable) {
-      base.ReadUpkObject(data, ref index, endOffset, skipProperties, skipParse, nameTable);
+    public override void ReadUpkObject(byte[] data, ref int index, int endOffset, bool skipProperties, bool skipParse, UpkHeader header, out string message) {
+      base.ReadUpkObject(data, ref index, endOffset, skipProperties, skipParse, header, out message);
 
       if (skipParse) return;
 

@@ -70,6 +70,46 @@ namespace UpkManager.Domain.Controllers {
 
       if (String.IsNullOrEmpty(settings.PathToGame)) return;
 
+      await loadAllFiles();
+    }
+
+    private async void onSettingsChanged(SettingsChangedMessage message) {
+      settings = message.Settings;
+
+      if (String.IsNullOrEmpty(settings.PathToGame)) {
+        viewModel.Files.ForEach(f => f.PropertyChanged -= onUpkFileViewModelChanged);
+
+        viewModel.Files.Clear();
+
+        messenger.Send(new FileHeaderLoadingMessage());
+
+        return;
+      }
+
+      await loadAllFiles();
+    }
+
+    #endregion Messages
+
+    #region Commands
+
+    private void registerCommands() {
+      menuViewModel.ScanUpkFiles = new RelayCommandAsync(onScanUpkFilesExecute, canScanUpkFilesExecute);
+    }
+
+    private async Task onScanUpkFilesExecute() {
+      if (viewModel.Files.Any()) await scanUpkFiles(viewModel.Files.ToList());
+    }
+
+    private bool canScanUpkFilesExecute() {
+      return viewModel.Files.Any();
+    }
+
+    #endregion Commands
+
+    #region Private Methods
+
+    private async Task loadAllFiles() {
       viewModel.Files.Clear();
 
       LoadProgressMessage progress = new LoadProgressMessage { Text = "Loading Game Files..." };
@@ -131,32 +171,6 @@ namespace UpkManager.Domain.Controllers {
       messenger.Send(progress);
     }
 
-    private async void onSettingsChanged(SettingsChangedMessage message) {
-      settings = message.Settings;
-
-      await loadGameFiles();
-    }
-
-    #endregion Messages
-
-    #region Commands
-
-    private void registerCommands() {
-      menuViewModel.ScanUpkFiles = new RelayCommandAsync(onScanUpkFilesExecute, canScanUpkFilesExecute);
-    }
-
-    private async Task onScanUpkFilesExecute() {
-      if (viewModel.Files.Any()) await scanUpkFiles(viewModel.Files.ToList());
-    }
-
-    private bool canScanUpkFilesExecute() {
-      return viewModel.Files.Any();
-    }
-
-    #endregion Commands
-
-    #region Private Methods
-
     private async Task<List<DomainUpkFile>> loadGameFiles() {
       List<DomainUpkFile> files = new List<DomainUpkFile>();
 
@@ -215,7 +229,7 @@ namespace UpkManager.Domain.Controllers {
 
       switch(e.PropertyName) {
         case "IsSelected": {
-          if (upkFile.IsSelected && upkFile.FileSize > 0) await messenger.SendAsync(new FileHeaderSelectedMessage { FullFilename = Path.Combine(settings.PathToGame, upkFile.GameFilename) });
+          if (upkFile.IsSelected) await messenger.SendAsync(new FileHeaderSelectedMessage { File = upkFile });
 
           break;
         }
@@ -237,6 +251,8 @@ namespace UpkManager.Domain.Controllers {
         messenger.Send(message);
 
         await scanUpkFile(header);
+
+        upkFile.IsErrored = header.IsErrored;
 
         upkFile.ExportTypes.AddRange(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
 
