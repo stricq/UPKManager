@@ -36,7 +36,7 @@
           <GridViewColumn Header="Textures">
             <GridViewColumn.CellTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding Path=SelectedType}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
+                <TextBlock Text="{Binding Path=SelectedType}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource ForegroundColor}" />
               </DataTemplate>
             </GridViewColumn.CellTemplate>
           </GridViewColumn>

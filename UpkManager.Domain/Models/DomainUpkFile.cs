@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 
 using STR.MvvmCommon;
 
@@ -20,7 +22,6 @@ namespace UpkManager.Domain.Models {
     private string id;
 
     private string fullFilename;
-    private string selectedType;
 
     private ObservableCollection<string> exportTypes;
 
@@ -70,10 +71,7 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref isChecked, value, () => IsChecked); }
     }
 
-    public string SelectedType {
-      get { return selectedType; }
-      set { SetField(ref selectedType, value, () => SelectedType); }
-    }
+    public string SelectedType => ExportTypes.Any(et => et.Equals("Texture2D", StringComparison.InvariantCultureIgnoreCase)) ? "\u2713" : String.Empty;
 
     public string Filename => fullFilename.Substring(fullFilename.LastIndexOf(@"\") + 1);
 

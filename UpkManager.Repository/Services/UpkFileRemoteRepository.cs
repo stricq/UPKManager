@@ -47,7 +47,15 @@ namespace UpkManager.Repository.Services {
     }
 
     public async Task SaveUpkFile(DomainUpkFile File) {
-      await Task.FromResult(1);
+      UpkFile file = await Task.Run(() => mapper.Map<UpkFile>(File));
+
+      RestRequest request = new RestRequest("UpkFile", Method.PUT) { RequestFormat = DataFormat.Json };
+
+      request.AddBody(file);
+
+      IRestResponse<string> response = await client.ExecuteTaskAsync<string>(request);
+
+      File.Id = response.Data;
     }
 
     #endregion IUpkFileRemoteRepository Implementation
