@@ -22,9 +22,11 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
+        <Label Grid.Row="0" Grid.Column="1" Content="Select the directory containing 'bns' and 'Local'." Padding="0,5" HorizontalAlignment="Left" Foreground="{StaticResource ForegroundColor}" />
+
         <Label      Grid.Row="1" Grid.Column="0" Content="Path to Game:" Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="{StaticResource ForegroundColor}" />
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-          <TextBox Text="{Binding Path=Message.Settings.PathToGame, UpdateSourceTrigger=PropertyChanged}" MinWidth="200" Height="20" />
+          <TextBox Text="{Binding Path=Message.Settings.PathToGame, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" Height="20" />
 
           <Button Content="Select" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=SelectGameDir}" />
         </StackPanel>

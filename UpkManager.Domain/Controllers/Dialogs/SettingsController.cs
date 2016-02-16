@@ -3,6 +3,7 @@
 using Ookii.Dialogs.Wpf;
 
 using STR.DialogView.Domain.Messages;
+
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
@@ -64,9 +65,7 @@ namespace UpkManager.Domain.Controllers.Dialogs {
     #region SelectGameDir Command
 
     private void onSelectGameDir() {
-      VistaFolderBrowserDialog fbd = new VistaFolderBrowserDialog {
-        Description = "Select the directory containing 'bns' and 'Local'."
-      };
+      VistaFolderBrowserDialog fbd = new VistaFolderBrowserDialog();
 
       bool? result = fbd.ShowDialog();
 

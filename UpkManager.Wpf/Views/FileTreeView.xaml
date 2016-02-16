@@ -14,7 +14,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <StackPanel Grid.Row="0" Margin="4" Orientation="Horizontal">
+    <StackPanel Grid.Row="0" Margin="4" Orientation="Horizontal" HorizontalAlignment="Center">
       <CheckBox Name="IsShowFilesWithType" Content="{x:Null}" IsChecked="{Binding Path=IsShowFilesWithType}" Margin="0,5,0,0" Focusable="False" />
       <Label Content="Show Files with Type:" Foreground="{StaticResource ForegroundColor}" />
       <ComboBox ItemsSource="{Binding Path=AllTypes}" SelectedItem="{Binding Path=SelectedType}" Width="325" Height="20" IsEnabled="{Binding Path=IsChecked, ElementName=IsShowFilesWithType}" />
