@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -11,6 +13,7 @@ using STR.Common.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
@@ -24,6 +27,8 @@ namespace UpkManager.Domain.Controllers {
   public class FileTreeController : IController {
 
     #region Private Fields
+
+    private string oldPathToGame;
 
     private DomainUpkManagerSettings settings;
 
@@ -51,6 +56,8 @@ namespace UpkManager.Domain.Controllers {
 
       remoteRepository = RemoteRepository;
 
+      viewModel.PropertyChanged += onViewModelPropertyChanged;
+
       registerMessages();
       registerCommands();
     }
@@ -68,7 +75,10 @@ namespace UpkManager.Domain.Controllers {
     private async Task onApplicationLoaded(AppLoadedMessage message) {
       settings = message.Settings;
 
-      if (String.IsNullOrEmpty(settings.PathToGame)) return;
+      oldPathToGame = settings.PathToGame;
+
+      viewModel.SelectedType        = ObjectType.Texture2D.ToString();
+      viewModel.IsShowFilesWithType = true;
 
       await loadAllFiles();
     }
@@ -76,17 +86,15 @@ namespace UpkManager.Domain.Controllers {
     private async void onSettingsChanged(SettingsChangedMessage message) {
       settings = message.Settings;
 
-      if (String.IsNullOrEmpty(settings.PathToGame)) {
+      if (settings.PathToGame != oldPathToGame) {
         viewModel.Files.ForEach(f => f.PropertyChanged -= onUpkFileViewModelChanged);
-
-        viewModel.Files.Clear();
 
         messenger.Send(new FileHeaderLoadingMessage());
 
-        return;
+        await loadAllFiles();
       }
 
-      await loadAllFiles();
+      oldPathToGame = settings.PathToGame;
     }
 
     #endregion Messages
@@ -110,13 +118,24 @@ namespace UpkManager.Domain.Controllers {
     #region Private Methods
 
     private async Task loadAllFiles() {
+      viewModel.AllFiles.Clear();
       viewModel.Files.Clear();
+
+      if (String.IsNullOrEmpty(settings.PathToGame)) return;
 
       LoadProgressMessage progress = new LoadProgressMessage { Text = "Loading Game Files..." };
 
       messenger.Send(progress);
 
       List<DomainUpkFile> localFiles = await loadGameFiles();
+
+      if (!localFiles.Any()) {
+        progress.IsComplete = true;
+
+        messenger.Send(progress);
+
+        return;
+      }
 
       progress.Text = "Loading Remote Database...";
 
@@ -129,11 +148,7 @@ namespace UpkManager.Domain.Controllers {
                                     where row1.FileSize == row2.FileSize
                                    select row2).ToList();
 
-      if (matches.Any()) {
-        matches.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
-
-        viewModel.Files.AddRange(matches.OrderBy(f => f.Filename));
-      }
+      if (matches.Any()) viewModel.AllFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> mods = (from row1 in localFiles
                                   join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
@@ -141,11 +156,9 @@ namespace UpkManager.Domain.Controllers {
                                 select row2).ToList();
 
       if (mods.Any()) {
-        mods.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
+        viewModel.AllFiles.AddRange(mods.OrderBy(f => f.Filename));
 
-        viewModel.Files.AddRange(mods.OrderBy(f => f.Filename));
-
-        viewModel.Files.Sort(f => f.Filename);
+        viewModel.AllFiles.Sort(f => f.Filename);
 
         await scanUpkFiles(mods);
       }
@@ -157,14 +170,18 @@ namespace UpkManager.Domain.Controllers {
                                 select row1).ToList();
 
       if (adds.Any()) {
-        adds.ForEach(d => d.PropertyChanged += onUpkFileViewModelChanged);
+        viewModel.AllFiles.AddRange(adds.OrderBy(f => f.Filename));
 
-        viewModel.Files.AddRange(adds.OrderBy(f => f.Filename));
-
-        viewModel.Files.Sort(f => f.Filename);
+        viewModel.AllFiles.Sort(f => f.Filename);
 
         await scanUpkFiles(adds);
       }
+
+      viewModel.AllTypes = new ObservableCollection<string>(viewModel.AllFiles.SelectMany(f => f.ExportTypes).Distinct().OrderBy(s => s));
+
+      viewModel.AllFiles.ForEach(f => f.PropertyChanged += onUpkFileViewModelChanged);
+
+      filterFiles();
 
       progress.IsComplete = true;
 
@@ -191,7 +208,9 @@ namespace UpkManager.Domain.Controllers {
         dirInfo  = new DirectoryInfo(path);
         dirInfos = await Task.Run(() => dirInfo.GetDirectories());
       }
-      catch(Exception) {
+      catch(Exception ex) {
+        messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
+
         return;
       }
 
@@ -222,7 +241,7 @@ namespace UpkManager.Domain.Controllers {
       }
     }
 
-    private async void onUpkFileViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+    private async void onUpkFileViewModelChanged(object sender, PropertyChangedEventArgs e) {
       DomainUpkFile upkFile = sender as DomainUpkFile;
 
       if (upkFile == null) return;
@@ -239,6 +258,34 @@ namespace UpkManager.Domain.Controllers {
       }
     }
 
+    private void onViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+      switch(e.PropertyName) {
+        case "IsShowFilesWithType": {
+          if (viewModel.IsShowFilesWithType) filterFiles();
+          else viewModel.Files = viewModel.AllFiles;
+
+          break;
+        }
+        case "SelectedType": {
+          filterFiles();
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+
+    private void filterFiles() {
+      viewModel.AllFiles.ForEach(f => {
+        f.IsSelected = false;
+        f.ContainsTargetObject = f.ExportTypes.Any(t => t.Equals(viewModel.SelectedType, StringComparison.InvariantCultureIgnoreCase));
+      });
+
+      viewModel.Files = new ObservableCollection<DomainUpkFile>(viewModel.AllFiles.Where(f => f.ContainsTargetObject));
+    }
+
     private async Task scanUpkFiles(List<DomainUpkFile> upkFiles) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
@@ -252,6 +299,7 @@ namespace UpkManager.Domain.Controllers {
 
         await scanUpkFile(header);
 
+        upkFile.FileSize  = header.FileSize;
         upkFile.IsErrored = header.IsErrored;
 
         upkFile.ExportTypes.AddRange(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));

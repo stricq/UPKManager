@@ -35,11 +35,11 @@ namespace UpkManager.Repository.Services {
 
       #region DTOs
 
-      config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.IsSelected,   opt => opt.Ignore())
-                                                .ForMember(dest => dest.IsErrored,    opt => opt.Ignore())
-                                                .ForMember(dest => dest.IsChecked,    opt => opt.Ignore())
-                                                .ForMember(dest => dest.SelectedType, opt => opt.Ignore())
-                                                .ForMember(dest => dest.Filename,     opt => opt.Ignore())
+      config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.IsSelected,           opt => opt.Ignore())
+                                                .ForMember(dest => dest.IsErrored,            opt => opt.Ignore())
+                                                .ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
+                                                .ForMember(dest => dest.ContainsTargetObject, opt => opt.Ignore())
+                                                .ForMember(dest => dest.Filename,             opt => opt.Ignore())
                                                 .ReverseMap();
 
       #endregion DTOs
@@ -49,6 +49,7 @@ namespace UpkManager.Repository.Services {
       config.CreateMap<UpkHeader, DomainHeader>().ForMember(dest => dest.FullFilename, opt => opt.Ignore())
                                                  .ForMember(dest => dest.Filename,     opt => opt.Ignore())
                                                  .ForMember(dest => dest.GuidString,   opt => opt.Ignore())
+                                                 .ForMember(dest => dest.FileSize,     opt => opt.Ignore())
                                                  .ReverseMap();
 
       config.CreateMap<UpkString, DomainString>().ReverseMap();

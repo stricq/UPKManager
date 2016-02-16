@@ -67,6 +67,8 @@ namespace UpkManager.Domain.Models {
 
     private string fullFilename;
 
+    private long fileSize;
+
     #endregion Private Fields
 
     #region Constructor
@@ -230,6 +232,11 @@ namespace UpkManager.Domain.Models {
     public string Filename => fullFilename.Substring(fullFilename.LastIndexOf(@"\") + 1);
 
     public string GuidString => new Guid(guid).ToString("B");
+
+    public long FileSize {
+      get { return fileSize; }
+      set { SetField(ref fileSize, value, () => FileSize); }
+    }
 
     #endregion Domain Properties
 

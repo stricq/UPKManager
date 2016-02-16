@@ -13,6 +13,8 @@ namespace UpkManager.Entities {
 
     public List<string> ExportTypes { get; set; }
 
+    public string Notes { get; set; }
+
   }
 
 }

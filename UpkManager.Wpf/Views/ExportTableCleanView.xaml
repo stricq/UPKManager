@@ -8,7 +8,7 @@
              mvvm:ViewModelLocator.ComposedViewModel="FileHeaderViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
-  <ListView ItemsSource="{Binding Path=Header.ExportTable}" Margin="-2" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
+  <ListView ItemsSource="{Binding Path=Header.ExportTable}" Margin="-2" BorderThickness="0" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
             VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
     <ListView.View>
       <GridView>

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
 
 using STR.MvvmCommon;
-
-using UpkManager.Domain.Constants;
 
 
 namespace UpkManager.Domain.Models {
@@ -17,6 +13,8 @@ namespace UpkManager.Domain.Models {
 
     #region Private Fields
 
+    private bool containsTargetObject;
+
     private bool isChecked;
     private bool isErrored;
     private bool isSelected;
@@ -26,6 +24,8 @@ namespace UpkManager.Domain.Models {
     private string id;
 
     private string gameFilename;
+
+    private string notes;
 
     private ObservableCollection<string> exportTypes;
 
@@ -61,6 +61,11 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref exportTypes, value, () => ExportTypes); }
     }
 
+    public string Notes {
+      get { return notes; }
+      set { SetField(ref notes, value, () => Notes); }
+    }
+
     #endregion Properties
 
     #region Domain Properties
@@ -80,7 +85,10 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref isChecked, value, () => IsChecked); }
     }
 
-    public string SelectedType => ExportTypes.Any(et => et.Equals(ObjectType.Texture2D.ToString(), StringComparison.InvariantCultureIgnoreCase)) ? "\u2713" : String.Empty;
+    public bool ContainsTargetObject {
+      get { return containsTargetObject; }
+      set { SetField(ref containsTargetObject, value, () => ContainsTargetObject); }
+    }
 
     public string Filename => Path.GetFileName(gameFilename);
 

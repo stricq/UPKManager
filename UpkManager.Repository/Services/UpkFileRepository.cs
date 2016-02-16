@@ -55,6 +55,8 @@ namespace UpkManager.Repository.Services {
 
       byte[] data = await Task.Run(() => File.ReadAllBytes(Header.FullFilename));
 
+      Header.FileSize = data.LongLength;
+
       message.Text = "Parsing Header...";
 
       LoadProgress?.Invoke(message);

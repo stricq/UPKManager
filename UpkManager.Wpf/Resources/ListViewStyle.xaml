@@ -194,4 +194,69 @@
     </Setter>
   </Style>
 
+  <Style x:Key="FileListViewItem" TargetType="ListViewItem">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type ListViewItem}">
+          <Border CornerRadius="3" SnapsToDevicePixels="True" BorderThickness="0" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
+            <GridViewRowPresenter Margin="0,0,0,1" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+          </Border>
+          <ControlTemplate.Triggers>
+
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Background" Value="#300000FF" />
+            </Trigger>
+
+            <Trigger Property="IsSelected" Value="True">
+              <Setter Property="Background" Value="#FF363EF8" />
+              <Setter Property="Foreground" Value="White"/>
+            </Trigger>
+
+            <DataTrigger Binding="{Binding Path=IsErrored}" Value="True">
+              <Setter Property="Foreground" Value="{StaticResource ListItemErrorColor}" />
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding Path=ContainsTargetObject}" Value="True">
+              <Setter Property="Foreground" Value="ForestGreen" />
+            </DataTrigger>
+
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding Path=IsSelected}" Value="True" />
+                <Condition Binding="{Binding Path=ContainsTargetObject}" Value="True" />
+              </MultiDataTrigger.Conditions>
+              <Setter Property="Background" Value="#FF363EF8" />
+              <Setter Property="Foreground" Value="PaleGreen" />
+            </MultiDataTrigger>
+
+            <!--
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsSelected" Value="True" />
+                <Condition Property="Selector.IsSelectionActive" Value="False" />
+              </MultiTrigger.Conditions>
+              <Setter Property="Background" Value="{StaticResource ListItemSelectedInactiveFill}" />
+              <Setter Property="BorderBrush" Value="#FFCFCFCF" />
+            </MultiTrigger>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsSelected" Value="True" />
+                <Condition Property="IsMouseOver" Value="True" />
+              </MultiTrigger.Conditions>
+              <Setter Property="Background" Value="#FF663EF8" />
+              <Setter Property="Foreground" Value="White" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+            -->
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
 </ResourceDictionary>
