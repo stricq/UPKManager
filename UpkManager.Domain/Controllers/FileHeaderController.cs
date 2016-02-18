@@ -26,6 +26,8 @@ namespace UpkManager.Domain.Controllers {
 
     #region Private Fields
 
+    private string oldNotes;
+
     private DomainUpkManagerSettings settings;
 
     private readonly FileHeaderViewModel   viewModel;
@@ -33,14 +35,15 @@ namespace UpkManager.Domain.Controllers {
 
     private readonly IMessenger messenger;
 
-    private readonly IUpkFileRepository fileRepository;
+    private readonly IUpkFileRepository         fileRepository;
+    private readonly IUpkFileRemoteRepository remoteRepository;
 
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public FileHeaderController(FileHeaderViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository FileRepository) {
+    public FileHeaderController(FileHeaderViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository FileRepository, IUpkFileRemoteRepository RemoteRepository) {
           viewModel =     ViewModel;
       menuViewModel = MenuViewModel;
 
@@ -48,7 +51,8 @@ namespace UpkManager.Domain.Controllers {
 
       messenger = Messenger;
 
-      fileRepository = FileRepository;
+        fileRepository =   FileRepository;
+      remoteRepository = RemoteRepository;
 
       registerMessages();
       registerCommands();
@@ -73,11 +77,16 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private void onFileHeaderLoading(FileHeaderLoadingMessage message) {
+      viewModel.File   = null;
       viewModel.Header = null;
     }
 
     private async Task onFileHeaderSelected(FileHeaderSelectedMessage message) {
       await loadUpkFile(Path.Combine(settings.PathToGame, message.File.GameFilename));
+
+      viewModel.File = message.File;
+
+      oldNotes = viewModel.File.Notes;
 
       message.File.IsErrored = viewModel.Header.IsErrored;
     }
@@ -91,6 +100,8 @@ namespace UpkManager.Domain.Controllers {
     #region Commands
 
     private void registerCommands() {
+      viewModel.SaveNotes = new RelayCommandAsync(onSaveNotesExecute, canSaveNotesExecute);
+
       menuViewModel.OpenFile = new RelayCommandAsync(onOpenFileExecuteAsync);
     }
 
@@ -111,6 +122,20 @@ namespace UpkManager.Domain.Controllers {
 
       await loadUpkFile(ofd.FileName);
     }
+
+    #region SaveNotes Command
+
+    private bool canSaveNotesExecute() {
+      return viewModel.File?.Notes != oldNotes;
+    }
+
+    private async Task onSaveNotesExecute() {
+      oldNotes = viewModel.File.Notes;
+
+      await remoteRepository.SaveUpkFile(viewModel.File);
+    }
+
+    #endregion SaveNotes Command
 
     #endregion Commands
 

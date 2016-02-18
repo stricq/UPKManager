@@ -40,6 +40,7 @@ namespace UpkManager.Repository.Services {
                                                 .ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
                                                 .ForMember(dest => dest.ContainsTargetObject, opt => opt.Ignore())
                                                 .ForMember(dest => dest.Filename,             opt => opt.Ignore())
+                                                .ForMember(dest => dest.NotesColumn,          opt => opt.Ignore())
                                                 .ReverseMap();
 
       #endregion DTOs

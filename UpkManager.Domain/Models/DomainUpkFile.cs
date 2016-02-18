@@ -63,7 +63,7 @@ namespace UpkManager.Domain.Models {
 
     public string Notes {
       get { return notes; }
-      set { SetField(ref notes, value, () => Notes); }
+      set { SetField(ref notes, value, () => Notes, () => NotesColumn); }
     }
 
     #endregion Properties
@@ -91,6 +91,8 @@ namespace UpkManager.Domain.Models {
     }
 
     public string Filename => Path.GetFileName(gameFilename);
+
+    public string NotesColumn => notes?.Length > 30 ? notes?.Substring(0, 30).Replace('\n', ' ') : notes;
 
     #endregion Domain Properties
 

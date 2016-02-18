@@ -39,15 +39,8 @@
             <v:FileTreeView />
           </TabItem>
 
-          <TabItem Header="File Header">
-            <v:FileHeaderView />
-          </TabItem>
-
-          <TabItem Header="Header Tables">
+          <TabItem Header="File Tables">
             <v:HeaderTablesView />
-          </TabItem>
-
-          <TabItem Header="Object Tree">
           </TabItem>
 
         </TabControl>
@@ -58,6 +51,10 @@
           <TabControl.Resources>
             <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
           </TabControl.Resources>
+
+          <TabItem Header="File Detail">
+            <v:FileHeaderView />
+          </TabItem>
 
           <TabItem Header="Object Detail">
             <v:PropertyView />

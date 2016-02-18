@@ -55,7 +55,7 @@
             <GridViewColumn Header="Notes">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Path=Notes}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding Path=NotesColumn}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>

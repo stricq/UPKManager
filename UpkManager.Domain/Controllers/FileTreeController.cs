@@ -106,7 +106,7 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task onScanUpkFilesExecute() {
-      if (viewModel.Files.Any()) await scanUpkFiles(viewModel.Files.ToList());
+      if (viewModel.Files.Any()) await scanUpkFiles(viewModel.AllFiles.ToList());
     }
 
     private bool canScanUpkFilesExecute() {
@@ -302,7 +302,7 @@ namespace UpkManager.Domain.Controllers {
         upkFile.FileSize  = header.FileSize;
         upkFile.IsErrored = header.IsErrored;
 
-        upkFile.ExportTypes.AddRange(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
+        upkFile.ExportTypes = new ObservableCollection<string>(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
 
         await remoteRepository.SaveUpkFile(upkFile);
       }
