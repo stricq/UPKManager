@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Ookii.Dialogs.Wpf;
-
 using STR.Common.Extensions;
 
 using STR.MvvmCommon;
@@ -101,26 +99,6 @@ namespace UpkManager.Domain.Controllers {
 
     private void registerCommands() {
       viewModel.SaveNotes = new RelayCommandAsync(onSaveNotesExecute, canSaveNotesExecute);
-
-      menuViewModel.OpenFile = new RelayCommandAsync(onOpenFileExecuteAsync);
-    }
-
-    private async Task onOpenFileExecuteAsync() {
-      VistaOpenFileDialog ofd = new VistaOpenFileDialog {
-        Multiselect      = false,
-        Filter           = "Unreal Package Files|*.upk",
-        Title            = "Select Package Files"
-      };
-
-      bool? result = ofd.ShowDialog();
-
-      if (!result.HasValue || !result.Value) return;
-
-      if (viewModel.Header != null && viewModel.Header.ExportTable.Any()) {
-        viewModel.Header.ExportTable.ForEach(et => et.PropertyChanged -= onExportTablePropertyChanged);
-      }
-
-      await loadUpkFile(ofd.FileName);
     }
 
     #region SaveNotes Command
@@ -145,6 +123,11 @@ namespace UpkManager.Domain.Controllers {
       switch(e.PropertyName) {
         case "IsSkipProperties": {
           if (menuViewModel.IsSkipProperties) menuViewModel.IsSkipParsing = true;
+
+          break;
+        }
+        case "IsSkipParsing": {
+          if (!menuViewModel.IsSkipParsing) menuViewModel.IsSkipProperties = false;
 
           break;
         }

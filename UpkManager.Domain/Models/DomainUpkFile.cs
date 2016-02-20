@@ -92,7 +92,7 @@ namespace UpkManager.Domain.Models {
 
     public string Filename => Path.GetFileName(gameFilename);
 
-    public string NotesColumn => (notes?.Length > 30 ? notes.Substring(0, 30) : notes)?.Replace("\r\n", " ").Replace('\t', ' ');
+    public string NotesColumn => (notes?.Length > 50 ? notes.Substring(0, 50) : notes)?.Replace("\r\n", " ").Replace('\t', ' ');
 
     #endregion Domain Properties
 

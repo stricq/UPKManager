@@ -10,17 +10,29 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Private Fields
 
+    private bool isExportable;
+
+    private bool isViewable;
+
     private DomainPropertyHeader propertyHeader;
 
     private int additionalDataOffset;
 
     private byte[] additionalData;
 
-    private bool canObjectSave;
-
     #endregion Private Fields
 
     #region Properties
+
+    public bool IsExportable {
+      get { return isExportable; }
+      set { SetField(ref isExportable, value, () => IsExportable); }
+    }
+
+    public bool IsViewable {
+      get { return isViewable; }
+      set { SetField(ref isViewable, value, () => IsViewable); }
+    }
 
     public DomainPropertyHeader PropertyHeader {
       get { return propertyHeader; }
@@ -38,11 +50,6 @@ namespace UpkManager.Domain.Models.Objects {
     }
 
     public virtual ObjectType ObjectType => ObjectType.Unknown;
-
-    public bool CanObjectSave {
-      get { return canObjectSave; }
-      set { SetField(ref canObjectSave, value, () => CanObjectSave); }
-    }
 
     #endregion Properties
 

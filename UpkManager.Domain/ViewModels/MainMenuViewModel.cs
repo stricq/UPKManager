@@ -15,10 +15,9 @@ namespace UpkManager.Domain.ViewModels {
     private bool isSkipProperties;
     private bool isSkipParsing;
 
-    private RelayCommandAsync openDirectory;
-    private RelayCommandAsync openFile;
-    private RelayCommandAsync scanUpkFiles;
+    private RelayCommand scanUpkFiles;
 
+    private RelayCommandAsync exportFiles;
     private RelayCommandAsync saveObjectAs;
 
     private RelayCommand settings;
@@ -44,19 +43,14 @@ namespace UpkManager.Domain.ViewModels {
       set { SetField(ref isSkipParsing, value, () => IsSkipParsing); }
     }
 
-    public RelayCommandAsync OpenDirectory {
-      get { return openDirectory; }
-      set { SetField(ref openDirectory, value, () => OpenDirectory); }
-    }
-
-    public RelayCommandAsync OpenFile {
-      get { return openFile; }
-      set { SetField(ref openFile, value, () => OpenFile); }
-    }
-
-    public RelayCommandAsync ScanUpkFiles {
+    public RelayCommand ScanUpkFiles {
       get { return scanUpkFiles; }
       set { SetField(ref scanUpkFiles, value, () => ScanUpkFiles); }
+    }
+
+    public RelayCommandAsync ExportFiles {
+      get { return exportFiles; }
+      set { SetField(ref exportFiles, value, () => ExportFiles); }
     }
 
     public RelayCommandAsync SaveObjectAs {

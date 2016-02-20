@@ -56,7 +56,8 @@ namespace UpkManager.Domain.Controllers.Dialogs {
     #region Commands
 
     private void registerCommands() {
-      viewModel.SelectGameDir = new RelayCommand(onSelectGameDir);
+      viewModel.SelectGameDir    = new RelayCommand(onSelectGameDir);
+      viewModel.SelectExportPath = new RelayCommand(onSelectExportPath);
 
       viewModel.Ok     = new RelayCommand(onOkExecute);
       viewModel.Cancel = new RelayCommand(onCancelExecute);
@@ -76,10 +77,30 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
     #endregion SelectGameDir Command
 
+    #region SelectExportPath Command
+
+    private void onSelectExportPath() {
+      VistaFolderBrowserDialog fbd = new VistaFolderBrowserDialog();
+
+      bool? result = fbd.ShowDialog();
+
+      if (!result.HasValue || !result.Value) return;
+
+      viewModel.Message.Settings.ExportPath = fbd.SelectedPath.EndsWith(@"\") ? fbd.SelectedPath : fbd.SelectedPath + @"\";
+    }
+
+    #endregion SelectExportPath Command
+
     #region OK Command
 
     private void onOkExecute() {
       messenger.Send(new CloseDialogMessage());
+
+      string pathToGame = viewModel.Message.Settings.PathToGame;
+      string exportPath = viewModel.Message.Settings.ExportPath;
+
+      viewModel.Message.Settings.PathToGame = pathToGame.EndsWith(@"\") ? pathToGame : pathToGame + @"\";
+      viewModel.Message.Settings.ExportPath = exportPath.EndsWith(@"\") ? exportPath : exportPath + @"\";
 
       if (viewModel.Message.Callback != null) {
         viewModel.Message.Callback(viewModel.Message);

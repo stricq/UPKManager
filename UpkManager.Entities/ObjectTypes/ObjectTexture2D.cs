@@ -32,9 +32,11 @@ namespace UpkManager.Entities.ObjectTypes {
 
     #region Overrides
 
-    public override ObjectType ObjectType => ObjectType.Texture2D;
+    public override bool IsExportable => true;
 
-    public override bool CanObjectSave => true;
+    public override bool IsViewable => true;
+
+    public override ObjectType ObjectType => ObjectType.Texture2D;
 
     public override void ReadUpkObject(byte[] data, ref int index, int endOffset, bool skipProperties, bool skipParse, UpkHeader header, out string message) {
       base.ReadUpkObject(data, ref index, endOffset, skipProperties, skipParse, header, out message);

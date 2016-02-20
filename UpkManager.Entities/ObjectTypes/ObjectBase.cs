@@ -17,11 +17,17 @@ namespace UpkManager.Entities.ObjectTypes {
 
     public byte[] AdditionalData { get; set; }
 
+    #endregion Properties
+
+    #region Public Virtual Properties
+
     public virtual ObjectType ObjectType => ObjectType.Unknown;
 
-    public virtual bool CanObjectSave => false;
+    public virtual bool IsExportable => false;
 
-    #endregion Properties
+    public virtual bool IsViewable => false;
+
+    #endregion Public Virtual Properties
 
     #region Public Virtual Methods
 

@@ -69,7 +69,7 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private bool canSaveObjectAsExecute() {
-      return viewModel.Export != null && viewModel.Export.DomainObject.CanObjectSave;
+      return viewModel.Export != null && viewModel.Export.DomainObject.IsExportable;
     }
 
     private async Task onSaveObjectAsExecute() {

@@ -1,6 +1,4 @@
-﻿
-
-using UpkManager.Domain.Constants;
+﻿using UpkManager.Domain.Constants;
 
 
 namespace UpkManager.Domain.Models.Objects {

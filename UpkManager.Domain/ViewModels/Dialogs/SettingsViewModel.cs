@@ -17,6 +17,7 @@ namespace UpkManager.Domain.ViewModels.Dialogs {
     private SettingsEditMessage message;
 
     private RelayCommand selectGameDir;
+    private RelayCommand selectExportPath;
 
     private RelayCommand ok;
     private RelayCommand cancel;
@@ -33,6 +34,11 @@ namespace UpkManager.Domain.ViewModels.Dialogs {
     public RelayCommand SelectGameDir {
       get { return selectGameDir; }
       set { SetField(ref selectGameDir, value, () => SelectGameDir); }
+    }
+
+    public RelayCommand SelectExportPath {
+      get { return selectExportPath; }
+      set { SetField(ref selectExportPath, value, () => SelectExportPath); }
     }
 
     public RelayCommand Ok {

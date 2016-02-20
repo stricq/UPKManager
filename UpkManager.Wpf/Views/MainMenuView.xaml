@@ -10,33 +10,24 @@
   <Menu Height="24" Padding="3,3,0,0" VerticalContentAlignment="Center" BorderThickness="0,0,0,1" BorderBrush="{StaticResource StatusBarBorderColor}" Background="{StaticResource MenuGradient}">
 
     <MenuItem Header="_File" Foreground="White">
-      <MenuItem Header="Open _Directory" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=OpenDirectory}" />
-      <MenuItem Header="_Open UPK File"  Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=OpenFile}" />
-
-      <Separator />
-
-      <MenuItem Header="_Scan UPK Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ScanUpkFiles}" />
-
-      <Separator />
-
-      <MenuItem Header="O_bject" Foreground="{StaticResource BackgroundColor}">
-        <MenuItem Header="Save Object _As..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=SaveObjectAs}" />
-      </MenuItem>
+      <MenuItem Header="Export Selected Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ExportFiles}" />
+      <MenuItem Header="Save Object _As..."    Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=SaveObjectAs}" />
 
       <Separator />
 
       <MenuItem Header="E_xit" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=Exit}" />
     </MenuItem>
 
-    <MenuItem Header="_View" Foreground="White">
-      <MenuItem Header="_Export Table" Foreground="{StaticResource BackgroundColor}">
-        <MenuItem Header="_Raw Data" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsViewRawData}" />
-      </MenuItem>
-    </MenuItem>
-
     <MenuItem Header="_Settings" Foreground="White">
-      <MenuItem Header="Skip _Properties"     Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipProperties}" />
-      <MenuItem Header="Skip _Object Parsing" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipParsing}" />
+      <MenuItem Header="_Debug" Foreground="{StaticResource BackgroundColor}">
+        <MenuItem Header="Skip _Properties"            Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipProperties}" />
+        <MenuItem Header="Skip _Object Parsing"        Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipParsing}" />
+        <MenuItem Header="View Export Table _Raw Data" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsViewRawData}" />
+
+        <Separator />
+
+        <MenuItem Header="_Scan UPK Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ScanUpkFiles}" />
+      </MenuItem>
 
       <Separator />
 

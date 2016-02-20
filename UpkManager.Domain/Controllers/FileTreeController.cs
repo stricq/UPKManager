@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using STR.Common.Extensions;
 using STR.Common.Messages;
 
+using STR.DialogView.Domain.Messages;
+
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
@@ -102,16 +104,40 @@ namespace UpkManager.Domain.Controllers {
     #region Commands
 
     private void registerCommands() {
-      menuViewModel.ScanUpkFiles = new RelayCommandAsync(onScanUpkFilesExecute, canScanUpkFilesExecute);
+      menuViewModel.ExportFiles = new RelayCommandAsync(onExportFilesExecute, canExportFilesExecute);
+
+      menuViewModel.ScanUpkFiles = new RelayCommand(onScanUpkFilesExecute, canScanUpkFilesExecute);
     }
 
-    private async Task onScanUpkFilesExecute() {
-      if (viewModel.Files.Any()) await scanUpkFiles(viewModel.AllFiles.ToList());
+    #region ExportFiles Command
+
+    private bool canExportFilesExecute() {
+      return viewModel.Files.Any(f => f.IsChecked);
     }
+
+    private async Task onExportFilesExecute() {
+      await Task.FromResult(1);
+    }
+
+    #endregion ExportFiles Command
+
+    #region ScanUpkFiles Command
 
     private bool canScanUpkFilesExecute() {
-      return viewModel.Files.Any();
+      return viewModel.AllFiles.Any();
     }
+
+    private void onScanUpkFilesExecute() {
+      messenger.Send(new MessageBoxDialogMessage { Message = "Scanning all the UPK files can take a very long time.\n\nAre you sure?", Callback = onScanUpkFilesResponse });
+    }
+
+    private async void onScanUpkFilesResponse(MessageBoxDialogMessage message) {
+      if (message.IsCancel) return;
+
+      await scanUpkFiles(viewModel.AllFiles.ToList());
+    }
+
+    #endregion ScanUpkFiles Command
 
     #endregion Commands
 

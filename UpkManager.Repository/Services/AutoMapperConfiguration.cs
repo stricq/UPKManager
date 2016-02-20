@@ -108,20 +108,24 @@ namespace UpkManager.Repository.Services {
                                                       .Include<ObjectTexture2D, DomainObjectTexture2D>()
                                                       .ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                       .ReverseMap()
-                                                      .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+                                                      .ForMember(dest => dest.IsExportable, opt => opt.Ignore())
+                                                      .ForMember(dest => dest.IsViewable,   opt => opt.Ignore());
 
       config.CreateMap<ObjectDistributionBase, DomainObjectDistributionBase>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                                               .ReverseMap()
-                                                                              .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+                                                                              .ForMember(dest => dest.IsExportable, opt => opt.Ignore())
+                                                                              .ForMember(dest => dest.IsViewable,   opt => opt.Ignore());
 
       config.CreateMap<ObjectObjectRedirector, DomainObjectObjectRedirector>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                                               .ReverseMap()
-                                                                              .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+                                                                              .ForMember(dest => dest.IsExportable, opt => opt.Ignore())
+                                                                              .ForMember(dest => dest.IsViewable,   opt => opt.Ignore());
 
       config.CreateMap<ObjectTexture2D, DomainObjectTexture2D>().ForMember(dest => dest.ObjectType, opt => opt.Ignore())
                                                                 .ForMember(dest => dest.GuidString, opt => opt.Ignore())
                                                                 .ReverseMap()
-                                                                .ForMember(dest => dest.CanObjectSave, opt => opt.Ignore());
+                                                                .ForMember(dest => dest.IsExportable, opt => opt.Ignore())
+                                                                .ForMember(dest => dest.IsViewable,   opt => opt.Ignore());
 
       config.CreateMap<MipMap, DomainMipMap>().ReverseMap();
 

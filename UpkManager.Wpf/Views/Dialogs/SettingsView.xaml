@@ -16,6 +16,7 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -31,7 +32,14 @@
           <Button Content="Select" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=SelectGameDir}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Label      Grid.Row="2" Grid.Column="0" Content="Export Path:" Padding="5,3,5,5" Margin="0,6,0,0" HorizontalAlignment="Right" Foreground="{StaticResource ForegroundColor}" />
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,6,0,0">
+          <TextBox Text="{Binding Path=Message.Settings.ExportPath, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" Height="20" />
+
+          <Button Content="Select" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=SelectExportPath}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,6,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
 
           <Button Content="Save"   Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=Ok}"     IsDefault="True" />
           <Button Content="Cancel" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=Cancel}" IsCancel="True" />
