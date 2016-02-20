@@ -72,7 +72,7 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
       if (!result.HasValue || !result.Value) return;
 
-      viewModel.Message.Settings.PathToGame = fbd.SelectedPath.EndsWith(@"\") ? fbd.SelectedPath : fbd.SelectedPath + @"\";
+      viewModel.Message.Settings.PathToGame = fbd.SelectedPath;
     }
 
     #endregion SelectGameDir Command
@@ -86,7 +86,7 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
       if (!result.HasValue || !result.Value) return;
 
-      viewModel.Message.Settings.ExportPath = fbd.SelectedPath.EndsWith(@"\") ? fbd.SelectedPath : fbd.SelectedPath + @"\";
+      viewModel.Message.Settings.ExportPath = fbd.SelectedPath;
     }
 
     #endregion SelectExportPath Command
@@ -98,6 +98,12 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
       string pathToGame = viewModel.Message.Settings.PathToGame;
       string exportPath = viewModel.Message.Settings.ExportPath;
+
+      if (!pathToGame.ToLower().EndsWith("contents") && !pathToGame.ToLower().EndsWith(@"contents\")) {
+        messenger.Send(new MessageBoxDialogMessage { Header = "Invalid Path", Message = "The selected directory does not contain the 'bns' and 'Local' directories.", HasCancel = false });
+
+        return;
+      }
 
       viewModel.Message.Settings.PathToGame = pathToGame.EndsWith(@"\") ? pathToGame : pathToGame + @"\";
       viewModel.Message.Settings.ExportPath = exportPath.EndsWith(@"\") ? exportPath : exportPath + @"\";
