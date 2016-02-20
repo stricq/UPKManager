@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Solution Items", "00 Sol
 		UpkManager.sln.DotSettings = UpkManager.sln.DotSettings
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "UpkManager.Installer", "UpkManager.Installer\UpkManager.Installer.vdproj", "{65223597-C0E1-494F-9DBE-F8F12625F060}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,8 @@ Global
 		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65223597-C0E1-494F-9DBE-F8F12625F060}.Debug|Any CPU.ActiveCfg = Debug
+		{65223597-C0E1-494F-9DBE-F8F12625F060}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,5 +59,6 @@ Global
 		{04C2CFAF-8F1E-4631-88A6-0B9DC017452E} = {63DD830A-A38B-4997-AF10-6C546DB06083}
 		{422FF85B-4CE4-40DE-BE3E-D0DB8B1158CD} = {007002FA-C0CA-4AF8-94B8-D8447EFF8B5A}
 		{7D01E90D-0C4F-47D5-B05F-57FE640D23C5} = {007002FA-C0CA-4AF8-94B8-D8447EFF8B5A}
+		{65223597-C0E1-494F-9DBE-F8F12625F060} = {715DB300-AAD3-450A-8D14-F581CD02959C}
 	EndGlobalSection
 EndGlobal
