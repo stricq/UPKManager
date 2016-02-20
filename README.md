@@ -27,16 +27,16 @@ For the Path to the Game, you want to choose the directory that contains the 'bn
 
 The Export Path can be any location where you want the exported textures to be saved.
 
-### File Listing
+### Viewing Textures
 In the File Listing tab, you will see all the UPK files.  Only those containing textures will be shown by default.
 
 Click on any file in the list and the program will load and parse all the objects contained in the file.
 
-Now switch to the File Tables tab.
+Now switch to the File Tables tab on the left.
 
 The Export Table tab shows all the objects contained in the file.  You can select any object where the Type Name column is Texture2D.
 
-After you select an object in the Export Table list, the Texture View tab on the left will display the texture.
+After you select an object in the Export Table list, the Texture View tab on the right will display the texture.
 
 While viewing a texture, you can save that single texture from the menu by choosing File -> Save Object As...
 

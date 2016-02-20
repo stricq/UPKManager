@@ -94,8 +94,6 @@ namespace UpkManager.Domain.Controllers.Dialogs {
     #region OK Command
 
     private void onOkExecute() {
-      messenger.Send(new CloseDialogMessage());
-
       string pathToGame = viewModel.Message.Settings.PathToGame;
       string exportPath = viewModel.Message.Settings.ExportPath;
 
@@ -104,6 +102,8 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
         return;
       }
+
+      messenger.Send(new CloseDialogMessage());
 
       viewModel.Message.Settings.PathToGame = pathToGame.EndsWith(@"\") ? pathToGame : pathToGame + @"\";
       viewModel.Message.Settings.ExportPath = exportPath.EndsWith(@"\") ? exportPath : exportPath + @"\";
