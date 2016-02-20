@@ -18,6 +18,11 @@
       <MenuItem Header="E_xit" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=Exit}" />
     </MenuItem>
 
+    <MenuItem Header="_Edit" Foreground="White">
+      <MenuItem Header="Select _All Files"   Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=SelectAllFiles}" />
+      <MenuItem Header="_Deselect All Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=DeselectAllFiles}" />
+    </MenuItem>
+
     <MenuItem Header="_Settings" Foreground="White">
       <MenuItem Header="_Debug" Foreground="{StaticResource BackgroundColor}">
         <MenuItem Header="Skip _Properties"            Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipProperties}" />

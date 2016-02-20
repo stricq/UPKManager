@@ -20,6 +20,7 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
+using UpkManager.Domain.Models.Tables;
 using UpkManager.Domain.ViewModels;
 
 
@@ -106,6 +107,9 @@ namespace UpkManager.Domain.Controllers {
     private void registerCommands() {
       menuViewModel.ExportFiles = new RelayCommandAsync(onExportFilesExecute, canExportFilesExecute);
 
+      menuViewModel.SelectAllFiles   = new RelayCommand(onSelectAllFilesExecute,   canSelectAllFilesExecute);
+      menuViewModel.DeselectAllFiles = new RelayCommand(onDeselectAllFilesExecute, canDeselectAllFilesExecute);
+
       menuViewModel.ScanUpkFiles = new RelayCommand(onScanUpkFilesExecute, canScanUpkFilesExecute);
     }
 
@@ -116,10 +120,34 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task onExportFilesExecute() {
-      await Task.FromResult(1);
+      await exportFileObjects(viewModel.Files.Where(f => f.IsChecked).ToList());
     }
 
     #endregion ExportFiles Command
+
+    #region SelectAllFiles Command
+
+    private bool canSelectAllFilesExecute() {
+      return viewModel.Files.Any();
+    }
+
+    private void onSelectAllFilesExecute() {
+      viewModel.Files.ForEach(f => f.IsChecked = true);
+    }
+
+    #endregion SelectAllFiles Command
+
+    #region DeselectAllFiles Command
+
+    private bool canDeselectAllFilesExecute() {
+      return viewModel.Files.Any();
+    }
+
+    private void onDeselectAllFilesExecute() {
+      viewModel.Files.ForEach(f => f.IsChecked = false);
+    }
+
+    #endregion DeselectAllFiles Command
 
     #region ScanUpkFiles Command
 
@@ -345,6 +373,38 @@ namespace UpkManager.Domain.Controllers {
       catch(Exception ex) {
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = "Error Scanning UPK File.", Exception = ex, HeaderText = "Scan Error" });
       }
+    }
+
+    private async Task exportFileObjects(List<DomainUpkFile> files) {
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Exporting...", Total = files.Count };
+
+      foreach(DomainUpkFile file in files) {
+        string directory = Path.Combine(settings.ExportPath, Path.GetDirectoryName(file.GameFilename), Path.GetFileNameWithoutExtension(file.GameFilename));
+
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+        DomainHeader header = new DomainHeader { FullFilename = Path.Combine(settings.PathToGame, file.GameFilename) };
+
+        await repository.LoadAndParseUpk(header, false, false, null);
+
+        if (header.IsErrored) file.IsErrored = true;
+
+        message.Current += 1;
+
+        foreach(DomainExportTableEntry export in header.ExportTable.Where(e => !e.IsErrored && e.DomainObject.IsExportable)) {
+          string filename = Path.Combine(directory, $"{export.Name}.dds");
+
+          message.StatusText = filename;
+
+          messenger.Send(message);
+
+          await repository.SaveObject(export, filename);
+        }
+      }
+
+      message.IsComplete = true;
+
+      messenger.Send(message);
     }
 
     #endregion Private Methods

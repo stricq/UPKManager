@@ -20,6 +20,9 @@ namespace UpkManager.Domain.ViewModels {
     private RelayCommandAsync exportFiles;
     private RelayCommandAsync saveObjectAs;
 
+    private RelayCommand selectAllFiles;
+    private RelayCommand deselectAllFiles;
+
     private RelayCommand settings;
 
     private RelayCommand exit;
@@ -56,6 +59,16 @@ namespace UpkManager.Domain.ViewModels {
     public RelayCommandAsync SaveObjectAs {
       get { return saveObjectAs; }
       set { SetField(ref saveObjectAs, value, () => SaveObjectAs); }
+    }
+
+    public RelayCommand SelectAllFiles {
+      get { return selectAllFiles; }
+      set { SetField(ref selectAllFiles, value, () => SelectAllFiles); }
+    }
+
+    public RelayCommand DeselectAllFiles {
+      get { return deselectAllFiles; }
+      set { SetField(ref deselectAllFiles, value, () => DeselectAllFiles); }
     }
 
     public RelayCommand Settings {

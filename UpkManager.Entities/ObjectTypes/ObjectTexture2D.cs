@@ -79,56 +79,62 @@ namespace UpkManager.Entities.ObjectTypes {
     public override void SaveObject(string filename) {
       if (MipMaps == null || !MipMaps.Any()) return;
 
-      MemoryStream memory = buildDdsImage();
+      ImageEngineFormat format;
+
+      MemoryStream memory = buildDdsImage(out format);
 
       if (memory == null) return;
 
-      byte[] image = memory.GetBuffer();
+      ImageEngineImage ddsImage = new ImageEngineImage(memory);
 
       FileStream stream = new FileStream(filename, FileMode.Create);
 
-      stream.Write(image, 0, image.Length);
+      ddsImage.Save(stream, format, false);
 
       stream.Close();
+
+      memory.Close();
     }
 
     public override Stream GetObjectStream() {
       if (MipMaps == null || !MipMaps.Any()) return null;
 
-      return buildDdsImage();
+      ImageEngineFormat format;
+
+      return buildDdsImage(out format);
     }
 
     #endregion Overrides
 
     #region Private Methods
 
-    private MemoryStream buildDdsImage() {
+    private MemoryStream buildDdsImage(out ImageEngineFormat imageFormat) {
       PropertyByteValue formatProp = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as PropertyByteValue;
+
+      imageFormat = ImageEngineFormat.Unknown;
 
       if (formatProp == null) return null;
 
       string format = formatProp.ToString().Replace("PF_", null);
 
-      ImageEngineFormat fourcc;
-
       switch(format) {
         case "DXT1": {
-          fourcc = ImageEngineFormat.DDS_DXT1;
+          imageFormat = ImageEngineFormat.DDS_DXT1;
 
           break;
         }
         case "DXT5": {
-          fourcc = ImageEngineFormat.DDS_DXT5;
+          imageFormat = ImageEngineFormat.DDS_DXT5;
 
           break;
         }
         case "G8": {
-          fourcc = ImageEngineFormat.DDS_G8_L8;
+          imageFormat = ImageEngineFormat.DDS_G8_L8;
 
           break;
         }
         case "A8R8G8B8": {
-          fourcc = ImageEngineFormat.DDS_ARGB;
+          imageFormat = ImageEngineFormat.DDS_ARGB;
 
           break;
         }
@@ -141,7 +147,7 @@ namespace UpkManager.Entities.ObjectTypes {
 
       if (mipMap == null) return null;
 
-      DDSGeneral.DDS_HEADER header = DDSGeneral.Build_DDS_Header(0, mipMap.Height, mipMap.Width, fourcc);
+      DDSGeneral.DDS_HEADER header = DDSGeneral.Build_DDS_Header(0, mipMap.Height, mipMap.Width, imageFormat);
 
       MemoryStream stream = new MemoryStream();
 
