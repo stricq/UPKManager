@@ -8,7 +8,7 @@
         mvvm:FrameworkElementBehaviors.LoadedCommand="{Binding Path=Loaded}"
         mvvm:WindowBehaviors.ClosingCommand="{Binding Path=Closing}"
         Title="Blade and Soul - UPK Manager - STR Programming Services"
-        WindowStartupLocation="CenterScreen" MinWidth="1280" MinHeight="1024" ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen" MinWidth="800" MinHeight="600" ResizeMode="CanResizeWithGrip"
         SnapsToDevicePixels="True" UseLayoutRounding="True"
         Background="{StaticResource BackgroundColor}"
         FontFamily="Tahoma">
