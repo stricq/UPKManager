@@ -19,6 +19,8 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
     #region Private Fields
 
+    private string oldPathToGame;
+
     private readonly SettingsViewModel viewModel;
 
     private readonly IMessenger messenger;
@@ -47,6 +49,8 @@ namespace UpkManager.Domain.Controllers.Dialogs {
 
     private void onSettingsEdit(SettingsEditMessage message) {
       viewModel.Message = message;
+
+      oldPathToGame = message.Settings.PathToGame;
 
       messenger.Send(new OpenDialogMessage { Name = DialogNames.Settings });
     }
@@ -97,8 +101,10 @@ namespace UpkManager.Domain.Controllers.Dialogs {
       string pathToGame = viewModel.Message.Settings.PathToGame;
       string exportPath = viewModel.Message.Settings.ExportPath;
 
-      if (!pathToGame.ToLower().EndsWith("contents") && !pathToGame.ToLower().EndsWith(@"contents\")) {
+      if (!pathToGame.ToLowerInvariant().EndsWith("contents") && !pathToGame.ToLowerInvariant().EndsWith(@"contents\")) {
         messenger.Send(new MessageBoxDialogMessage { Header = "Invalid Path", Message = "The selected directory does not contain the 'bns' and 'Local' directories.", HasCancel = false });
+
+        viewModel.Message.Settings.PathToGame = oldPathToGame;
 
         return;
       }

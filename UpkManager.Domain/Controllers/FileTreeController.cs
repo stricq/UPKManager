@@ -253,7 +253,7 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task loadDirectoryAsync(List<DomainUpkFile> parent, string path) {
-      if (path.EndsWith("mod") || path.EndsWith("mods")) return;
+      if (path.ToLowerInvariant().EndsWith("mod") || path.ToLowerInvariant().EndsWith("mods")) return;
 
       DirectoryInfo   dirInfo;
       DirectoryInfo[] dirInfos;
