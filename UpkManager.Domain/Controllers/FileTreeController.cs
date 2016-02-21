@@ -191,6 +191,14 @@ namespace UpkManager.Domain.Controllers {
         return;
       }
 
+      List<DomainUpkFile> mods = (from row in localFiles
+                                   let path = Path.GetDirectoryName(row.GameFilename)
+                                 where path != null
+                                    && !path.ToLowerInvariant().EndsWith("cookedpc")
+                                select row).ToList();
+
+      localFiles.RemoveAll(f => mods.Contains(f));
+
       progress.Text = "Loading Remote Database...";
 
       messenger.Send(progress);
@@ -204,17 +212,17 @@ namespace UpkManager.Domain.Controllers {
 
       if (matches.Any()) viewModel.AllFiles.AddRange(matches.OrderBy(f => f.Filename));
 
-      List<DomainUpkFile> mods = (from row1 in localFiles
+      List<DomainUpkFile> changes = (from row1 in localFiles
                                   join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
                                  where row1.FileSize != row2.FileSize
                                 select row2).ToList();
 
-      if (mods.Any()) {
-        viewModel.AllFiles.AddRange(mods.OrderBy(f => f.Filename));
+      if (changes.Any()) {
+        viewModel.AllFiles.AddRange(changes.OrderBy(f => f.Filename));
 
         viewModel.AllFiles.Sort(f => f.Filename);
 
-        await scanUpkFiles(mods);
+        await scanUpkFiles(changes);
       }
 
       List<DomainUpkFile> adds = (from row1 in localFiles
@@ -233,7 +241,11 @@ namespace UpkManager.Domain.Controllers {
 
       viewModel.AllTypes = new ObservableCollection<string>(viewModel.AllFiles.SelectMany(f => f.ExportTypes).Distinct().OrderBy(s => s));
 
-      viewModel.AllFiles.ForEach(f => f.PropertyChanged += onUpkFileViewModelChanged);
+      viewModel.AllFiles.ForEach(f => {
+        f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)));
+
+        f.PropertyChanged += onUpkFileViewModelChanged;
+      });
 
       filterFiles();
 
@@ -253,8 +265,6 @@ namespace UpkManager.Domain.Controllers {
     }
 
     private async Task loadDirectoryAsync(List<DomainUpkFile> parent, string path) {
-      if (path.ToLowerInvariant().EndsWith("mod") || path.ToLowerInvariant().EndsWith("mods")) return;
-
       DirectoryInfo   dirInfo;
       DirectoryInfo[] dirInfos;
 
@@ -358,7 +368,9 @@ namespace UpkManager.Domain.Controllers {
 
         upkFile.ExportTypes = new ObservableCollection<string>(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
 
-        await remoteRepository.SaveUpkFile(upkFile);
+        string path = Path.GetDirectoryName(upkFile.GameFilename);
+
+        if (path != null && path.ToLowerInvariant().EndsWith("cookedpc")) await remoteRepository.SaveUpkFile(upkFile);
       }
 
       message.IsComplete = true;
@@ -403,6 +415,7 @@ namespace UpkManager.Domain.Controllers {
       }
 
       message.IsComplete = true;
+      message.StatusText = null;
 
       messenger.Send(message);
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 
 using STR.MvvmCommon;
 
@@ -29,12 +30,16 @@ namespace UpkManager.Domain.Models {
 
     private ObservableCollection<string> exportTypes;
 
+    private ObservableCollection<DomainUpkFile> moddedFiles;
+
     #endregion Private Fields
 
     #region Constructor
 
     public DomainUpkFile() {
       exportTypes = new ObservableCollection<string>();
+
+      moddedFiles = new ObservableCollection<DomainUpkFile>();
     }
 
     #endregion Constructor
@@ -93,6 +98,13 @@ namespace UpkManager.Domain.Models {
     public string Filename => Path.GetFileName(gameFilename);
 
     public string NotesColumn => (notes?.Length > 50 ? notes.Substring(0, 50) : notes)?.Replace("\r\n", " ").Replace('\t', ' ');
+
+    public ObservableCollection<DomainUpkFile> ModdedFiles {
+      get { return moddedFiles; }
+      set { SetField(ref moddedFiles, value, () => ModdedFiles); }
+    }
+
+    public bool IsModded => moddedFiles.Any();
 
     #endregion Domain Properties
 
