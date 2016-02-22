@@ -9,10 +9,11 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Messages.Application;
-using UpkManager.Domain.ViewModels.Dialogs;
+
+using UpkManager.Wpf.ViewModels.Dialogs;
 
 
-namespace UpkManager.Domain.Controllers.Dialogs {
+namespace UpkManager.Wpf.Controllers.Dialogs {
 
   [Export(typeof(IController))]
   public class SettingsController : IController {

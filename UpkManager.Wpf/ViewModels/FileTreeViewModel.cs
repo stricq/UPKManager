@@ -6,7 +6,7 @@ using STR.MvvmCommon;
 using UpkManager.Domain.Models;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("FileTreeViewModel")]

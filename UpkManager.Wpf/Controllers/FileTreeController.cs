@@ -21,10 +21,11 @@ using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
-using UpkManager.Domain.ViewModels;
+
+using UpkManager.Wpf.ViewModels;
 
 
-namespace UpkManager.Domain.Controllers {
+namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
   public class FileTreeController : IController {

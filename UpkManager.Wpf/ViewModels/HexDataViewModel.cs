@@ -3,7 +3,7 @@
 using STR.MvvmCommon;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [PartCreationPolicy(CreationPolicy.NonShared)]

@@ -89,7 +89,7 @@ namespace UpkManager.Entities.ObjectTypes {
 
       FileStream stream = new FileStream(filename, FileMode.Create);
 
-      ddsImage.Save(stream, format, false);
+      ddsImage.Save(stream, format, MipHandling.KeepTopOnly);
 
       stream.Close();
 

@@ -7,7 +7,7 @@ using UpkManager.Domain.Models.Compression;
 using UpkManager.Domain.Models.Tables;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("HeaderTablesViewModel")]

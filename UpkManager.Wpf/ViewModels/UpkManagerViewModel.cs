@@ -5,7 +5,7 @@ using System.Windows;
 using STR.MvvmCommon;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("UpkManagerViewModel")]

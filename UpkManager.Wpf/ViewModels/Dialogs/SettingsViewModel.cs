@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.Composition;
 
 using STR.DialogView.Domain.Contracts;
+
 using STR.MvvmCommon;
 
 using UpkManager.Domain.Messages.Application;
 
 
-namespace UpkManager.Domain.ViewModels.Dialogs {
+namespace UpkManager.Wpf.ViewModels.Dialogs {
 
   [Export]
   [ViewModel("SettingsViewModel")]

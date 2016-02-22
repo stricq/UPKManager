@@ -8,10 +8,11 @@ using STR.MvvmCommon.Contracts;
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
-using UpkManager.Domain.ViewModels;
+
+using UpkManager.Wpf.ViewModels;
 
 
-namespace UpkManager.Domain.Controllers {
+namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
   public class ImageController : IController {

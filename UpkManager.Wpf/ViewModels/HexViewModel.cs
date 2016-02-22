@@ -4,7 +4,7 @@ using System.ComponentModel.Composition;
 using STR.MvvmCommon;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("HexViewModel")]

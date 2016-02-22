@@ -4,7 +4,7 @@ using System.Windows.Media.Imaging;
 using STR.MvvmCommon;
 
 
-namespace UpkManager.Domain.ViewModels {
+namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("ImageViewModel")]

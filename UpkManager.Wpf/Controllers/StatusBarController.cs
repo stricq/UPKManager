@@ -7,10 +7,11 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Messages.Status;
-using UpkManager.Domain.ViewModels;
+
+using UpkManager.Wpf.ViewModels;
 
 
-namespace UpkManager.Domain.Controllers {
+namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
   public class StatusBarController : IController {
