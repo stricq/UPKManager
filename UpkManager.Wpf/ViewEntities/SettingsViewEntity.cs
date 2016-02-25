@@ -1,9 +1,9 @@
 ﻿using STR.MvvmCommon;
 
 
-namespace UpkManager.Domain.Models {
+namespace UpkManager.Wpf.ViewEntities {
 
-  public class DomainUpkManagerSettings : ObservableObject {
+  public class SettingsViewEntity : ObservableObject {
 
     #region Private Fields
 

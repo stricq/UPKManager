@@ -8,13 +8,13 @@
              mvvm:ViewModelLocator.ComposedViewModel="HexViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
-  <Grid>
+  <Grid Margin="6">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <Grid Grid.Row="0" Margin="4,4,4,6" HorizontalAlignment="Center">
+    <Grid Grid.Row="0" HorizontalAlignment="Center">
       <StackPanel Orientation="Horizontal">
         <Label Content="Search:" Padding="5,3,5,5" Foreground="{StaticResource ForegroundColor}" />
 
@@ -25,7 +25,7 @@
       </StackPanel>
     </Grid>
 
-    <HeaderedContentControl Grid.Row="1" Header="{Binding Path=Title}" Margin="4,0,4,4" Style="{StaticResource TallHeaderedContentStyle}">
+    <HeaderedContentControl Grid.Row="1" Header="{Binding Path=Title}" Margin="0,6,0,0" Style="{StaticResource TallHeaderedContentStyle}">
       <ListView ItemsSource="{Binding Path=HexData}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
         <ListView.View>
           <GridView>

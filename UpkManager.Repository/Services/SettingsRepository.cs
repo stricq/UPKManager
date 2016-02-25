@@ -35,19 +35,19 @@ namespace UpkManager.Repository.Services {
 
     #region ISettingsRepository Implementation
 
-    public async Task<DomainUpkManagerSettings> LoadSettingsAsync() {
-      UpkManagerSettings settings;
+    public async Task<DomainSettings> LoadSettingsAsync() {
+      Settings settings;
 
       if (await Task.Run(() => File.Exists(Filename))) {
-        settings = await Task.Run(() => JsonConvert.DeserializeObject<UpkManagerSettings>(File.ReadAllText(Filename)));
+        settings = await Task.Run(() => JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Filename)));
       }
-      else settings = new UpkManagerSettings();
+      else settings = new Settings();
 
-      return await Task.Run(() => mapper.Map<DomainUpkManagerSettings>(settings));
+      return await Task.Run(() => mapper.Map<DomainSettings>(settings));
     }
 
-    public async Task SaveSettings(DomainUpkManagerSettings Settings) {
-      UpkManagerSettings settings = await Task.Run(() => mapper.Map<UpkManagerSettings>(Settings));
+    public async Task SaveSettings(DomainSettings Settings) {
+      Settings settings = await Task.Run(() => mapper.Map<Settings>(Settings));
 
       string json = await Task.Run(() => JsonConvert.SerializeObject(settings, Formatting.Indented));
 

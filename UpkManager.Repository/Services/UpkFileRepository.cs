@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -224,7 +225,7 @@ namespace UpkManager.Repository.Services {
           }
         }).ContinueWith(task => {
           if (header.ExportTableCount > 1000) {
-            message.Current += 1;
+            message.IncrementCurrent();
 
             loadProgress?.Invoke(message);
           }

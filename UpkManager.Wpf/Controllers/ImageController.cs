@@ -5,7 +5,6 @@ using CSharpImageLibrary.General;
 
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
 
@@ -50,7 +49,7 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onExportObjectSelected(ExportObjectSelectedMessage message) {
-      if (message.ExportObject.DomainObject.ObjectType == ObjectType.Texture2D) {
+      if (message.ExportObject.DomainObject.IsViewable) {
         Stream stream = repository.GetObjectStream(message.ExportObject);
 
         if (stream != null) {

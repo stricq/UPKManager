@@ -15,6 +15,7 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Messages.FileHeader;
 
+using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 

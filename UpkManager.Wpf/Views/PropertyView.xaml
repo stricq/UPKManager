@@ -8,13 +8,13 @@
              mvvm:ViewModelLocator.ComposedViewModel="PropertyViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
-  <Grid>
+  <Grid Margin="6">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <HeaderedContentControl Grid.Row="1" Header="Properties" Margin="4" Style="{StaticResource TallHeaderedContentStyle}">
+    <HeaderedContentControl Grid.Row="1" Header="Properties" Style="{StaticResource TallHeaderedContentStyle}">
       <ListView ItemsSource="{Binding Path=Export.DomainObject.PropertyHeader.Properties}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}"
                 b:GridViewBehaviors.AutoResizeColumns="True">
         <ListView.View>

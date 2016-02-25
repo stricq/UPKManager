@@ -10,11 +10,11 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
-
+using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -27,7 +27,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private string oldNotes;
 
-    private DomainUpkManagerSettings settings;
+    private SettingsViewEntity settings;
 
     private readonly FileHeaderViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;

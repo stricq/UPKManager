@@ -8,8 +8,7 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
-using UpkManager.Domain.Messages.Application;
-
+using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.ViewModels.Dialogs;
 
 

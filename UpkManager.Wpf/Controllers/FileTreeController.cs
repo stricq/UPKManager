@@ -17,11 +17,11 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
-
+using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -34,7 +34,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private string oldPathToGame;
 
-    private DomainUpkManagerSettings settings;
+    private SettingsViewEntity settings;
 
     private readonly FileTreeViewModel viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -298,6 +298,8 @@ namespace UpkManager.Wpf.Controllers {
         if (files.Length > 0) {
           List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length }).ToList();
 
+          upkFiles.Where(f => f.GameFilename.ToLowerInvariant() == "startup_int.upk").ToList().ForEach(f => upkFiles.Remove(f));
+
           parent.AddRange(upkFiles);
         }
       }
@@ -313,7 +315,11 @@ namespace UpkManager.Wpf.Controllers {
 
       switch(e.PropertyName) {
         case "IsSelected": {
-          if (upkFile.IsSelected) await messenger.SendAsync(new FileHeaderSelectedMessage { File = upkFile });
+          if (upkFile.IsSelected) {
+            await messenger.SendAsync(new FileHeaderSelectedMessage { File = upkFile });
+
+            viewModel.Files.Where(f => f != upkFile).ForEach(f => f.IsSelected = false);
+          }
 
           break;
         }

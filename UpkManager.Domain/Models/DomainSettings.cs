@@ -1,8 +1,8 @@
 ﻿
 
-namespace UpkManager.Entities {
+namespace UpkManager.Domain.Models {
 
-  public class UpkManagerSettings {
+  public class DomainSettings {
 
     public string PathToGame { get; set; }
 

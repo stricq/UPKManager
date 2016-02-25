@@ -4,7 +4,7 @@ using STR.DialogView.Domain.Contracts;
 
 using STR.MvvmCommon;
 
-using UpkManager.Domain.Messages.Application;
+using UpkManager.Wpf.Messages.Application;
 
 
 namespace UpkManager.Wpf.ViewModels.Dialogs {

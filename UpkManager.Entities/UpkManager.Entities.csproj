@@ -94,7 +94,7 @@
     <Compile Include="Tables\ObjectTableEntry.cs" />
     <Compile Include="UpkFile.cs" />
     <Compile Include="UpkHeader.cs" />
-    <Compile Include="UpkManagerSettings.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="UpkString.cs" />
     <Compile Include="ObjectTypes\ObjectBase.cs" />
   </ItemGroup>

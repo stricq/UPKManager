@@ -7,9 +7,9 @@ namespace UpkManager.Domain.Contracts {
 
   public interface ISettingsRepository {
 
-    Task<DomainUpkManagerSettings> LoadSettingsAsync();
+    Task<DomainSettings> LoadSettingsAsync();
 
-    Task SaveSettings(DomainUpkManagerSettings Settings);
+    Task SaveSettings(DomainSettings Settings);
 
   }
 

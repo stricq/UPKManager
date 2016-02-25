@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.Composition.Hosting;
+﻿using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Windows;
 
 using AutoMapper;
 
+using STR.Common.Extensions;
 using STR.MvvmCommon.Contracts;
 using STR.MvvmCommon.Mef;
 
@@ -37,9 +39,9 @@ namespace UpkManager.Wpf {
     protected override void OnStartup(StartupEventArgs e) {
       base.OnStartup(e);
 
-      IAutoMapperConfiguration configuration = container.Get<IAutoMapperConfiguration>();
+      IEnumerable<IAutoMapperConfiguration> configurations = container.GetAll<IAutoMapperConfiguration>();
 
-      MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg => configuration.RegisterMappings(cfg));
+      MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg => configurations.ForEach(configuration => configuration.RegisterMappings(cfg)));
 
       mapperConfiguration.AssertConfigurationIsValid();
 

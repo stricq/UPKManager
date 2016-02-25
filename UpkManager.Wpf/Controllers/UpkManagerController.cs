@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
+using AutoMapper;
+
 using STR.Common.Messages;
 
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.Application;
 using UpkManager.Domain.Models;
 
+using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -27,7 +30,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private bool isStartupComplete;
 
-    private DomainUpkManagerSettings settings;
+    private SettingsViewEntity settings;
 
     private readonly UpkManagerViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -36,12 +39,14 @@ namespace UpkManager.Wpf.Controllers {
 
     private readonly ISettingsRepository settingsRepository;
 
+    private readonly IMapper mapper;
+
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public UpkManagerController(UpkManagerViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, ISettingsRepository SettingsRepository) {
+    public UpkManagerController(UpkManagerViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, ISettingsRepository SettingsRepository, IMapper Mapper) {
       if (Application.Current != null) Application.Current.DispatcherUnhandledException += onCurrentDispatcherUnhandledException;
 
       AppDomain.CurrentDomain.UnhandledException += onDomainUnhandledException;
@@ -59,7 +64,9 @@ namespace UpkManager.Wpf.Controllers {
 
       settingsRepository = SettingsRepository;
 
-      settings = Task.Run(() => settingsRepository.LoadSettingsAsync()).Result;
+      mapper = Mapper;
+
+      settings = mapper.Map<SettingsViewEntity>(Task.Run(() => settingsRepository.LoadSettingsAsync()).Result);
 
       registerCommands();
     }
@@ -115,7 +122,7 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(new SettingsChangedMessage { Settings = settings });
 
-      settingsRepository.SaveSettings(settings);
+      settingsRepository.SaveSettings(mapper.Map<DomainSettings>(settings));
     }
 
     private void onDomainUnhandledException(object sender, UnhandledExceptionEventArgs e) {

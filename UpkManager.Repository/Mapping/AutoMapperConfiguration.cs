@@ -18,7 +18,7 @@ using UpkManager.Entities.PropertyTypes;
 using UpkManager.Entities.Tables;
 
 
-namespace UpkManager.Repository.Services {
+namespace UpkManager.Repository.Mapping {
 
   [Export(typeof(IAutoMapperConfiguration))]
   public class AutoMapperConfiguration : IAutoMapperConfiguration {
@@ -29,7 +29,7 @@ namespace UpkManager.Repository.Services {
 
       #region Settings
 
-      config.CreateMap<UpkManagerSettings, DomainUpkManagerSettings>().ReverseMap();
+      config.CreateMap<Settings, DomainSettings>().ReverseMap();
 
       #endregion Settings
 

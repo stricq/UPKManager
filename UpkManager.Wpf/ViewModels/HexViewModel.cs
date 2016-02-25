@@ -3,6 +3,8 @@ using System.ComponentModel.Composition;
 
 using STR.MvvmCommon;
 
+using UpkManager.Wpf.ViewEntities;
+
 
 namespace UpkManager.Wpf.ViewModels {
 

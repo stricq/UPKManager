@@ -2,16 +2,16 @@
 
 using STR.Common.Messages;
 
-using UpkManager.Domain.Models;
+using UpkManager.Wpf.ViewEntities;
 
 
-namespace UpkManager.Domain.Messages.Application {
+namespace UpkManager.Wpf.Messages.Application {
 
   public class SettingsEditMessage : MessageBase {
 
     public bool IsCancel { get; set; }
 
-    public DomainUpkManagerSettings Settings { get; set; }
+    public SettingsViewEntity Settings { get; set; }
 
     public Action<SettingsEditMessage> Callback { get; set; }
 

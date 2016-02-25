@@ -9,7 +9,7 @@
              mvvm:ViewModelLocator.ComposedViewModel="HeaderTablesViewModel"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="768">
 
-  <TabControl Margin="4,3,4,4" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}">
+  <TabControl Margin="6,5,6,6" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}">
     <TabControl.Resources>
       <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
     </TabControl.Resources>
@@ -34,7 +34,7 @@
     </TabItem>
 
     <TabItem Header="Generations">
-      <ListView Margin="-2" ItemsSource="{Binding Path=Generations}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
+      <ListView ItemsSource="{Binding Path=Generations}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
         <ListView.View>
           <GridView>
 
@@ -69,7 +69,7 @@
     </TabItem>
 
     <TabItem Header="Compression">
-      <Grid Margin="4">
+      <Grid Margin="6">
         <Grid.RowDefinitions>
           <RowDefinition Height="2*" MinHeight="100" />
           <RowDefinition Height="6" />

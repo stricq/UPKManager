@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CSharpImageLibrary, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -97,9 +97,6 @@
     <Compile Include="Contracts\ISettingsRepository.cs" />
     <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
-    <Compile Include="Messages\Application\AppLoadedMessage.cs" />
-    <Compile Include="Messages\Application\SettingsChangedMessage.cs" />
-    <Compile Include="Messages\Application\SettingsEditMessage.cs" />
     <Compile Include="Messages\FileHeader\FileHeaderLoadingMessage.cs" />
     <Compile Include="Messages\FileHeader\FileHeaderSelectedMessage.cs" />
     <Compile Include="Messages\FileHeader\LoadProgressMessage.cs" />
@@ -111,7 +108,7 @@
     <Compile Include="Messages\FileHeader\ExportObjectSelectedMessage.cs" />
     <Compile Include="Messages\FileHeader\FileHeaderLoadedMessage.cs" />
     <Compile Include="Messages\HeaderTables\CompressedBlockSelectedMessage.cs" />
-    <Compile Include="Models\DomainUpkManagerSettings.cs" />
+    <Compile Include="Models\DomainSettings.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
     <Compile Include="Models\Objects\DomainObjectDistributionBase.cs" />
     <Compile Include="Models\Objects\DomainObjectObjectRedirector.cs" />

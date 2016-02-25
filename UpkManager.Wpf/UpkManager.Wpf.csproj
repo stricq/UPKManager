@@ -39,8 +39,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CSharpImageLibrary, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -119,11 +119,16 @@
     <Compile Include="Controllers\PropertyController.cs" />
     <Compile Include="Controllers\StatusBarController.cs" />
     <Compile Include="Controllers\UpkManagerController.cs" />
+    <Compile Include="Mapping\AutoMapperConfiguration.cs" />
+    <Compile Include="Messages\Application\AppLoadedMessage.cs" />
+    <Compile Include="Messages\Application\SettingsChangedMessage.cs" />
+    <Compile Include="Messages\Application\SettingsEditMessage.cs" />
+    <Compile Include="ViewEntities\SettingsViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsViewModel.cs" />
     <Compile Include="ViewModels\FileHeaderViewModel.cs" />
     <Compile Include="ViewModels\FileTreeViewModel.cs" />
     <Compile Include="ViewModels\HeaderTablesViewModel.cs" />
-    <Compile Include="ViewModels\HexDataViewModel.cs" />
+    <Compile Include="ViewEntities\HexDataViewEntity.cs" />
     <Compile Include="ViewModels\HexViewModel.cs" />
     <Compile Include="ViewModels\ImageViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
