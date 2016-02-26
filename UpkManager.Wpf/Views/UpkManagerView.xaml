@@ -14,7 +14,7 @@
         Width="{Binding Path=Settings.WindowW, Mode=TwoWay}" Height="{Binding Path=Settings.WindowH, Mode=TwoWay}"
          Left="{Binding Path=Settings.WindowX, Mode=TwoWay}"    Top="{Binding Path=Settings.WindowY, Mode=TwoWay}"
         WindowState="{Binding Path=Settings.MainWindowState, Mode=TwoWay}"
-        FontFamily="Tahoma">
+        FontFamily="Tahoma" Icon="pack://siteoforigin:,,,/Images/UpkManagerIcon.ico">
 
   <Grid>
     <Grid>
