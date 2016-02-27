@@ -38,6 +38,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Images\UpkManagerIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
@@ -111,7 +114,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Behaviors\GridViewBehaviors.cs" />
-    <Compile Include="Controllers\Dialogs\SettingsController.cs" />
+    <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
     <Compile Include="Controllers\FileHeaderController.cs" />
     <Compile Include="Controllers\FileTreeController.cs" />
     <Compile Include="Controllers\HeaderTablesController.cs" />
@@ -124,7 +127,8 @@
     <Compile Include="Messages\Application\AppLoadedMessage.cs" />
     <Compile Include="Messages\Application\SettingsChangedMessage.cs" />
     <Compile Include="Messages\Application\SettingsEditMessage.cs" />
-    <Compile Include="ViewEntities\SettingsViewEntity.cs" />
+    <Compile Include="ViewEntities\SettingsDialogViewEntity.cs" />
+    <Compile Include="ViewEntities\SettingsWindowViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsViewModel.cs" />
     <Compile Include="ViewModels\FileHeaderViewModel.cs" />
     <Compile Include="ViewModels\FileTreeViewModel.cs" />
@@ -136,8 +140,8 @@
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
-    <Compile Include="Views\Dialogs\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
+    <Compile Include="Views\Dialogs\SettingsDialogView.xaml.cs">
+      <DependentUpon>SettingsDialogView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ExportTableCleanView.xaml.cs">
       <DependentUpon>ExportTableCleanView.xaml</DependentUpon>
@@ -242,7 +246,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Dialogs\SettingsView.xaml">
+    <Page Include="Views\Dialogs\SettingsDialogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

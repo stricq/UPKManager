@@ -20,8 +20,8 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
+
 using UpkManager.Wpf.Messages.Application;
-using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -34,7 +34,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private string oldPathToGame;
 
-    private SettingsViewEntity settings;
+    private DomainSettings settings;
 
     private readonly FileTreeViewModel viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -88,8 +88,6 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private async void onSettingsChanged(SettingsChangedMessage message) {
-      settings = message.Settings;
-
       if (settings.PathToGame != oldPathToGame) {
         viewModel.Files.ForEach(f => f.PropertyChanged -= onUpkFileViewModelChanged);
 

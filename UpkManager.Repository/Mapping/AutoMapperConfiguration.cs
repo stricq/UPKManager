@@ -27,12 +27,6 @@ namespace UpkManager.Repository.Mapping {
 
     public void RegisterMappings(IMapperConfiguration config) {
 
-      #region Settings
-
-      config.CreateMap<Settings, DomainSettings>().ReverseMap();
-
-      #endregion Settings
-
       #region DTOs
 
       config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.IsSelected,           opt => opt.Ignore())

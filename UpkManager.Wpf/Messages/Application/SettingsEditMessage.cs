@@ -11,7 +11,7 @@ namespace UpkManager.Wpf.Messages.Application {
 
     public bool IsCancel { get; set; }
 
-    public SettingsViewEntity Settings { get; set; }
+    public SettingsDialogViewEntity Settings { get; set; }
 
     public Action<SettingsEditMessage> Callback { get; set; }
 

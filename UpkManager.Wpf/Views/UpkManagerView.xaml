@@ -8,13 +8,14 @@
         mvvm:FrameworkElementBehaviors.LoadedCommand="{Binding Path=Loaded}"
         mvvm:WindowBehaviors.ClosingCommand="{Binding Path=Closing}"
         Title="Blade and Soul - UPK Manager - STR Programming Services"
+        Icon="pack://siteoforigin:,,,/Images/UpkManagerIcon.ico"
         WindowStartupLocation="Manual" MinWidth="800" MinHeight="600" ResizeMode="CanResizeWithGrip"
         SnapsToDevicePixels="True" UseLayoutRounding="True"
         Background="{StaticResource BackgroundColor}"
         Width="{Binding Path=Settings.WindowW, Mode=TwoWay}" Height="{Binding Path=Settings.WindowH, Mode=TwoWay}"
          Left="{Binding Path=Settings.WindowX, Mode=TwoWay}"    Top="{Binding Path=Settings.WindowY, Mode=TwoWay}"
         WindowState="{Binding Path=Settings.MainWindowState, Mode=TwoWay}"
-        FontFamily="Tahoma" Icon="pack://siteoforigin:,,,/Images/UpkManagerIcon.ico">
+        FontFamily="Tahoma">
 
   <Grid>
     <Grid>
@@ -28,12 +29,13 @@
 
       <Grid Grid.Row="1" Margin="6">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="600" MinWidth="506" />
+          <ColumnDefinition MinWidth="516" Width="{Binding Path=Settings.SplitterDistance}" />
           <ColumnDefinition Width="6" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TabControl Grid.Column="0" Margin="0,-1,8,0" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}">
+        <TabControl Grid.Column="0" Margin="0,-1,8,0" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}"
+                    mvvm:FrameworkElementBehaviors.SizeChangedCommand="{Binding Path=SizeChanged}">
           <TabControl.Resources>
             <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
           </TabControl.Resources>

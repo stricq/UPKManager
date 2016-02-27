@@ -7,7 +7,7 @@
              mvvm:ViewModelLocator.ComposedViewModel="ImageViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
-  <ScrollViewer x:Name="Image" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
 
     <Image Source="{Binding Path=Texture}" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
 

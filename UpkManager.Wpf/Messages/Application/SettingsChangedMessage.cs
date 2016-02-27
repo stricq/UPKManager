@@ -1,11 +1,11 @@
-﻿using UpkManager.Wpf.ViewEntities;
+﻿using UpkManager.Domain.Models;
 
 
 namespace UpkManager.Wpf.Messages.Application {
 
   public class SettingsChangedMessage {
 
-    public SettingsViewEntity Settings { get; set; }
+    public DomainSettings Settings { get; set; }
 
   }
 

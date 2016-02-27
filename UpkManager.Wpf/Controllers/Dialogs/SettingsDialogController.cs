@@ -8,6 +8,7 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
+
 using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.ViewModels.Dialogs;
 
@@ -15,7 +16,7 @@ using UpkManager.Wpf.ViewModels.Dialogs;
 namespace UpkManager.Wpf.Controllers.Dialogs {
 
   [Export(typeof(IController))]
-  public class SettingsController : IController {
+  public class SettingsDialogController : IController {
 
     #region Private Fields
 
@@ -30,7 +31,7 @@ namespace UpkManager.Wpf.Controllers.Dialogs {
     #region Constructor
 
     [ImportingConstructor]
-    public SettingsController(SettingsViewModel ViewModel, IMessenger Messenger) {
+    public SettingsDialogController(SettingsViewModel ViewModel, IMessenger Messenger) {
       viewModel = ViewModel;
 
       messenger = Messenger;

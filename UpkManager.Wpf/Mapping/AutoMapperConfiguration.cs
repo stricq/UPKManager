@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Windows;
 
 using AutoMapper;
 
@@ -19,7 +20,14 @@ namespace UpkManager.Wpf.Mapping {
 
       #region Settings
 
-      config.CreateMap<DomainSettings, SettingsViewEntity>().ReverseMap();
+      config.CreateMap<DomainSettings, SettingsDialogViewEntity>().ReverseMap();
+
+      config.CreateMap<DomainSettings, SettingsWindowViewEntity>().ForMember(dest => dest.AreSettingsChanged, opt => opt.Ignore())
+                                                                  .ForMember(dest => dest.MainWindowState,    opt => opt.ResolveUsing(src => src.Maximized ? WindowState.Maximized : WindowState.Normal));
+
+      config.CreateMap<SettingsWindowViewEntity, DomainSettings>().ForMember(dest => dest.Maximized,  opt => opt.ResolveUsing(src => src.MainWindowState == WindowState.Maximized))
+                                                                  .ForMember(dest => dest.PathToGame, opt => opt.Ignore())
+                                                                  .ForMember(dest => dest.ExportPath, opt => opt.Ignore());
 
       #endregion Settings
 

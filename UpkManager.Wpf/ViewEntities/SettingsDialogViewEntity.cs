@@ -3,7 +3,7 @@
 
 namespace UpkManager.Wpf.ViewEntities {
 
-  public class SettingsViewEntity : ObservableObject {
+  public class SettingsDialogViewEntity : ObservableObject {
 
     #region Private Fields
 

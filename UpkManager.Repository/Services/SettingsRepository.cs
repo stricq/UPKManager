@@ -7,10 +7,10 @@ using AutoMapper;
 
 using Newtonsoft.Json;
 
+using STR.Common.Extensions;
+
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
-
-using UpkManager.Entities;
 
 
 namespace UpkManager.Repository.Services {
@@ -36,20 +36,32 @@ namespace UpkManager.Repository.Services {
     #region ISettingsRepository Implementation
 
     public async Task<DomainSettings> LoadSettingsAsync() {
-      Settings settings;
+      DomainSettings settings;
 
       if (await Task.Run(() => File.Exists(Filename))) {
-        settings = await Task.Run(() => JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Filename)));
-      }
-      else settings = new Settings();
+        settings = await Task.Run(() => JsonConvert.DeserializeObject<DomainSettings>(File.ReadAllText(Filename)));
 
-      return await Task.Run(() => mapper.Map<DomainSettings>(settings));
+        if (settings.WindowW.EqualInPercentRange(0)) {
+          settings.WindowW = 1280;
+          settings.WindowH = 720;
+
+          settings.WindowX = 100;
+          settings.WindowY = 100;
+        }
+      }
+      else settings = new DomainSettings {
+        WindowW = 1280,
+        WindowH = 720,
+
+        WindowX = 100,
+        WindowY = 100
+      };
+
+      return settings;
     }
 
     public async Task SaveSettings(DomainSettings Settings) {
-      Settings settings = await Task.Run(() => mapper.Map<Settings>(Settings));
-
-      string json = await Task.Run(() => JsonConvert.SerializeObject(settings, Formatting.Indented));
+      string json = await Task.Run(() => JsonConvert.SerializeObject(Settings, Formatting.Indented));
 
       if (!await Task.Run(() => File.Exists(Filename))) await Task.Run(() => Directory.CreateDirectory(Path.GetDirectoryName(Filename)));
 

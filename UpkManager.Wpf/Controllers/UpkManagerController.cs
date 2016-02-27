@@ -14,6 +14,7 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Messages.Status;
 using UpkManager.Domain.Models;
 
 using UpkManager.Wpf.Messages.Application;
@@ -30,7 +31,9 @@ namespace UpkManager.Wpf.Controllers {
 
     private bool isStartupComplete;
 
-    private SettingsViewEntity settings;
+    private DateTime lastSave = DateTime.Now;
+
+    private readonly DomainSettings settings;
 
     private readonly UpkManagerViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -66,12 +69,35 @@ namespace UpkManager.Wpf.Controllers {
 
       mapper = Mapper;
 
-      settings = mapper.Map<SettingsViewEntity>(Task.Run(() => settingsRepository.LoadSettingsAsync()).Result);
+      settings = Task.Run(() => settingsRepository.LoadSettingsAsync()).Result;
 
+      viewModel.Settings = mapper.Map<SettingsWindowViewEntity>(settings);
+
+      registerMessages();
       registerCommands();
     }
 
     #endregion Constructor
+
+    #region Messages
+
+    private void registerMessages() {
+      messenger.RegisterAsync<StatusTickMessage>(this, onStatusTick);
+    }
+
+    private async Task onStatusTick(StatusTickMessage message) {
+      if ((DateTime.Now - lastSave).Seconds > 3 && viewModel.Settings.AreSettingsChanged) {
+        mapper.Map(viewModel.Settings, settings);
+
+        await settingsRepository.SaveSettings(settings);
+
+        viewModel.Settings.AreSettingsChanged = false;
+
+        lastSave = DateTime.Now;
+      }
+    }
+
+    #endregion Messages
 
     #region Commands
 
@@ -79,6 +105,8 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Loaded = new RelayCommandAsync<RoutedEventArgs>(onLoadedExecuteAsync);
 
       viewModel.Closing = new RelayCommand<CancelEventArgs>(onClosingExecute);
+
+      viewModel.SizeChanged = new RelayCommand<SizeChangedEventArgs>(onSizeChanged);
 
       menuViewModel.Settings = new RelayCommand(onSettingsExecute);
 
@@ -99,8 +127,12 @@ namespace UpkManager.Wpf.Controllers {
       args.Cancel = message.Cancel;
     }
 
+    private void onSizeChanged(SizeChangedEventArgs args) {
+      viewModel.Settings.SplitterDistance = args.NewSize.Width + 6;
+    }
+
     private void onSettingsExecute() {
-      messenger.Send(new SettingsEditMessage { Settings = settings, Callback = onSettingsEditResponse });
+      messenger.Send(new SettingsEditMessage { Settings = mapper.Map<SettingsDialogViewEntity>(settings), Callback = onSettingsEditResponse });
     }
 
     private void onExitExecute() {
@@ -118,7 +150,7 @@ namespace UpkManager.Wpf.Controllers {
     private void onSettingsEditResponse(SettingsEditMessage message) {
       if (message.IsCancel) return;
 
-      settings = message.Settings;
+      mapper.Map(message.Settings, settings);
 
       messenger.Send(new SettingsChangedMessage { Settings = settings });
 

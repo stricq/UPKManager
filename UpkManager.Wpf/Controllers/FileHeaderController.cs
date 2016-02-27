@@ -13,8 +13,8 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
+
 using UpkManager.Wpf.Messages.Application;
-using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -27,7 +27,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private string oldNotes;
 
-    private SettingsViewEntity settings;
+    private DomainSettings settings;
 
     private readonly FileHeaderViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -67,8 +67,6 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Register<FileHeaderLoadingMessage>(this, onFileHeaderLoading);
 
       messenger.RegisterAsync<FileHeaderSelectedMessage>(this, onFileHeaderSelected);
-
-      messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
     }
 
     private void onAppLoaded(AppLoadedMessage message) {
@@ -88,10 +86,6 @@ namespace UpkManager.Wpf.Controllers {
       oldNotes = viewModel.File.Notes;
 
       message.File.IsErrored = viewModel.Header.IsErrored;
-    }
-
-    private void onSettingsChanged(SettingsChangedMessage message) {
-      settings = message.Settings;
     }
 
     #endregion Messages

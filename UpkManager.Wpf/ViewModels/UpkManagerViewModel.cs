@@ -4,6 +4,8 @@ using System.Windows;
 
 using STR.MvvmCommon;
 
+using UpkManager.Wpf.ViewEntities;
+
 
 namespace UpkManager.Wpf.ViewModels {
 
@@ -17,6 +19,10 @@ namespace UpkManager.Wpf.ViewModels {
 
     private RelayCommand<CancelEventArgs> closing;
 
+    private RelayCommand<SizeChangedEventArgs> sizeChanged;
+
+    private SettingsWindowViewEntity settings;
+
     #endregion Private Fields
 
     #region Properties
@@ -29,6 +35,16 @@ namespace UpkManager.Wpf.ViewModels {
     public RelayCommand<CancelEventArgs> Closing {
       get { return closing; }
       set { SetField(ref closing, value, () => Closing); }
+    }
+
+    public RelayCommand<SizeChangedEventArgs> SizeChanged {
+      get { return sizeChanged; }
+      set { SetField(ref sizeChanged, value, () => SizeChanged); }
+    }
+
+    public SettingsWindowViewEntity Settings {
+      get { return settings; }
+      set { SetField(ref settings, value, () => Settings); }
     }
 
     #endregion Properties
