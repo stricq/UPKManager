@@ -92,7 +92,8 @@ namespace UpkManager.Entities {
 
       Signature = BitConverter.ToUInt32(data, index); index += sizeof(uint);
 
-      if (Signature != FileHeader.Signature) throw new Exception("Missing signature.  File is not a properly formatted UPK file.");
+      if (Signature == FileHeader.EncryptedSignature) decryptChunk(data);
+      else if (Signature != FileHeader.Signature) throw new Exception("File is not a properly formatted UPK file.");
 
       Version   = BitConverter.ToUInt16(data, index); index += sizeof(ushort);
       Licensee  = BitConverter.ToUInt16(data, index); index += sizeof(ushort);
@@ -172,6 +173,16 @@ namespace UpkManager.Entities {
       }
 
       return chunks;
+    }
+
+    private static void decryptChunk(byte[] data) {
+      if (data.Length < 32) return;
+
+//    const string key = "qiffjdlerdoqymvketdcl0er2subioxq";
+
+      byte[] key = { 0x71, 0x69, 0x66, 0x66, 0x6a, 0x64, 0x6c, 0x65, 0x72, 0x64, 0x6f, 0x71, 0x79, 0x6d, 0x76, 0x6b, 0x65, 0x74, 0x64, 0x63, 0x6c, 0x30, 0x65, 0x72, 0x32, 0x73, 0x75, 0x62, 0x69, 0x6f, 0x78, 0x71 };
+
+      for(int i = 0; i < data.Length; ++i) data[i] ^= key[i % 32];
     }
 
     #endregion Private Methods

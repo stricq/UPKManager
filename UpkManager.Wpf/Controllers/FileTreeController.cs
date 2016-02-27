@@ -296,8 +296,6 @@ namespace UpkManager.Wpf.Controllers {
         if (files.Length > 0) {
           List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length }).ToList();
 
-          upkFiles.Where(f => f.GameFilename.ToLowerInvariant() == "startup_int.upk").ToList().ForEach(f => upkFiles.Remove(f));
-
           parent.AddRange(upkFiles);
         }
       }
