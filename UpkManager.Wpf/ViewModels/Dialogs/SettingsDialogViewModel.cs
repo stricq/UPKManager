@@ -11,7 +11,7 @@ namespace UpkManager.Wpf.ViewModels.Dialogs {
 
   [Export]
   [ViewModel("SettingsViewModel")]
-  public class SettingsViewModel : ObservableObject, IDialogViewModel {
+  public class SettingsDialogViewModel : ObservableObject, IDialogViewModel {
 
     #region Private Fields
 

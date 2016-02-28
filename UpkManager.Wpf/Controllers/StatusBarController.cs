@@ -6,8 +6,7 @@ using System.Windows.Threading;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Messages.FileHeader;
-using UpkManager.Domain.Messages.Status;
-
+using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewModels;
 
 

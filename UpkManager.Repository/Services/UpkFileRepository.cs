@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -276,10 +275,10 @@ namespace UpkManager.Repository.Services {
     // https://github.com/gildor2/UModel/blob/c871f9d534e0bd42a17b4d4268c0ecc59dd7191e/Unreal/UnPackage.cpp
     //
     private static void patchPointers(UpkHeader header) {
-      uint code1 = ((uint)header.Size             & 0xff) << 24
-                 | ((uint)header.NameTableCount   & 0xff) << 16
-                 | ((uint)header.NameTableOffset  & 0xff) << 8
-                 | ((uint)header.ExportTableCount & 0xff);
+      uint code1 = ((uint)header.Size             & 0xffu) << 24
+                 | ((uint)header.NameTableCount   & 0xffu) << 16
+                 | ((uint)header.NameTableOffset  & 0xffu) << 8
+                 | ((uint)header.ExportTableCount & 0xffu);
 
       int code2 = (header.ExportTableOffset + header.ImportTableCount + header.ImportTableOffset) & 0x1f;
 

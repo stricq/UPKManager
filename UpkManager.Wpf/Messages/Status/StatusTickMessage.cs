@@ -1,7 +1,7 @@
 ﻿using STR.Common.Messages;
 
 
-namespace UpkManager.Domain.Messages.Status {
+namespace UpkManager.Wpf.Messages.Status {
 
   public class StatusTickMessage : MessageBase {
 

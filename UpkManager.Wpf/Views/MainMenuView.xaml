@@ -39,6 +39,10 @@
       <MenuItem Header="S_ettings..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=Settings}" />
     </MenuItem>
 
+    <MenuItem Header="_Help" Foreground="White">
+      <MenuItem Header="_About..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=About}" />
+    </MenuItem>
+
   </Menu>
 
 </UserControl>

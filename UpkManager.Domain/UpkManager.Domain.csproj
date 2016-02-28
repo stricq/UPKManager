@@ -100,7 +100,6 @@
     <Compile Include="Messages\FileHeader\FileHeaderLoadingMessage.cs" />
     <Compile Include="Messages\FileHeader\FileHeaderSelectedMessage.cs" />
     <Compile Include="Messages\FileHeader\LoadProgressMessage.cs" />
-    <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunk.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkBlock.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkHeader.cs" />

@@ -22,7 +22,7 @@ namespace UpkManager.Wpf.Controllers.Dialogs {
 
     private string oldPathToGame;
 
-    private readonly SettingsViewModel viewModel;
+    private readonly SettingsDialogViewModel viewModel;
 
     private readonly IMessenger messenger;
 
@@ -31,7 +31,7 @@ namespace UpkManager.Wpf.Controllers.Dialogs {
     #region Constructor
 
     [ImportingConstructor]
-    public SettingsDialogController(SettingsViewModel ViewModel, IMessenger Messenger) {
+    public SettingsDialogController(SettingsDialogViewModel ViewModel, IMessenger Messenger) {
       viewModel = ViewModel;
 
       messenger = Messenger;

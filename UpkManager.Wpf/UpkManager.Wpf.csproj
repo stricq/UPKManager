@@ -114,6 +114,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Behaviors\GridViewBehaviors.cs" />
+    <Compile Include="Behaviors\HyperlinkBehaviors.cs" />
+    <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
     <Compile Include="Controllers\FileHeaderController.cs" />
     <Compile Include="Controllers\FileTreeController.cs" />
@@ -124,12 +126,15 @@
     <Compile Include="Controllers\StatusBarController.cs" />
     <Compile Include="Controllers\UpkManagerController.cs" />
     <Compile Include="Mapping\AutoMapperConfiguration.cs" />
+    <Compile Include="Messages\Application\AboutMessage.cs" />
     <Compile Include="Messages\Application\AppLoadedMessage.cs" />
     <Compile Include="Messages\Application\SettingsChangedMessage.cs" />
     <Compile Include="Messages\Application\SettingsEditMessage.cs" />
+    <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="ViewEntities\SettingsDialogViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsWindowViewEntity.cs" />
-    <Compile Include="ViewModels\Dialogs\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
     <Compile Include="ViewModels\FileHeaderViewModel.cs" />
     <Compile Include="ViewModels\FileTreeViewModel.cs" />
     <Compile Include="ViewModels\HeaderTablesViewModel.cs" />
@@ -140,6 +145,9 @@
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
+    <Compile Include="Views\Dialogs\AboutDialogView.xaml.cs">
+      <DependentUpon>AboutDialogView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialogs\SettingsDialogView.xaml.cs">
       <DependentUpon>SettingsDialogView.xaml</DependentUpon>
     </Compile>
@@ -246,6 +254,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Dialogs\AboutDialogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialogs\SettingsDialogView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -320,6 +332,11 @@
     <None Include="Images\UpkManagerIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\UpkManagerAbout.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

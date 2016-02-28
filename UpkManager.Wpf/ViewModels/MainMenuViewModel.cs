@@ -24,6 +24,7 @@ namespace UpkManager.Wpf.ViewModels {
     private RelayCommand deselectAllFiles;
 
     private RelayCommand settings;
+    private RelayCommand about;
 
     private RelayCommand exit;
 
@@ -74,6 +75,11 @@ namespace UpkManager.Wpf.ViewModels {
     public RelayCommand Settings {
       get { return settings; }
       set { SetField(ref settings, value, () => Settings); }
+    }
+
+    public RelayCommand About {
+      get { return about; }
+      set { SetField(ref about, value, () => About); }
     }
 
     public RelayCommand Exit {

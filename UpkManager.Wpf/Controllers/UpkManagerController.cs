@@ -14,10 +14,10 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.Status;
 using UpkManager.Domain.Models;
 
 using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
@@ -109,8 +109,8 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.SizeChanged = new RelayCommand<SizeChangedEventArgs>(onSizeChanged);
 
       menuViewModel.Settings = new RelayCommand(onSettingsExecute);
-
-      menuViewModel.Exit = new RelayCommand(onExitExecute);
+      menuViewModel.About    = new RelayCommand(onAboutExecute);
+      menuViewModel.Exit     = new RelayCommand(onExitExecute);
     }
 
     private async Task onLoadedExecuteAsync(RoutedEventArgs args) {
@@ -128,11 +128,15 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onSizeChanged(SizeChangedEventArgs args) {
-      viewModel.Settings.SplitterDistance = args.NewSize.Width + 6;
+      viewModel.Settings.SplitterDistance = args.NewSize.Width + 8;
     }
 
     private void onSettingsExecute() {
       messenger.Send(new SettingsEditMessage { Settings = mapper.Map<SettingsDialogViewEntity>(settings), Callback = onSettingsEditResponse });
+    }
+
+    private void onAboutExecute() {
+      messenger.Send(new AboutMessage());
     }
 
     private void onExitExecute() {
