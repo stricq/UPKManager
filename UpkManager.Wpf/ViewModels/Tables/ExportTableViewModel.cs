@@ -4,9 +4,10 @@ using System.ComponentModel.Composition;
 using STR.MvvmCommon;
 
 using UpkManager.Wpf.ViewEntities;
+using UpkManager.Wpf.ViewEntities.Tables;
 
 
-namespace UpkManager.Wpf.ViewModels {
+namespace UpkManager.Wpf.ViewModels.Tables {
 
   [Export]
   [ViewModel("ExportTableViewModel")]

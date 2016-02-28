@@ -117,12 +117,14 @@
     <Compile Include="Behaviors\HyperlinkBehaviors.cs" />
     <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
-    <Compile Include="Controllers\ExportTableController.cs" />
+    <Compile Include="Controllers\Tables\ExportTableController.cs" />
     <Compile Include="Controllers\HeaderController.cs" />
     <Compile Include="Controllers\FileTreeController.cs" />
     <Compile Include="Controllers\HeaderTablesController.cs" />
     <Compile Include="Controllers\HexController.cs" />
     <Compile Include="Controllers\ImageController.cs" />
+    <Compile Include="Controllers\Tables\ImportTableController.cs" />
+    <Compile Include="Controllers\Tables\NameTableController.cs" />
     <Compile Include="Controllers\PropertyController.cs" />
     <Compile Include="Controllers\StatusBarController.cs" />
     <Compile Include="Controllers\UpkManagerController.cs" />
@@ -136,20 +138,24 @@
     <Compile Include="Messages\Status\LoadProgressMessage.cs" />
     <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="Messages\Tables\ExportTableEntrySelectedMessage.cs" />
-    <Compile Include="ViewEntities\ExportTableEntryViewEntity.cs" />
+    <Compile Include="ViewEntities\Tables\ExportTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\HeaderViewEntity.cs" />
+    <Compile Include="ViewEntities\Tables\ImportTableEntryViewEntity.cs" />
+    <Compile Include="ViewEntities\Tables\NameTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsDialogViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsWindowViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
-    <Compile Include="ViewModels\ExportTableViewModel.cs" />
+    <Compile Include="ViewModels\Tables\ExportTableViewModel.cs" />
     <Compile Include="ViewModels\HeaderViewModel.cs" />
     <Compile Include="ViewModels\FileTreeViewModel.cs" />
     <Compile Include="ViewModels\HeaderTablesViewModel.cs" />
     <Compile Include="ViewEntities\HexDataViewEntity.cs" />
     <Compile Include="ViewModels\HexViewModel.cs" />
     <Compile Include="ViewModels\ImageViewModel.cs" />
+    <Compile Include="ViewModels\Tables\ImportTableViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
+    <Compile Include="ViewModels\Tables\NameTableViewModel.cs" />
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
@@ -159,10 +165,10 @@
     <Compile Include="Views\Dialogs\SettingsDialogView.xaml.cs">
       <DependentUpon>SettingsDialogView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ExportTableCleanView.xaml.cs">
+    <Compile Include="Views\Tables\ExportTableCleanView.xaml.cs">
       <DependentUpon>ExportTableCleanView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ExportTableRawView.xaml.cs">
+    <Compile Include="Views\Tables\ExportTableRawView.xaml.cs">
       <DependentUpon>ExportTableRawView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HeaderView.xaml.cs">
@@ -180,13 +186,13 @@
     <Compile Include="Views\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ImportTableView.xaml.cs">
+    <Compile Include="Views\Tables\ImportTableView.xaml.cs">
       <DependentUpon>ImportTableView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainMenuView.xaml.cs">
       <DependentUpon>MainMenuView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\NameTableView.xaml.cs">
+    <Compile Include="Views\Tables\NameTableView.xaml.cs">
       <DependentUpon>NameTableView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PropertyView.xaml.cs">
@@ -270,11 +276,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ExportTableCleanView.xaml">
+    <Page Include="Views\Tables\ExportTableCleanView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ExportTableRawView.xaml">
+    <Page Include="Views\Tables\ExportTableRawView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -298,7 +304,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ImportTableView.xaml">
+    <Page Include="Views\Tables\ImportTableView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -306,7 +312,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\NameTableView.xaml">
+    <Page Include="Views\Tables\NameTableView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

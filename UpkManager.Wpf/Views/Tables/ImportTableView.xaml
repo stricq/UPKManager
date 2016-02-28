@@ -1,15 +1,15 @@
-﻿<UserControl x:Class="UpkManager.Wpf.Views.ImportTableView"
+﻿<UserControl x:Class="UpkManager.Wpf.Views.Tables.ImportTableView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
-             mvvm:ViewModelLocator.ComposedViewModel="FileHeaderViewModel"
+             mvvm:ViewModelLocator.ComposedViewModel="ImportTableViewModel"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="768">
 
   <Grid>
-    <ListView ItemsSource="{Binding Path=Header.ImportTable}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
+    <ListView ItemsSource="{Binding Path=ImportTableEntries}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
               VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
       <ListView.View>
         <GridView>
@@ -46,10 +46,10 @@
             </GridViewColumn.CellTemplate>
           </GridViewColumn>
 
-          <GridViewColumn Header="Owner Name">
+          <GridViewColumn Header="Owner Reference">
             <GridViewColumn.CellTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding Path=OwnerName}" TextAlignment="Left" />
+                <TextBlock Text="{Binding Path=OwnerReference, StringFormat=0x{0:X8}}" TextAlignment="Left" />
               </DataTemplate>
             </GridViewColumn.CellTemplate>
           </GridViewColumn>

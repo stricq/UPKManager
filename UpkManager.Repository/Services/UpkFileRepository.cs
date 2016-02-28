@@ -127,7 +127,7 @@ namespace UpkManager.Repository.Services {
       int index = header.NameTableOffset;
 
       for(int i = 0; i < header.NameTableCount; ++i) {
-        NameTableEntry name = new NameTableEntry { Index = i };
+        NameTableEntry name = new NameTableEntry { TableIndex = i };
 
         await Task.Run(() => name.ReadNameTableEntry(data, ref index));
 

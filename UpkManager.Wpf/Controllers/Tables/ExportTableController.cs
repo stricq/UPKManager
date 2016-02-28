@@ -14,18 +14,18 @@ using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
-using UpkManager.Wpf.ViewEntities;
-using UpkManager.Wpf.ViewModels;
+using UpkManager.Wpf.ViewEntities.Tables;
+using UpkManager.Wpf.ViewModels.Tables;
 
 
-namespace UpkManager.Wpf.Controllers {
+namespace UpkManager.Wpf.Controllers.Tables {
 
   [Export(typeof(IController))]
   public class ExportTableController : IController {
 
     #region Private Fields
 
-    private List<DomainExportTableEntry> exportTableEntries;
+    private readonly List<DomainExportTableEntry> exportTableEntries;
 
     private readonly ExportTableViewModel viewModel;
 

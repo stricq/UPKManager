@@ -3,7 +3,7 @@
 using STR.MvvmCommon;
 
 
-namespace UpkManager.Wpf.ViewEntities {
+namespace UpkManager.Wpf.ViewEntities.Tables {
 
   public class ExportTableEntryViewEntity : ObservableObject {
 

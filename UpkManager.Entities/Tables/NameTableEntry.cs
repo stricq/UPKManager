@@ -7,7 +7,7 @@ namespace UpkManager.Entities.Tables {
 
     #region Private Fields
 
-    public int Index { get; set; }
+    public int TableIndex { get; set; }
 
     public UpkString Name { get; set; }
 

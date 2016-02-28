@@ -13,7 +13,7 @@ namespace UpkManager.Domain.Models.Tables {
     //
     // Repository Fields
     //
-    private int index;
+    private int tableIndex;
 
     private DomainString name;
 
@@ -27,9 +27,9 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Properties
 
-    public int Index {
-      get { return index; }
-      set { SetField(ref index, value, () => Index); }
+    public int TableIndex {
+      get { return tableIndex; }
+      set { SetField(ref tableIndex, value, () => TableIndex); }
     }
 
     public DomainString Name {

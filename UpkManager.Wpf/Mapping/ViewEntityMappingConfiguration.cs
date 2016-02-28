@@ -10,6 +10,7 @@ using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
+using UpkManager.Wpf.ViewEntities.Tables;
 
 
 namespace UpkManager.Wpf.Mapping {
@@ -50,6 +51,10 @@ namespace UpkManager.Wpf.Mapping {
       #region Tables
 
       config.CreateMap<DomainExportTableEntry, ExportTableEntryViewEntity>().ForMember(dest => dest.Guid, opt => opt.ResolveUsing(src => new Guid(src.Guid)));
+
+      config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>();
+
+      config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.String));
 
       #endregion Tables
 
