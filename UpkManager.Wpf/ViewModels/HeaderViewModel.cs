@@ -4,12 +4,14 @@ using STR.MvvmCommon;
 
 using UpkManager.Domain.Models;
 
+using UpkManager.Wpf.ViewEntities;
+
 
 namespace UpkManager.Wpf.ViewModels {
 
   [Export]
-  [ViewModel("FileHeaderViewModel")]
-  public class FileHeaderViewModel : ObservableObject {
+  [ViewModel("HeaderViewModel")]
+  public class HeaderViewModel : ObservableObject {
 
     #region Private Fields
 
@@ -17,7 +19,7 @@ namespace UpkManager.Wpf.ViewModels {
 
     private DomainUpkFile file;
 
-    private DomainHeader header;
+    private HeaderViewEntity header;
 
     #endregion Private Fields
 
@@ -33,7 +35,7 @@ namespace UpkManager.Wpf.ViewModels {
       set { SetField(ref file, value, () => File, () => AreNotesEnabled); }
     }
 
-    public DomainHeader Header {
+    public HeaderViewEntity Header {
       get { return header; }
       set { SetField(ref header, value, () => Header); }
     }

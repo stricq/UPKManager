@@ -5,10 +5,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
-             mvvm:ViewModelLocator.ComposedViewModel="FileHeaderViewModel"
+             mvvm:ViewModelLocator.ComposedViewModel="ExportTableViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
-  <ListView ItemsSource="{Binding Path=Header.ExportTable}" BorderThickness="0" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
+  <ListView ItemsSource="{Binding Path=ExportTableEntries}" BorderThickness="0" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
             VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
     <ListView.View>
       <GridView>

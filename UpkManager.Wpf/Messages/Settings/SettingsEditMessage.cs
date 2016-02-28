@@ -5,7 +5,7 @@ using STR.Common.Messages;
 using UpkManager.Wpf.ViewEntities;
 
 
-namespace UpkManager.Wpf.Messages.Application {
+namespace UpkManager.Wpf.Messages.Settings {
 
   public class SettingsEditMessage : MessageBase {
 

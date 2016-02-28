@@ -5,7 +5,7 @@ using System.Windows.Threading;
 
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Messages.FileHeader;
+using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewModels;
 
@@ -50,13 +50,18 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<FileHeaderLoadingMessage>(this, onFileHeaderLoading);
+      messenger.Register<FileLoadingMessage>(this, onFileLoading);
+      messenger.Register<FileLoadedMessage>(this, onFileLoaded);
 
       messenger.Register<LoadProgressMessage>(this, onLoadProgress);
     }
 
-    private void onFileHeaderLoading(FileHeaderLoadingMessage message) {
-      viewModel.StatusText = message.Filename;
+    private void onFileLoading(FileLoadingMessage message) {
+      viewModel.StatusText = null;
+    }
+
+    private void onFileLoaded(FileLoadedMessage message) {
+      viewModel.StatusText = message.File.Header.FullFilename;
     }
 
     private void onLoadProgress(LoadProgressMessage message) {

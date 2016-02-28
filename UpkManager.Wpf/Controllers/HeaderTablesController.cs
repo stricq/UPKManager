@@ -7,10 +7,10 @@ using STR.Common.Extensions;
 
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Messages.HeaderTables;
 using UpkManager.Domain.Models.Compression;
 
+using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -22,7 +22,6 @@ namespace UpkManager.Wpf.Controllers {
     #region Private Fields
 
     private readonly HeaderTablesViewModel viewModel;
-    private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
 
@@ -32,14 +31,13 @@ namespace UpkManager.Wpf.Controllers {
 
     [ImportingConstructor]
     public HeaderTablesController(HeaderTablesViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger) {
-          viewModel = ViewModel;
-      menuViewModel = MenuViewModel;
+      viewModel = ViewModel;
 
       messenger = Messenger;
 
       viewModel.Blocks = new ObservableCollection<DomainCompressedChunkBlock>();
 
-      menuViewModel.PropertyChanged += onMenuViewModelChanged;
+      MenuViewModel.PropertyChanged += onMenuViewModelChanged;
 
       registerMessages();
     }
@@ -49,16 +47,16 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<FileHeaderLoadedMessage>(this, onFileHeaderLoaded);
+      messenger.Register<FileLoadedMessage>(this, onFileHeaderLoaded);
     }
 
-    private void onFileHeaderLoaded(FileHeaderLoadedMessage message) {
+    private void onFileHeaderLoaded(FileLoadedMessage message) {
       if (viewModel.Chunks != null && viewModel.Chunks.Any()) {
         viewModel.Chunks.ForEach(chunk => chunk.PropertyChanged -= onChunkPropertyChanged);
       }
 
-      viewModel.Generations = message.FileHeader.Generations;
-      viewModel.Chunks      = message.FileHeader.CompressedChunks;
+      viewModel.Generations = message.File.Header.Generations;
+      viewModel.Chunks      = message.File.Header.CompressedChunks;
 
       viewModel.Blocks.Clear();
 

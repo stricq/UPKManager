@@ -28,6 +28,8 @@ namespace UpkManager.Domain.Models {
 
     private string notes;
 
+    private DomainHeader header;
+
     private ObservableCollection<string> exportTypes;
 
     private ObservableCollection<DomainUpkFile> moddedFiles;
@@ -59,6 +61,11 @@ namespace UpkManager.Domain.Models {
     public string GameFilename {
       get { return gameFilename; }
       set { SetField(ref gameFilename, value, () => GameFilename); }
+    }
+
+    public DomainHeader Header {
+      get { return header; }
+      set { SetField(ref header, value, () => Header); }
     }
 
     public ObservableCollection<string> ExportTypes {

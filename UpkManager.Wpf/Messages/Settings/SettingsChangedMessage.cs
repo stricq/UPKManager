@@ -1,7 +1,7 @@
 ﻿using UpkManager.Domain.Models;
 
 
-namespace UpkManager.Wpf.Messages.Application {
+namespace UpkManager.Wpf.Messages.Settings {
 
   public class SettingsChangedMessage {
 

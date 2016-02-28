@@ -37,6 +37,7 @@ namespace UpkManager.Repository.Mapping {
                                                 .ForMember(dest => dest.NotesColumn,          opt => opt.Ignore())
                                                 .ForMember(dest => dest.ModdedFiles,          opt => opt.Ignore())
                                                 .ForMember(dest => dest.IsModded,             opt => opt.Ignore())
+                                                .ForMember(dest => dest.Header,               opt => opt.Ignore())
                                                 .ReverseMap();
 
       #endregion DTOs

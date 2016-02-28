@@ -1,11 +1,9 @@
 ﻿using System.Threading;
 
-using STR.Common.Messages;
 
+namespace UpkManager.Domain.Models {
 
-namespace UpkManager.Domain.Messages.FileHeader {
-
-  public class LoadProgressMessage : MessageBase {
+  public class DomainLoadProgress {
 
     #region Private Fields
 

@@ -13,8 +13,8 @@ using STR.Common.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Messages.FileHeader;
-
+using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
@@ -58,14 +58,14 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<FileHeaderLoadingMessage>(this, onFileHeaderLoadingMessage);
+      messenger.Register<FileLoadingMessage>(this, onFileHeaderLoadingMessage);
 
-      messenger.RegisterAsync<ExportObjectSelectedMessage>(this, onExportObjectSelectedMessage);
+      messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportObjectSelectedMessage);
 
       messenger.Register<ApplicationClosingMessage>(this, onApplicationClosing);
     }
 
-    private void onFileHeaderLoadingMessage(FileHeaderLoadingMessage message) {
+    private void onFileHeaderLoadingMessage(FileLoadingMessage message) {
       tokenSource?.Cancel();
 
       viewModel.HexData.Clear();
@@ -73,16 +73,16 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Title = "No Display";
     }
 
-    private async Task onExportObjectSelectedMessage(ExportObjectSelectedMessage message) {
+    private async Task onExportObjectSelectedMessage(ExportTableEntrySelectedMessage message) {
       tokenSource?.Cancel();
 
       tokenSource = new CancellationTokenSource();
 
-      viewModel.Title = message.ExportObject.Name;
+      viewModel.Title = message.ExportTableEntry.Name;
 
       title = viewModel.Title;
 
-      await buildHexDataAsync(message.ExportObject.DomainObject.AdditionalData, message.ExportObject.DomainObject.AdditionalDataOffset, tokenSource.Token);
+      await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalData, message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
     }
 
     private void onApplicationClosing(ApplicationClosingMessage message) {

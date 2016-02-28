@@ -97,15 +97,11 @@
     <Compile Include="Contracts\ISettingsRepository.cs" />
     <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
-    <Compile Include="Messages\FileHeader\FileHeaderLoadingMessage.cs" />
-    <Compile Include="Messages\FileHeader\FileHeaderSelectedMessage.cs" />
-    <Compile Include="Messages\FileHeader\LoadProgressMessage.cs" />
+    <Compile Include="Models\DomainLoadProgress.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunk.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkBlock.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkHeader.cs" />
     <Compile Include="Models\DomainHeader.cs" />
-    <Compile Include="Messages\FileHeader\ExportObjectSelectedMessage.cs" />
-    <Compile Include="Messages\FileHeader\FileHeaderLoadedMessage.cs" />
     <Compile Include="Messages\HeaderTables\CompressedBlockSelectedMessage.cs" />
     <Compile Include="Models\DomainSettings.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />

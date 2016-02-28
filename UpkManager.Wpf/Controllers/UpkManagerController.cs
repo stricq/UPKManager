@@ -17,6 +17,7 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 
 using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.Messages.Settings;
 using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;

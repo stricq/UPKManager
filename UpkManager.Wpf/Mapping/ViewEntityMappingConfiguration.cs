@@ -1,18 +1,21 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows;
 
 using AutoMapper;
 
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
+using UpkManager.Domain.Models.Tables;
 
+using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 
 
 namespace UpkManager.Wpf.Mapping {
 
   [Export(typeof(IAutoMapperConfiguration))]
-  public class AutoMapperConfiguration : IAutoMapperConfiguration {
+  public class ViewEntityMappingConfiguration : IAutoMapperConfiguration {
 
     #region IAutoMapperConfiguration Implementation
 
@@ -30,6 +33,25 @@ namespace UpkManager.Wpf.Mapping {
                                                                   .ForMember(dest => dest.ExportPath, opt => opt.Ignore());
 
       #endregion Settings
+
+      #region Messages
+
+      config.CreateMap<DomainLoadProgress, LoadProgressMessage>().ForMember(dest => dest.CanAsync, opt => opt.Ignore());
+
+      #endregion Messages
+
+      #region Header
+
+      config.CreateMap<DomainHeader, HeaderViewEntity>().ForMember(dest => dest.Group, opt => opt.MapFrom(src => src.Group.String))
+                                                        .ForMember(dest => dest.Guid,  opt => opt.ResolveUsing(src => new Guid(src.Guid)));
+
+      #endregion Header
+
+      #region Tables
+
+      config.CreateMap<DomainExportTableEntry, ExportTableEntryViewEntity>().ForMember(dest => dest.Guid, opt => opt.ResolveUsing(src => new Guid(src.Guid)));
+
+      #endregion Tables
 
     }
 

@@ -10,7 +10,6 @@ using AutoMapper;
 using STR.Common.Extensions;
 
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
 
@@ -48,14 +47,17 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRepository Implementation
 
-    public async Task<DomainHeader> LoadAndParseUpk(DomainHeader Header, bool SkipProperties, bool SkipParsing, Action<LoadProgressMessage> LoadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Loading File..." };
+    public async Task<DomainHeader> LoadAndParseUpk(string filename, bool SkipProperties, bool SkipParsing, Action<DomainLoadProgress> LoadProgress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Loading File..." };
 
       LoadProgress?.Invoke(message);
 
-      byte[] data = await Task.Run(() => File.ReadAllBytes(Header.FullFilename));
+      DomainHeader header = new DomainHeader();
 
-      Header.FileSize = data.LongLength;
+      byte[] data = await Task.Run(() => File.ReadAllBytes(filename));
+
+      header.FullFilename = filename;
+      header.FileSize     = data.LongLength;
 
       message.Text = "Parsing Header...";
 
@@ -73,9 +75,9 @@ namespace UpkManager.Repository.Services {
 
           LoadProgress?.Invoke(message);
 
-          mapper.Map(upkHeader, Header);
+          mapper.Map(upkHeader, header);
 
-          return Header;
+          return header;
         }
 
         data = await decompressChunksAsync(upkHeader.CompressedChunks, upkHeader.CompressionFlags, LoadProgress);
@@ -92,13 +94,13 @@ namespace UpkManager.Repository.Services {
 
       await parseExportTableObjects(data, upkHeader, SkipProperties, SkipParsing, LoadProgress);
 
-      mapper.Map(upkHeader, Header); // Can't throw this on the background as Header is being observed.  Need to fix.
+      mapper.Map(upkHeader, header); // Can't throw this on the background as Header is being observed.  Need to fix.
 
       message.IsComplete = true;
 
       LoadProgress?.Invoke(message);
 
-      return Header;
+      return header;
     }
 
     public async Task SaveObject(DomainExportTableEntry Export, string Filename) {
@@ -117,8 +119,8 @@ namespace UpkManager.Repository.Services {
 
     #region Private Methods
 
-    private static async Task readNameTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Reading Name Table", Current = 0, Total = header.NameTableCount };
+    private static async Task readNameTable(byte[] data, UpkHeader header, Action<DomainLoadProgress> loadProgress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Name Table", Current = 0, Total = header.NameTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -139,8 +141,8 @@ namespace UpkManager.Repository.Services {
       }
     }
 
-    private static async Task readImportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Reading Import Table", Current = 0, Total = header.ImportTableCount };
+    private static async Task readImportTable(byte[] data, UpkHeader header, Action<DomainLoadProgress> loadProgress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Import Table", Current = 0, Total = header.ImportTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -163,8 +165,8 @@ namespace UpkManager.Repository.Services {
       }
     }
 
-    private static async Task readExportTable(byte[] data, UpkHeader header, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Reading Export Table", Current = 0, Total = header.ExportTableCount };
+    private static async Task readExportTable(byte[] data, UpkHeader header, Action<DomainLoadProgress> loadProgress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Export Table", Current = 0, Total = header.ExportTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -193,8 +195,8 @@ namespace UpkManager.Repository.Services {
       Array.ConstrainedCopy(data, header.DependsTableOffset, header.DependsTable, 0, header.Size - header.DependsTableOffset);
     }
 
-    private static async Task parseExportTableObjects(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Parsing Export Table Objects", Current = 0, Total = header.ExportTableCount };
+    private static async Task parseExportTableObjects(byte[] data, UpkHeader header, bool skipProperties, bool skipParse, Action<DomainLoadProgress> loadProgress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Parsing Export Table Objects", Current = 0, Total = header.ExportTableCount };
 
       loadProgress?.Invoke(message);
 
@@ -232,8 +234,8 @@ namespace UpkManager.Repository.Services {
       });
     }
 
-    private async Task<byte[]> decompressChunksAsync(List<CompressedChunk> chunks, uint flags, Action<LoadProgressMessage> loadProgress) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Decompressing", Current = 0, Total = chunks.SelectMany(chunk => chunk.Header.Blocks).Count() };
+    private async Task<byte[]> decompressChunksAsync(List<CompressedChunk> chunks, uint flags, Action<DomainLoadProgress> loadProgress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Decompressing", Current = 0, Total = chunks.SelectMany(chunk => chunk.Header.Blocks).Count() };
 
       int totalSize = chunks.Min(ch => ch.UncompressedOffset);
 

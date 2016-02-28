@@ -58,7 +58,7 @@
           </TabControl.Resources>
 
           <TabItem Header="File Detail">
-            <v:FileHeaderView />
+            <v:HeaderView />
           </TabItem>
 
           <TabItem Header="Object Detail">

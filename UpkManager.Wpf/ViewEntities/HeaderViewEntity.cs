@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
-using System.IO;
 
 using STR.MvvmCommon;
 
-using UpkManager.Domain.Models.Compression;
-using UpkManager.Domain.Models.Tables;
 
+namespace UpkManager.Wpf.ViewEntities {
 
-namespace UpkManager.Domain.Models {
-
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainHeader : ObservableObject {
+  public class HeaderViewEntity : ObservableObject {
 
     #region Private Fields
-    //
-    // Entity Fields
-    //
+
+    private string fullFilename;
+
     private uint signature;
 
     private ushort version;
@@ -26,7 +18,7 @@ namespace UpkManager.Domain.Models {
 
     private int size;
 
-    private DomainString group;
+    private string group;
 
     private uint flags;
 
@@ -41,55 +33,28 @@ namespace UpkManager.Domain.Models {
 
     private int dependsTableOffset;
 
-    private byte[] guid;
+    private Guid guid;
 
-    private ObservableCollection<DomainGenerationTableEntry> generations;
+    private int generationsCount;
 
     private uint engineVersion;
     private uint cookerVersion;
 
     private uint compressionFlags;
 
-    private ObservableCollection<DomainCompressedChunk> compressedChunks;
+    private int compressedChunksCount;
 
     private uint unknown1;
     private uint unknown2;
 
-    private ObservableCollection<DomainNameTableEntry> nameTable;
-
-    private ObservableCollection<DomainExportTableEntry> exportTable;
-    private ObservableCollection<DomainImportTableEntry> importTable;
-
-    private byte[] dependsTable;
-    //
-    // Domain Fields
-    //
-    private bool isErrored;
-
-    private string fullFilename;
-
-    private long fileSize;
-
     #endregion Private Fields
 
-    #region Constructor
-
-    public DomainHeader() {
-      guid = new byte[16];
-
-      generations = new ObservableCollection<DomainGenerationTableEntry>();
-
-      compressedChunks = new ObservableCollection<DomainCompressedChunk>();
-
-      nameTable = new ObservableCollection<DomainNameTableEntry>();
-
-      exportTable = new ObservableCollection<DomainExportTableEntry>();
-      importTable = new ObservableCollection<DomainImportTableEntry>();
-    }
-
-    #endregion Constructor
-
     #region Properties
+
+    public string FullFilename {
+      get { return fullFilename; }
+      set { SetField(ref fullFilename, value, () => FullFilename); }
+    }
 
     public uint Signature {
       get { return signature; }
@@ -111,7 +76,7 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref size, value, () => Size); }
     }
 
-    public DomainString Group {
+    public string Group {
       get { return group; }
       set { SetField(ref group, value, () => Group); }
     }
@@ -156,14 +121,14 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref dependsTableOffset, value, () => DependsTableOffset); }
     }
 
-    public byte[] Guid {
+    public Guid Guid {
       get { return guid; }
-      set { SetField(ref guid, value, () => Guid, () => GuidString); }
+      set { SetField(ref guid, value, () => Guid); }
     }
 
-    public ObservableCollection<DomainGenerationTableEntry> Generations {
-      get { return generations; }
-      set { SetField(ref generations, value, () => Generations); }
+    public int GenerationsCount {
+      get { return generationsCount; }
+      set { SetField(ref generationsCount, value, () => GenerationsCount); }
     }
 
     public uint EngineVersion {
@@ -181,9 +146,9 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref compressionFlags, value, () => CompressionFlags); }
     }
 
-    public ObservableCollection<DomainCompressedChunk> CompressedChunks {
-      get { return compressedChunks; }
-      set { SetField(ref compressedChunks, value, () => CompressedChunks); }
+    public int CompressedChunksCount {
+      get { return compressedChunksCount; }
+      set { SetField(ref compressedChunksCount, value, () => CompressedChunksCount); }
     }
 
     public uint Unknown1 {
@@ -196,50 +161,7 @@ namespace UpkManager.Domain.Models {
       set { SetField(ref unknown2, value, () => Unknown2); }
     }
 
-    public ObservableCollection<DomainNameTableEntry> NameTable {
-      get { return nameTable; }
-      set { SetField(ref nameTable, value, () => NameTable); }
-    }
-
-    public ObservableCollection<DomainExportTableEntry> ExportTable {
-      get { return exportTable; }
-      set { SetField(ref exportTable, value, () => ExportTable); }
-    }
-
-    public ObservableCollection<DomainImportTableEntry> ImportTable {
-      get { return importTable; }
-      set { SetField(ref importTable, value, () => ImportTable); }
-    }
-
-    public byte[] DependsTable {
-      get { return dependsTable; }
-      set { SetField(ref dependsTable, value, () => DependsTable); }
-    }
-
     #endregion Properties
-
-    #region Domain Properties
-
-    public string FullFilename {
-      get { return fullFilename; }
-      set { SetField(ref fullFilename, value, () => FullFilename, () => Filename); }
-    }
-
-    public bool IsErrored {
-      get { return isErrored; }
-      set { SetField(ref isErrored, value, () => IsErrored); }
-    }
-
-    public string Filename => Path.GetFileName(fullFilename);
-
-    public string GuidString => new Guid(guid).ToString("B");
-
-    public long FileSize {
-      get { return fileSize; }
-      set { SetField(ref fileSize, value, () => FileSize); }
-    }
-
-    #endregion Domain Properties
 
   }
 

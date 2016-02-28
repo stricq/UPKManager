@@ -10,6 +10,7 @@ using STR.MvvmCommon.Contracts;
 using UpkManager.Domain.Constants;
 
 using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.Messages.Settings;
 using UpkManager.Wpf.ViewModels.Dialogs;
 
 

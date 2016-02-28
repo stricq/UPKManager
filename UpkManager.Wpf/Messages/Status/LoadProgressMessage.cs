@@ -1,0 +1,24 @@
+﻿using STR.Common.Messages;
+
+
+namespace UpkManager.Wpf.Messages.Status {
+
+  public class LoadProgressMessage : MessageBase {
+
+    #region Properties
+
+    public string Text { get; set; }
+
+    public int Current { get; set; }
+
+    public double Total { get; set; }
+
+    public string StatusText { get; set; }
+
+    public bool IsComplete { get; set; }
+
+    #endregion Properties
+
+  }
+
+}

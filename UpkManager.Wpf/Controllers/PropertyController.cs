@@ -7,8 +7,8 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.FileHeader;
-
+using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -48,16 +48,16 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<ExportObjectSelectedMessage>(this, onExportObjectSelected);
+      messenger.Register<ExportTableEntrySelectedMessage>(this, onExportObjectSelected);
 
-      messenger.Register<FileHeaderLoadingMessage>(this, onFileHeaderLoading);
+      messenger.Register<FileLoadingMessage>(this, onFileLoading);
     }
 
-    private void onExportObjectSelected(ExportObjectSelectedMessage message) {
-      viewModel.Export = message.ExportObject;
+    private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
+      viewModel.Export = message.ExportTableEntry;
     }
 
-    private void onFileHeaderLoading(FileHeaderLoadingMessage message) {
+    private void onFileLoading(FileLoadingMessage message) {
       viewModel.Export = null;
     }
 

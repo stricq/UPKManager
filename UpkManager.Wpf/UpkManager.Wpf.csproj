@@ -117,7 +117,8 @@
     <Compile Include="Behaviors\HyperlinkBehaviors.cs" />
     <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
-    <Compile Include="Controllers\FileHeaderController.cs" />
+    <Compile Include="Controllers\ExportTableController.cs" />
+    <Compile Include="Controllers\HeaderController.cs" />
     <Compile Include="Controllers\FileTreeController.cs" />
     <Compile Include="Controllers\HeaderTablesController.cs" />
     <Compile Include="Controllers\HexController.cs" />
@@ -125,17 +126,24 @@
     <Compile Include="Controllers\PropertyController.cs" />
     <Compile Include="Controllers\StatusBarController.cs" />
     <Compile Include="Controllers\UpkManagerController.cs" />
-    <Compile Include="Mapping\AutoMapperConfiguration.cs" />
+    <Compile Include="Mapping\ViewEntityMappingConfiguration.cs" />
     <Compile Include="Messages\Application\AboutMessage.cs" />
     <Compile Include="Messages\Application\AppLoadedMessage.cs" />
-    <Compile Include="Messages\Application\SettingsChangedMessage.cs" />
-    <Compile Include="Messages\Application\SettingsEditMessage.cs" />
+    <Compile Include="Messages\FileListing\FileLoadingMessage.cs" />
+    <Compile Include="Messages\Settings\SettingsChangedMessage.cs" />
+    <Compile Include="Messages\Settings\SettingsEditMessage.cs" />
+    <Compile Include="Messages\FileListing\FileLoadedMessage.cs" />
+    <Compile Include="Messages\Status\LoadProgressMessage.cs" />
     <Compile Include="Messages\Status\StatusTickMessage.cs" />
+    <Compile Include="Messages\Tables\ExportTableEntrySelectedMessage.cs" />
+    <Compile Include="ViewEntities\ExportTableEntryViewEntity.cs" />
+    <Compile Include="ViewEntities\HeaderViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsDialogViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsWindowViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
-    <Compile Include="ViewModels\FileHeaderViewModel.cs" />
+    <Compile Include="ViewModels\ExportTableViewModel.cs" />
+    <Compile Include="ViewModels\HeaderViewModel.cs" />
     <Compile Include="ViewModels\FileTreeViewModel.cs" />
     <Compile Include="ViewModels\HeaderTablesViewModel.cs" />
     <Compile Include="ViewEntities\HexDataViewEntity.cs" />
@@ -157,8 +165,8 @@
     <Compile Include="Views\ExportTableRawView.xaml.cs">
       <DependentUpon>ExportTableRawView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FileHeaderView.xaml.cs">
-      <DependentUpon>FileHeaderView.xaml</DependentUpon>
+    <Compile Include="Views\HeaderView.xaml.cs">
+      <DependentUpon>HeaderView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FileTreeView.xaml.cs">
       <DependentUpon>FileTreeView.xaml</DependentUpon>
@@ -270,7 +278,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\FileHeaderView.xaml">
+    <Page Include="Views\HeaderView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -338,6 +346,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

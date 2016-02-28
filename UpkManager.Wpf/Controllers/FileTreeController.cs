@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+using AutoMapper;
+
 using STR.Common.Extensions;
 using STR.Common.Messages;
 
@@ -17,11 +19,13 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.FileHeader;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Settings;
+using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -40,6 +44,7 @@ namespace UpkManager.Wpf.Controllers {
     private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
+    private readonly IMapper    mapper;
 
     private readonly IUpkFileRepository repository;
 
@@ -50,17 +55,20 @@ namespace UpkManager.Wpf.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public FileTreeController(FileTreeViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
+    public FileTreeController(FileTreeViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
           viewModel = ViewModel;
       menuViewModel = MenuViewModel;
 
       messenger = Messenger;
+         mapper = Mapper;
 
       repository = Repository;
 
       remoteRepository = RemoteRepository;
 
-      viewModel.PropertyChanged += onViewModelPropertyChanged;
+          viewModel.PropertyChanged += onViewModelPropertyChanged;
+      menuViewModel.PropertyChanged += onMenuViewModelPropertyChanged;
+
 
       registerMessages();
       registerCommands();
@@ -91,7 +99,7 @@ namespace UpkManager.Wpf.Controllers {
       if (settings.PathToGame != oldPathToGame) {
         viewModel.Files.ForEach(f => f.PropertyChanged -= onUpkFileViewModelChanged);
 
-        messenger.Send(new FileHeaderLoadingMessage());
+        messenger.Send(new FileLoadingMessage());
 
         await loadAllFiles();
       }
@@ -312,9 +320,13 @@ namespace UpkManager.Wpf.Controllers {
       switch(e.PropertyName) {
         case "IsSelected": {
           if (upkFile.IsSelected) {
-            await messenger.SendAsync(new FileHeaderSelectedMessage { File = upkFile });
-
             viewModel.Files.Where(f => f != upkFile).ForEach(f => f.IsSelected = false);
+
+            messenger.Send(new FileLoadingMessage());
+
+            if (upkFile.Header == null) await loadUpkFile(upkFile);
+
+            messenger.Send(new FileLoadedMessage { File = upkFile });
           }
 
           break;
@@ -344,6 +356,24 @@ namespace UpkManager.Wpf.Controllers {
       }
     }
 
+    private void onMenuViewModelPropertyChanged(object sender, PropertyChangedEventArgs e) {
+      switch(e.PropertyName) {
+        case "IsSkipProperties": {
+          if (menuViewModel.IsSkipProperties) menuViewModel.IsSkipParsing = true;
+
+          break;
+        }
+        case "IsSkipParsing": {
+          if (!menuViewModel.IsSkipParsing) menuViewModel.IsSkipProperties = false;
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+
     private void filterFiles() {
       viewModel.AllFiles.ForEach(f => {
         f.IsSelected = false;
@@ -353,23 +383,31 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Files = new ObservableCollection<DomainUpkFile>(viewModel.AllFiles.Where(f => f.ContainsTargetObject));
     }
 
+    private async Task loadUpkFile(DomainUpkFile file) {
+      file.Header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing, onLoadProgress);
+
+      file.IsErrored = file.Header.IsErrored;
+    }
+
+    private void onLoadProgress(DomainLoadProgress progress) {
+      messenger.Send(mapper.Map<LoadProgressMessage>(progress));
+    }
+
     private async Task scanUpkFiles(List<DomainUpkFile> upkFiles) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
       foreach(DomainUpkFile upkFile in upkFiles) {
-        DomainHeader header = new DomainHeader { FullFilename = Path.Combine(settings.PathToGame, upkFile.GameFilename) };
-
         message.Current   += 1;
         message.StatusText = Path.Combine(settings.PathToGame, upkFile.GameFilename);
 
         messenger.Send(message);
 
-        await scanUpkFile(header);
+        await scanUpkFile(upkFile);
 
-        upkFile.FileSize  = header.FileSize;
-        upkFile.IsErrored = header.IsErrored;
+        upkFile.FileSize  = upkFile.Header.FileSize;
+        upkFile.IsErrored = upkFile.Header.IsErrored;
 
-        upkFile.ExportTypes = new ObservableCollection<string>(header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
+        upkFile.ExportTypes = new ObservableCollection<string>(upkFile.Header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
 
         string path = Path.GetDirectoryName(upkFile.GameFilename);
 
@@ -381,9 +419,9 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Send(message);
     }
 
-    private async Task scanUpkFile(DomainHeader header) {
+    private async Task scanUpkFile(DomainUpkFile file) {
       try {
-        await repository.LoadAndParseUpk(header, true, true, null);
+        file.Header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), true, true, null);
       }
       catch(Exception ex) {
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = "Error Scanning UPK File.", Exception = ex, HeaderText = "Scan Error" });
@@ -398,9 +436,7 @@ namespace UpkManager.Wpf.Controllers {
 
         if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
-        DomainHeader header = new DomainHeader { FullFilename = Path.Combine(settings.PathToGame, file.GameFilename) };
-
-        await repository.LoadAndParseUpk(header, false, false, null);
+        DomainHeader header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), false, false, null);
 
         if (header.IsErrored) file.IsErrored = true;
 

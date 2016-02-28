@@ -6,8 +6,8 @@ using CSharpImageLibrary.General;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
-using UpkManager.Domain.Messages.FileHeader;
-
+using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -43,14 +43,14 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<ExportObjectSelectedMessage>(this, onExportObjectSelected);
+      messenger.Register<ExportTableEntrySelectedMessage>(this, onExportObjectSelected);
 
-      messenger.Register<FileHeaderLoadingMessage>(this, onFileHeaderLoading);
+      messenger.Register<FileLoadingMessage>(this, onFileLoading);
     }
 
-    private void onExportObjectSelected(ExportObjectSelectedMessage message) {
-      if (message.ExportObject.DomainObject.IsViewable) {
-        Stream stream = repository.GetObjectStream(message.ExportObject);
+    private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
+      if (message.ExportTableEntry.DomainObject.IsViewable) {
+        Stream stream = repository.GetObjectStream(message.ExportTableEntry);
 
         if (stream != null) {
           ImageEngineImage image = new ImageEngineImage(stream);
@@ -66,7 +66,7 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Texture = null;
     }
 
-    private void onFileHeaderLoading(FileHeaderLoadingMessage message) {
+    private void onFileLoading(FileLoadingMessage message) {
       viewModel.Texture = null;
     }
 
