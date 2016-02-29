@@ -47,8 +47,6 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger = Messenger;
 
-      viewModel.PropertyChanged += onViewModelPropertyChanged;
-
       registerMessages();
       registerCommands();
     }
@@ -58,14 +56,14 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<FileLoadingMessage>(this, onFileHeaderLoadingMessage);
+      messenger.Register<FileLoadingMessage>(this, onFileLoadingMessage);
 
-      messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportObjectSelectedMessage);
+      messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportTableEntrySelectedMessage);
 
       messenger.Register<ApplicationClosingMessage>(this, onApplicationClosing);
     }
 
-    private void onFileHeaderLoadingMessage(FileLoadingMessage message) {
+    private void onFileLoadingMessage(FileLoadingMessage message) {
       tokenSource?.Cancel();
 
       viewModel.HexData.Clear();
@@ -73,7 +71,7 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Title = "No Display";
     }
 
-    private async Task onExportObjectSelectedMessage(ExportTableEntrySelectedMessage message) {
+    private async Task onExportTableEntrySelectedMessage(ExportTableEntrySelectedMessage message) {
       tokenSource?.Cancel();
 
       tokenSource = new CancellationTokenSource();
@@ -125,9 +123,6 @@ namespace UpkManager.Wpf.Controllers {
     #endregion Commands
 
     #region Private Methods
-
-    private void onViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-    }
 
     private async Task buildHexDataAsync(byte[] data, int fileOffset, CancellationToken token) {
       viewModel.HexData.Clear();

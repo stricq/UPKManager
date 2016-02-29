@@ -76,6 +76,10 @@ namespace UpkManager.Wpf.Controllers.Tables {
       viewModel.ExportTableEntries.ForEach(export => export.PropertyChanged += onExportTableEntryPropertyChanged);
     }
 
+    #endregion Messages
+
+    #region Private Methods
+
     private void onExportTableEntryPropertyChanged(object sender, PropertyChangedEventArgs args) {
       ExportTableEntryViewEntity export = sender as ExportTableEntryViewEntity;
 
@@ -83,7 +87,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       switch(args.PropertyName) {
         case "IsSelected": {
-          if (export.IsSelected) messenger.Send(new ExportTableEntrySelectedMessage { ExportTableEntry = exportTableEntries.Single(et => et.TableIndex == export.TableIndex) });
+          if (export.IsSelected) messenger.SendAsync(new ExportTableEntrySelectedMessage { ExportTableEntry = exportTableEntries.Single(et => et.TableIndex == export.TableIndex) });
 
           break;
         }
@@ -93,7 +97,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
       }
     }
 
-    #endregion Messages
+    #endregion Private Methods
 
   }
 
