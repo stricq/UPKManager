@@ -41,7 +41,7 @@
           </TabControl.Resources>
 
           <TabItem Header="File Listing">
-            <v:FileTreeView />
+            <v:FileListingView />
           </TabItem>
 
           <TabItem Header="File Tables">

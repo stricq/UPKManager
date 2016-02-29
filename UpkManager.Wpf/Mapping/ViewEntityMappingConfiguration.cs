@@ -6,6 +6,7 @@ using AutoMapper;
 
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
+using UpkManager.Domain.Models.Compression;
 using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.Status;
@@ -52,9 +53,18 @@ namespace UpkManager.Wpf.Mapping {
 
       config.CreateMap<DomainExportTableEntry, ExportTableEntryViewEntity>().ForMember(dest => dest.Guid, opt => opt.ResolveUsing(src => new Guid(src.Guid)));
 
-      config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>();
+      config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>().ForMember(dest => dest.IsErrored, opt => opt.Ignore());
 
-      config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.String));
+      config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name,      opt => opt.MapFrom(src => src.Name.String))
+                                                                        .ForMember(dest => dest.IsErrored, opt => opt.Ignore());
+
+      config.CreateMap<DomainGenerationTableEntry, GenerationsTableEntryViewEntity>().ForMember(dest => dest.IsErrored, opt => opt.Ignore());
+
+      config.CreateMap<DomainCompressedChunk, CompressionTableEntryViewEntity>().ForMember(dest => dest.IsErrored,         opt => opt.Ignore())
+                                                                                .ForMember(dest => dest.BlockSize,         opt => opt.MapFrom(src => src.Header.BlockSize))
+                                                                                .ForMember(dest => dest.CompressionBlocks, opt => opt.MapFrom(src => src.Header.Blocks));
+
+      config.CreateMap<DomainCompressedChunkBlock, CompressionBlockViewEntity>();
 
       #endregion Tables
 

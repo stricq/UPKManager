@@ -10,7 +10,7 @@ namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("FileTreeViewModel")]
-  public class FileTreeViewModel : ObservableObject {
+  public class FileListingViewModel : ObservableObject {
 
     #region Private Fields
 
@@ -28,7 +28,7 @@ namespace UpkManager.Wpf.ViewModels {
 
     #region Constructor
 
-    public FileTreeViewModel() {
+    public FileListingViewModel() {
       AllFiles = new ObservableCollection<DomainUpkFile>();
 
       Files = new ObservableCollection<DomainUpkFile>();

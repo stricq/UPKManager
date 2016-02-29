@@ -117,12 +117,14 @@
     <Compile Include="Behaviors\HyperlinkBehaviors.cs" />
     <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
+    <Compile Include="Controllers\Tables\CompressionTablesController.cs" />
     <Compile Include="Controllers\Tables\ExportTableController.cs" />
     <Compile Include="Controllers\HeaderController.cs" />
-    <Compile Include="Controllers\FileTreeController.cs" />
+    <Compile Include="Controllers\FileListingController.cs" />
     <Compile Include="Controllers\HeaderTablesController.cs" />
     <Compile Include="Controllers\HexController.cs" />
     <Compile Include="Controllers\ImageController.cs" />
+    <Compile Include="Controllers\Tables\GenerationsTableController.cs" />
     <Compile Include="Controllers\Tables\ImportTableController.cs" />
     <Compile Include="Controllers\Tables\NameTableController.cs" />
     <Compile Include="Controllers\PropertyController.cs" />
@@ -138,21 +140,26 @@
     <Compile Include="Messages\Status\LoadProgressMessage.cs" />
     <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="Messages\Tables\ExportTableEntrySelectedMessage.cs" />
+    <Compile Include="ViewEntities\Tables\CompressionBlockViewEntity.cs" />
+    <Compile Include="ViewEntities\Tables\CompressionTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\ExportTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\HeaderViewEntity.cs" />
+    <Compile Include="ViewEntities\Tables\GenerationsTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\ImportTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\NameTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsDialogViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsWindowViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
+    <Compile Include="ViewModels\Tables\CompressionTablesViewModel.cs" />
     <Compile Include="ViewModels\Tables\ExportTableViewModel.cs" />
     <Compile Include="ViewModels\HeaderViewModel.cs" />
-    <Compile Include="ViewModels\FileTreeViewModel.cs" />
+    <Compile Include="ViewModels\FileListingViewModel.cs" />
     <Compile Include="ViewModels\HeaderTablesViewModel.cs" />
     <Compile Include="ViewEntities\HexDataViewEntity.cs" />
     <Compile Include="ViewModels\HexViewModel.cs" />
     <Compile Include="ViewModels\ImageViewModel.cs" />
+    <Compile Include="ViewModels\Tables\GenerationsTableViewModel.cs" />
     <Compile Include="ViewModels\Tables\ImportTableViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\Tables\NameTableViewModel.cs" />
@@ -165,6 +172,9 @@
     <Compile Include="Views\Dialogs\SettingsDialogView.xaml.cs">
       <DependentUpon>SettingsDialogView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Tables\CompressionTablesView.xaml.cs">
+      <DependentUpon>CompressionTablesView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Tables\ExportTableCleanView.xaml.cs">
       <DependentUpon>ExportTableCleanView.xaml</DependentUpon>
     </Compile>
@@ -174,8 +184,8 @@
     <Compile Include="Views\HeaderView.xaml.cs">
       <DependentUpon>HeaderView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FileTreeView.xaml.cs">
-      <DependentUpon>FileTreeView.xaml</DependentUpon>
+    <Compile Include="Views\FileListingView.xaml.cs">
+      <DependentUpon>FileListingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HeaderTablesView.xaml.cs">
       <DependentUpon>HeaderTablesView.xaml</DependentUpon>
@@ -185,6 +195,9 @@
     </Compile>
     <Compile Include="Views\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tables\GenerationsTableView.xaml.cs">
+      <DependentUpon>GenerationsTableView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tables\ImportTableView.xaml.cs">
       <DependentUpon>ImportTableView.xaml</DependentUpon>
@@ -276,6 +289,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Tables\CompressionTablesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Tables\ExportTableCleanView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -288,7 +305,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\FileTreeView.xaml">
+    <Page Include="Views\FileListingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -301,6 +318,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Tables\GenerationsTableView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

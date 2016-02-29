@@ -32,7 +32,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class FileTreeController : IController {
+  public class FileListingController : IController {
 
     #region Private Fields
 
@@ -40,7 +40,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private DomainSettings settings;
 
-    private readonly FileTreeViewModel viewModel;
+    private readonly FileListingViewModel viewModel;
     private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
@@ -55,7 +55,7 @@ namespace UpkManager.Wpf.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public FileTreeController(FileTreeViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
+    public FileListingController(FileListingViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
           viewModel = ViewModel;
       menuViewModel = MenuViewModel;
 

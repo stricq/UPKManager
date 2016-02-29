@@ -7,6 +7,7 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
 
     #region Private Fields
 
+    private bool isErrored;
     private bool isSelected;
 
     private int tableIndex;
@@ -18,6 +19,11 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
     #endregion Private Fields
 
     #region Properties
+
+    public bool IsErrored {
+      get { return isErrored; }
+      set { SetField(ref isErrored, value, () => IsErrored); }
+    }
 
     public bool IsSelected {
       get { return isSelected; }

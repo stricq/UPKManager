@@ -13,12 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace UpkManager.Wpf.Views {
+namespace UpkManager.Wpf.Views.Tables {
   /// <summary>
-  /// Interaction logic for FileTreeView.xaml
+  /// Interaction logic for CompressionTablesView.xaml
   /// </summary>
-  public partial class FileTreeView : UserControl {
-    public FileTreeView() {
+  public partial class CompressionTablesView : UserControl {
+    public CompressionTablesView() {
       InitializeComponent();
     }
   }

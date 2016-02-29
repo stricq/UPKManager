@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="UpkManager.Wpf.Views.FileTreeView"
+﻿<UserControl x:Class="UpkManager.Wpf.Views.FileListingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"

@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="UpkManager.Wpf.Views.Tables.GenerationsTableView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
+             mvvm:ViewModelLocator.ComposedViewModel="GenerationsTableViewModel"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
+
+  <ListView ItemsSource="{Binding Path=GenerationsTableEntries}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
+    <ListView.View>
+      <GridView>
+
+        <GridViewColumn Header="Export Count">
+          <GridViewColumn.CellTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Path=ExportTableCount, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+            </DataTemplate>
+          </GridViewColumn.CellTemplate>
+        </GridViewColumn>
+
+        <GridViewColumn Header="Name Count">
+          <GridViewColumn.CellTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Path=NameTableCount, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+            </DataTemplate>
+          </GridViewColumn.CellTemplate>
+        </GridViewColumn>
+
+        <GridViewColumn Header="Net Object Count">
+          <GridViewColumn.CellTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Path=NetObjectCount, StringFormat={}{0:N0}}" TextAlignment="Right" FontFamily="Consolas" />
+            </DataTemplate>
+          </GridViewColumn.CellTemplate>
+        </GridViewColumn>
+
+      </GridView>
+    </ListView.View>
+
+  </ListView>
+
+</UserControl>
