@@ -385,6 +385,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private async Task loadUpkFile(DomainUpkFile file) {
       file.Header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing, onLoadProgress);
+//    file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
 
       file.IsErrored = file.Header.IsErrored;
     }
@@ -408,6 +409,8 @@ namespace UpkManager.Wpf.Controllers {
         upkFile.IsErrored = upkFile.Header.IsErrored;
 
         upkFile.ExportTypes = new ObservableCollection<string>(upkFile.Header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
+
+        upkFile.Header = null;
 
         string path = Path.GetDirectoryName(upkFile.GameFilename);
 

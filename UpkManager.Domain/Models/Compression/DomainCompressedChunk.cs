@@ -1,69 +1,45 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Threading.Tasks;
 
-using STR.MvvmCommon;
+using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Compression {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainCompressedChunk : ObservableObject {
-
-    #region Private Fields
-    //
-    // Repository Fields
-    //
-    private int uncompressedOffset;
-    private int uncompressedSize;
-
-    private int compressedOffset;
-    private int compressedSize;
-
-    private DomainCompressedChunkHeader header;
-    //
-    // Domain Fields
-    //
-    private bool isSelected;
-
-    #endregion Private Fields
+  public class DomainCompressedChunk {
 
     #region Properties
 
-    public int UncompressedOffset {
-      get { return uncompressedOffset; }
-      set { SetField(ref uncompressedOffset, value, () => UncompressedOffset); }
-    }
+    public int UncompressedOffset { get; set; }
 
-    public int UncompressedSize {
-      get { return uncompressedSize; }
-      set { SetField(ref uncompressedSize, value, () => UncompressedSize); }
-    }
+    public int UncompressedSize { get; set; }
 
-    public int CompressedOffset {
-      get { return compressedOffset; }
-      set { SetField(ref compressedOffset, value, () => CompressedOffset); }
-    }
+    public int CompressedOffset { get; set; }
 
-    public int CompressedSize {
-      get { return compressedSize; }
-      set { SetField(ref compressedSize, value, () => CompressedSize); }
-    }
+    public int CompressedSize { get; set; }
 
-    public DomainCompressedChunkHeader Header {
-      get { return header; }
-      set { SetField(ref header, value, () => Header); }
-    }
+    public DomainCompressedChunkHeader Header { get; set; }
 
     #endregion Properties
 
-    #region Domain Properties
+    #region Domain Methods
 
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
+    public virtual async Task ReadCompressedChunk(IByteArrayReader reader) {
+      UncompressedOffset = reader.ReadInt32();
+      UncompressedSize   = reader.ReadInt32();
+
+      CompressedOffset = reader.ReadInt32();
+      CompressedSize   = reader.ReadInt32();
+
+      Header = new DomainCompressedChunkHeader();
+
+      await Header.ReadCompressedChunkHeader(reader.Splice(CompressedOffset));
     }
 
-    #endregion Domain Properties
+    public virtual byte[] DecompressChunk(uint flags) {
+      return new byte[0];
+    }
+
+    #endregion Domain Methods
 
   }
 

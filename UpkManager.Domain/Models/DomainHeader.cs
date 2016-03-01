@@ -1,245 +1,204 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
-using STR.MvvmCommon;
-
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models.Compression;
 using UpkManager.Domain.Models.Tables;
 
 
 namespace UpkManager.Domain.Models {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainHeader : ObservableObject {
+  public class DomainHeader {
 
     #region Private Fields
-    //
-    // Entity Fields
-    //
-    private uint signature;
 
-    private ushort version;
-    private ushort licensee;
-
-    private int size;
-
-    private DomainString group;
-
-    private uint flags;
-
-    private int nameTableCount;
-    private int nameTableOffset;
-
-    private int exportTableCount;
-    private int exportTableOffset;
-
-    private int importTableCount;
-    private int importTableOffset;
-
-    private int dependsTableOffset;
-
-    private byte[] guid;
-
-    private ObservableCollection<DomainGenerationTableEntry> generations;
-
-    private uint engineVersion;
-    private uint cookerVersion;
-
-    private uint compressionFlags;
-
-    private ObservableCollection<DomainCompressedChunk> compressedChunks;
-
-    private uint unknown1;
-    private uint unknown2;
-
-    private ObservableCollection<DomainNameTableEntry> nameTable;
-
-    private ObservableCollection<DomainExportTableEntry> exportTable;
-    private ObservableCollection<DomainImportTableEntry> importTable;
-
-    private byte[] dependsTable;
-    //
-    // Domain Fields
-    //
-    private bool isErrored;
-
-    private string fullFilename;
-
-    private long fileSize;
+    private readonly IByteArrayReader reader;
 
     #endregion Private Fields
 
     #region Constructor
 
-    public DomainHeader() {
-      guid = new byte[16];
+    public DomainHeader(IByteArrayReader Reader) {
+      reader = Reader;
 
-      generations = new ObservableCollection<DomainGenerationTableEntry>();
+      Group = new DomainString();
 
-      compressedChunks = new ObservableCollection<DomainCompressedChunk>();
+      Generations = new List<DomainGenerationTableEntry>();
 
-      nameTable = new ObservableCollection<DomainNameTableEntry>();
+      CompressedChunks = new List<DomainCompressedChunk>();
 
-      exportTable = new ObservableCollection<DomainExportTableEntry>();
-      importTable = new ObservableCollection<DomainImportTableEntry>();
+      NameTable = new List<DomainNameTableEntry>();
+
+      ExportTable = new List<DomainExportTableEntry>();
+      ImportTable = new List<DomainImportTableEntry>();
     }
 
     #endregion Constructor
 
     #region Properties
 
-    public uint Signature {
-      get { return signature; }
-      set { SetField(ref signature, value, () => Signature); }
-    }
+    public uint Signature { get; set; }
 
-    public ushort Version {
-      get { return version; }
-      set { SetField(ref version, value, () => Version); }
-    }
+    public ushort Version  { get; set; }
 
-    public ushort Licensee {
-      get { return licensee; }
-      set { SetField(ref licensee, value, () => Licensee); }
-    }
+    public ushort Licensee { get; set; }
 
-    public int Size {
-      get { return size; }
-      set { SetField(ref size, value, () => Size); }
-    }
+    public int Size { get; set; }
 
-    public DomainString Group {
-      get { return group; }
-      set { SetField(ref group, value, () => Group); }
-    }
+    public DomainString Group { get; set; }
 
-    public uint Flags {
-      get { return flags; }
-      set { SetField(ref flags, value, () => Flags); }
-    }
+    public uint Flags { get; set; }
 
-    public int NameTableCount {
-      get { return nameTableCount; }
-      set { SetField(ref nameTableCount, value, () => NameTableCount); }
-    }
+    public int NameTableCount { get; set; }
 
-    public int NameTableOffset {
-      get { return nameTableOffset; }
-      set { SetField(ref nameTableOffset, value, () => NameTableOffset); }
-    }
+    public int NameTableOffset { get; set; }
 
-    public int ExportTableCount {
-      get { return exportTableCount; }
-      set { SetField(ref exportTableCount, value, () => ExportTableCount); }
-    }
+    public int ExportTableCount { get; set; }
 
-    public int ExportTableOffset {
-      get { return exportTableOffset; }
-      set { SetField(ref exportTableOffset, value, () => ExportTableOffset); }
-    }
+    public int ExportTableOffset { get; set; }
 
-    public int ImportTableCount {
-      get { return importTableCount; }
-      set { SetField(ref importTableCount, value, () => ImportTableCount); }
-    }
+    public int ImportTableCount { get; set; }
 
-    public int ImportTableOffset {
-      get { return importTableOffset; }
-      set { SetField(ref importTableOffset, value, () => ImportTableOffset); }
-    }
+    public int ImportTableOffset { get; set; }
 
-    public int DependsTableOffset {
-      get { return dependsTableOffset; }
-      set { SetField(ref dependsTableOffset, value, () => DependsTableOffset); }
-    }
+    public int DependsTableOffset { get; set; }
 
-    public byte[] Guid {
-      get { return guid; }
-      set { SetField(ref guid, value, () => Guid, () => GuidString); }
-    }
+    public byte[] Guid { get; set; }
 
-    public ObservableCollection<DomainGenerationTableEntry> Generations {
-      get { return generations; }
-      set { SetField(ref generations, value, () => Generations); }
-    }
+    public List<DomainGenerationTableEntry> Generations { get; set; }
 
-    public uint EngineVersion {
-      get { return engineVersion; }
-      set { SetField(ref engineVersion, value, () => EngineVersion); }
-    }
+    public uint EngineVersion { get; set; }
 
-    public uint CookerVersion {
-      get { return cookerVersion; }
-      set { SetField(ref cookerVersion, value, () => CookerVersion); }
-    }
+    public uint CookerVersion { get; set; }
 
-    public uint CompressionFlags {
-      get { return compressionFlags; }
-      set { SetField(ref compressionFlags, value, () => CompressionFlags); }
-    }
+    public uint CompressionFlags { get; set; }
 
-    public ObservableCollection<DomainCompressedChunk> CompressedChunks {
-      get { return compressedChunks; }
-      set { SetField(ref compressedChunks, value, () => CompressedChunks); }
-    }
+    public List<DomainCompressedChunk> CompressedChunks { get; set; }
 
-    public uint Unknown1 {
-      get { return unknown1; }
-      set { SetField(ref unknown1, value, () => Unknown1); }
-    }
+    public uint Unknown1 { get; set; }
 
-    public uint Unknown2 {
-      get { return unknown2; }
-      set { SetField(ref unknown2, value, () => Unknown2); }
-    }
+    public uint Unknown2 { get; set; }
 
-    public ObservableCollection<DomainNameTableEntry> NameTable {
-      get { return nameTable; }
-      set { SetField(ref nameTable, value, () => NameTable); }
-    }
+    public List<DomainNameTableEntry> NameTable { get; set; }
 
-    public ObservableCollection<DomainExportTableEntry> ExportTable {
-      get { return exportTable; }
-      set { SetField(ref exportTable, value, () => ExportTable); }
-    }
+    public List<DomainExportTableEntry> ExportTable { get; set; }
 
-    public ObservableCollection<DomainImportTableEntry> ImportTable {
-      get { return importTable; }
-      set { SetField(ref importTable, value, () => ImportTable); }
-    }
+    public List<DomainImportTableEntry> ImportTable { get; set; }
 
-    public byte[] DependsTable {
-      get { return dependsTable; }
-      set { SetField(ref dependsTable, value, () => DependsTable); }
-    }
+    public byte[] DependsTable { get; set; } // (Size - DependsOffset) bytes of data
 
     #endregion Properties
 
     #region Domain Properties
 
-    public string FullFilename {
-      get { return fullFilename; }
-      set { SetField(ref fullFilename, value, () => FullFilename, () => Filename); }
-    }
+    public bool IsErrored { get; set; }
 
-    public bool IsErrored {
-      get { return isErrored; }
-      set { SetField(ref isErrored, value, () => IsErrored); }
-    }
+    public string FullFilename { get; set; }
 
-    public string Filename => Path.GetFileName(fullFilename);
+    public string Filename => Path.GetFileName(FullFilename);
 
-    public string GuidString => new Guid(guid).ToString("B");
-
-    public long FileSize {
-      get { return fileSize; }
-      set { SetField(ref fileSize, value, () => FileSize); }
-    }
+    public long FileSize { get; set; }
 
     #endregion Domain Properties
+
+    #region Domain Methods
+
+    public async Task ParseAsync() {
+      await readUpkHeader();
+    }
+
+    public DomainObjectTableEntry GetObjectTableEntry(int reference) {
+      if (reference < 0 && -reference - 1 < ImportTableCount) return ImportTable[-reference - 1];
+      if (reference > 0 &&  reference - 1 < ExportTableCount) return ExportTable[reference - 1];
+
+      if (reference == 0) return null;
+
+      throw new Exception($"Object reference ({reference:X8}) is out of range of both the Import and Export Tables.");
+    }
+
+    #endregion Domain Methods
+
+    #region Private Methods
+
+    private async Task readUpkHeader() {
+      reader.Seek(0);
+
+      Signature = reader.ReadUInt32();
+
+      if (Signature == FileHeader.EncryptedSignature) await reader.DecryptByteArray();
+      else if (Signature != FileHeader.Signature) throw new Exception("File is not a properly formatted UPK file.");
+
+      Version  = reader.ReadUInt16();
+      Licensee = reader.ReadUInt16();
+
+      Size = reader.ReadInt32();
+
+      await Group.ReadString(reader);
+
+      Flags = reader.ReadUInt32();
+
+      NameTableCount  = reader.ReadInt32();
+      NameTableOffset = reader.ReadInt32();
+
+      ExportTableCount  = reader.ReadInt32();
+      ExportTableOffset = reader.ReadInt32();
+
+      ImportTableCount  = reader.ReadInt32();
+      ImportTableOffset = reader.ReadInt32();
+
+      DependsTableOffset = reader.ReadInt32();
+
+      Guid = await reader.ReadBytes(16);
+
+      Generations = await readGenerationsTable();
+
+      EngineVersion = reader.ReadUInt32();
+      CookerVersion = reader.ReadUInt32();
+
+      CompressionFlags = reader.ReadUInt32();
+
+      CompressedChunks = await readCompressedChunksTable();
+
+      Unknown1 = reader.ReadUInt32();
+      Unknown2 = reader.ReadUInt32();
+    }
+
+    private async Task<List<DomainGenerationTableEntry>> readGenerationsTable() {
+      int count = reader.ReadInt32();
+
+      List<DomainGenerationTableEntry> generations = new List<DomainGenerationTableEntry>();
+
+      for(int i = 0; i < count; ++i) {
+        DomainGenerationTableEntry info = new DomainGenerationTableEntry();
+
+        await Task.Run(() => info.ReadGenerationTableEntry(reader));
+
+        generations.Add(info);
+      }
+
+      return generations;
+    }
+
+    private async Task<List<DomainCompressedChunk>> readCompressedChunksTable() {
+      int count = reader.ReadInt32();
+
+      List<DomainCompressedChunk> chunks = new List<DomainCompressedChunk>();
+
+      for(int i = 0; i < count; ++i) {
+        DomainCompressedChunk chunk = new DomainCompressedChunk();
+
+        await chunk.ReadCompressedChunk(reader);
+
+        chunks.Add(chunk);
+      }
+
+      return chunks;
+    }
+
+    #endregion Private Methods
 
   }
 

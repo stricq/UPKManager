@@ -1,49 +1,34 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Threading.Tasks;
 
-using STR.MvvmCommon;
+using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Compression {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainCompressedChunkBlock : ObservableObject {
-
-    #region Private Fields
-    //
-    // Repository Fields
-    //
-    private int   compressedSize;
-    private int uncompressedSize;
-    //
-    // Domain Fields
-    //
-    private bool isSelected;
-
-    #endregion Private Fields
+  public class DomainCompressedChunkBlock {
 
     #region Properties
 
-    public int CompressedSize {
-      get { return compressedSize; }
-      set { SetField(ref compressedSize, value, () => CompressedSize); }
-    }
+    public int CompressedSize { get; set; }
 
-    public int UncompressedSize {
-      get { return uncompressedSize; }
-      set { SetField(ref uncompressedSize, value, () => UncompressedSize); }
-    }
+    public int UncompressedSize { get; set; }
+
+    public byte[] CompressedData { get; set; }
 
     #endregion Properties
 
-    #region Domain Properties
+    #region Domain Methods
 
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
+    public void ReadCompressedChunkBlock(IByteArrayReader reader) {
+      CompressedSize   = reader.ReadInt32();
+      UncompressedSize = reader.ReadInt32();
     }
 
-    #endregion Domain Properties
+    public async Task ReadCompressedChunkBlockData(IByteArrayReader reader) {
+      CompressedData = await reader.ReadBytes(CompressedSize);
+    }
+
+    #endregion Domain Methods
 
   }
 

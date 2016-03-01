@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 
+using STR.Common.Contracts;
 using STR.Common.Extensions;
 
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
+using UpkManager.Domain.Services;
 
 using UpkManager.Entities;
 using UpkManager.Entities.Compression;
@@ -28,6 +30,8 @@ namespace UpkManager.Repository.Services {
 
     #region Private Fields
 
+    private readonly IClassFactory classFactory;
+
     private readonly IMapper mapper;
 
     private readonly ILzoCompressor lzoCompressor;
@@ -37,7 +41,9 @@ namespace UpkManager.Repository.Services {
     #region Constructor
 
     [ImportingConstructor]
-    public UpkFileRepository(IMapper Mapper, ILzoCompressor LzoCompressor) {
+    public UpkFileRepository(IClassFactory ClassFactory, IMapper Mapper, ILzoCompressor LzoCompressor) {
+      classFactory = ClassFactory;
+
       mapper = Mapper;
 
       lzoCompressor = LzoCompressor;
@@ -47,12 +53,27 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRepository Implementation
 
+    public async Task<DomainHeader> LoadUpkFile(string filename) {
+      IByteArrayReader reader = classFactory.Create<ByteArrayReader>();
+
+      byte[] data = await Task.Run(() => File.ReadAllBytes(filename));
+
+      reader.Initialize(data, 0);
+
+      DomainHeader header = new DomainHeader(reader) {
+        FullFilename = filename,
+        FileSize     = data.LongLength
+      };
+
+      return header;
+    }
+
     public async Task<DomainHeader> LoadAndParseUpk(string filename, bool SkipProperties, bool SkipParsing, Action<DomainLoadProgress> LoadProgress) {
       DomainLoadProgress message = new DomainLoadProgress { Text = "Loading File..." };
 
       LoadProgress?.Invoke(message);
 
-      DomainHeader header = new DomainHeader();
+      DomainHeader header = new DomainHeader(null);
 
       byte[] data = await Task.Run(() => File.ReadAllBytes(filename));
 

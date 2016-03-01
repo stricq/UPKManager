@@ -58,13 +58,15 @@ namespace UpkManager.Wpf.Mapping {
       config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name,      opt => opt.MapFrom(src => src.Name.String))
                                                                         .ForMember(dest => dest.IsErrored, opt => opt.Ignore());
 
-      config.CreateMap<DomainGenerationTableEntry, GenerationsTableEntryViewEntity>().ForMember(dest => dest.IsErrored, opt => opt.Ignore());
+      config.CreateMap<DomainGenerationTableEntry, GenerationsTableEntryViewEntity>().ForMember(dest => dest.IsErrored,  opt => opt.Ignore())
+                                                                                     .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
 
       config.CreateMap<DomainCompressedChunk, CompressionTableEntryViewEntity>().ForMember(dest => dest.IsErrored,         opt => opt.Ignore())
+                                                                                .ForMember(dest => dest.IsSelected,        opt => opt.Ignore())
                                                                                 .ForMember(dest => dest.BlockSize,         opt => opt.MapFrom(src => src.Header.BlockSize))
                                                                                 .ForMember(dest => dest.CompressionBlocks, opt => opt.MapFrom(src => src.Header.Blocks));
 
-      config.CreateMap<DomainCompressedChunkBlock, CompressionBlockViewEntity>();
+      config.CreateMap<DomainCompressedChunkBlock, CompressionBlockViewEntity>().ForMember(dest => dest.IsSelected, opt => opt.Ignore());
 
       #endregion Tables
 

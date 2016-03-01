@@ -1,71 +1,53 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
-using STR.MvvmCommon;
+using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Compression {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainCompressedChunkHeader : ObservableObject {
-
-    #region Private Fields
-    //
-    // Repository Fields
-    //
-    private uint signature;
-
-    private int blockSize;
-
-    private int   compressedSize;
-    private int uncompressedSize;
-
-    private ObservableCollection<DomainCompressedChunkBlock> blocks;
-    //
-    // Domain Fields
-    //
-    private bool isSelected;
-
-    #endregion Private Fields
+  public class DomainCompressedChunkHeader {
 
     #region Properties
 
-    public uint Signature {
-      get { return signature; }
-      set { SetField(ref signature, value, () => Signature); }
-    }
+    public uint Signature { get; set; }
 
-    public int BlockSize {
-      get { return blockSize; }
-      set { SetField(ref blockSize, value, () => BlockSize); }
-    }
+    public int BlockSize { get; set; }
 
-    public int CompressedSize {
-      get { return compressedSize; }
-      set { SetField(ref compressedSize, value, () => CompressedSize); }
-    }
+    public int CompressedSize { get; set; }
 
-    public int UncompressedSize {
-      get { return uncompressedSize; }
-      set { SetField(ref uncompressedSize, value, () => UncompressedSize); }
-    }
+    public int UncompressedSize { get; set; }
 
-    public ObservableCollection<DomainCompressedChunkBlock> Blocks {
-      get { return blocks; }
-      set { SetField(ref blocks, value, () => Blocks); }
-    }
+    public List<DomainCompressedChunkBlock> Blocks { get; set; }
 
     #endregion Properties
 
-    #region Domain Properties
+    #region Domain Methods
 
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
+    public async Task ReadCompressedChunkHeader(IByteArrayReader reader) {
+      Signature = reader.ReadUInt32();
+
+      BlockSize = reader.ReadInt32();
+
+      CompressedSize   = reader.ReadInt32();
+      UncompressedSize = reader.ReadInt32();
+
+      Blocks = new List<DomainCompressedChunkBlock>();
+
+      int blockCount = (UncompressedSize + BlockSize - 1) / BlockSize;
+
+      for(int i = 0; i < blockCount; ++i) {
+        DomainCompressedChunkBlock block = new DomainCompressedChunkBlock();
+
+        block.ReadCompressedChunkBlock(reader);
+
+        Blocks.Add(block);
+      }
+
+      foreach(DomainCompressedChunkBlock block in Blocks) await block.ReadCompressedChunkBlockData(reader);
     }
 
-    #endregion Domain Properties
+    #endregion Domain Methods
 
   }
 

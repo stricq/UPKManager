@@ -1,57 +1,29 @@
-﻿using System.ComponentModel.Composition;
-
-using STR.MvvmCommon;
+﻿using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Tables {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainGenerationTableEntry : ObservableObject {
-
-    #region Private Fields
-    //
-    // Repository Fields
-    //
-    private int exportTableCount;
-
-    private int nameTableCount;
-
-    private int netObjectCount;
-    //
-    // Domain Fields
-    //
-    private bool isSelected;
-
-    #endregion Private Fields
+  public class DomainGenerationTableEntry {
 
     #region Properties
 
-    public int ExportTableCount {
-      get { return exportTableCount; }
-      set { SetField(ref exportTableCount, value, () => ExportTableCount); }
-    }
+    public int ExportTableCount { get; set; }
 
-    public int NameTableCount {
-      get { return nameTableCount; }
-      set { SetField(ref nameTableCount, value, () => NameTableCount); }
-    }
+    public int NameTableCount { get; set; }
 
-    public int NetObjectCount {
-      get { return netObjectCount; }
-      set { SetField(ref netObjectCount, value, () => NetObjectCount); }
-    }
+    public int NetObjectCount { get; set; }
 
     #endregion Properties
 
-    #region Domain Properties
+    #region Domain Methods
 
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
+    public void ReadGenerationTableEntry(IByteArrayReader data) {
+      ExportTableCount = data.ReadInt32();
+      NameTableCount   = data.ReadInt32();
+      NetObjectCount   = data.ReadInt32();
     }
 
-    #endregion Domain Properties
+    #endregion Domain Methods
 
   }
 

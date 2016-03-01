@@ -10,6 +10,8 @@ namespace UpkManager.Domain.Contracts {
 
   public interface IUpkFileRepository {
 
+    Task<DomainHeader> LoadUpkFile(string filename);
+
     Task<DomainHeader> LoadAndParseUpk(string Filename, bool SkipProperties, bool SkipParsing, Action<DomainLoadProgress> LoadProgress);
 
     Task SaveObject(DomainExportTableEntry Export, string Filename);

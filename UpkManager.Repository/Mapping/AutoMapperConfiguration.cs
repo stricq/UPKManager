@@ -46,7 +46,6 @@ namespace UpkManager.Repository.Mapping {
 
       config.CreateMap<UpkHeader, DomainHeader>().ForMember(dest => dest.FullFilename, opt => opt.Ignore())
                                                  .ForMember(dest => dest.Filename,     opt => opt.Ignore())
-                                                 .ForMember(dest => dest.GuidString,   opt => opt.Ignore())
                                                  .ForMember(dest => dest.FileSize,     opt => opt.Ignore())
                                                  .ReverseMap();
 
@@ -56,21 +55,17 @@ namespace UpkManager.Repository.Mapping {
 
       #region Compression
 
-      config.CreateMap<CompressedChunk, DomainCompressedChunk>().ForMember(dest => dest.IsSelected, opt => opt.Ignore())
-                                                                .ReverseMap();
+      config.CreateMap<CompressedChunk, DomainCompressedChunk>().ReverseMap();
 
-      config.CreateMap<CompressedChunkHeader, DomainCompressedChunkHeader>().ForMember(dest => dest.IsSelected, opt => opt.Ignore())
-                                                                            .ReverseMap();
+      config.CreateMap<CompressedChunkHeader, DomainCompressedChunkHeader>().ReverseMap();
 
-      config.CreateMap<CompressedChunkBlock, DomainCompressedChunkBlock>().ForMember(dest => dest.IsSelected, opt => opt.Ignore())
-                                                                          .ReverseMap();
+      config.CreateMap<CompressedChunkBlock, DomainCompressedChunkBlock>().ReverseMap();
 
       #endregion Compression
 
       #region Tables
 
-      config.CreateMap<GenerationTableEntry, DomainGenerationTableEntry>().ForMember(dest => dest.IsSelected, opt => opt.Ignore())
-                                                                          .ReverseMap();
+      config.CreateMap<GenerationTableEntry, DomainGenerationTableEntry>().ReverseMap();
 
       config.CreateMap<NameTableEntry, DomainNameTableEntry>().ForMember(dest => dest.IsSelected, opt => opt.Ignore())
                                                               .ForMember(dest => dest.NameString, opt => opt.Ignore())
