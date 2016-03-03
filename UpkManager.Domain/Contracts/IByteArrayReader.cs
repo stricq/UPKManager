@@ -1,11 +1,13 @@
-﻿
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 
 namespace UpkManager.Domain.Contracts {
 
   public interface IByteArrayReader {
+
+    byte[] GetByteArray();
+
+    IByteArrayReader CreateNew(byte[] Data, int Index);
 
     /// <summary>
     /// Initializes the ByteArrayReader with an array of bytes and the specified index.
@@ -25,7 +27,12 @@ namespace UpkManager.Domain.Contracts {
     /// <summary>
     /// Creates a new ByteArrayReader from the current byte array with the index set to the specified offset.
     /// </summary>
-    IByteArrayReader Splice(int Offset);
+    IByteArrayReader Branch(int Offset);
+
+    /// <summary>
+    /// Creates a new ByteArrayReader from the current offset with the specified length.  The index is advanced.
+    /// </summary>
+    Task<IByteArrayReader> ReadByteArray(int Length);
 
     /// <summary>
     /// Creates a new ByteArrayReader starting at the specified offset with the specified length of data
@@ -36,7 +43,12 @@ namespace UpkManager.Domain.Contracts {
     /// <summary>
     /// Decrypts the current byte array from beginning to end.
     /// </summary>
-    Task DecryptByteArray();
+    Task Decrypt();
+
+    /// <summary>
+    /// LZO Decompresses the current byte array returning a new array of bytes.
+    /// </summary>
+    Task<byte[]> Decompress(int UncompressedSize);
 
     short ReadInt16();
 

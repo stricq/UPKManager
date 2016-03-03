@@ -384,8 +384,9 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private async Task loadUpkFile(DomainUpkFile file) {
-      file.Header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing, onLoadProgress);
-//    file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+      file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+
+      await file.Header.ReadHeaderAsync();
 
       file.IsErrored = file.Header.IsErrored;
     }
@@ -408,7 +409,7 @@ namespace UpkManager.Wpf.Controllers {
         upkFile.FileSize  = upkFile.Header.FileSize;
         upkFile.IsErrored = upkFile.Header.IsErrored;
 
-        upkFile.ExportTypes = new ObservableCollection<string>(upkFile.Header.ExportTable.Select(e => e.TypeName).Distinct().OrderBy(s => s));
+        upkFile.ExportTypes = new ObservableCollection<string>(upkFile.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s));
 
         upkFile.Header = null;
 
@@ -446,7 +447,7 @@ namespace UpkManager.Wpf.Controllers {
         message.Current += 1;
 
         foreach(DomainExportTableEntry export in header.ExportTable.Where(e => !e.IsErrored && e.DomainObject.IsExportable)) {
-          string filename = Path.Combine(directory, $"{export.Name}.dds");
+          string filename = Path.Combine(directory, $"{export.NameIndex.Name}.dds");
 
           message.StatusText = filename;
 

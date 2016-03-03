@@ -18,6 +18,8 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
     private string packageName;
     private string    typeName;
 
+    private string ownerReferenceName;
+
     #endregion Private Fields
 
     #region Properties
@@ -55,6 +57,11 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
     public string TypeName {
       get { return typeName; }
       set { SetField(ref typeName, value, () => TypeName); }
+    }
+
+    public string OwnerReferenceName {
+      get { return ownerReferenceName; }
+      set { SetField(ref ownerReferenceName, value, () => OwnerReferenceName); }
     }
 
     #endregion Properties

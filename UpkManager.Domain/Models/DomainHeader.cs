@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+
+using STR.Common.Extensions;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
@@ -15,7 +18,7 @@ namespace UpkManager.Domain.Models {
 
     #region Private Fields
 
-    private readonly IByteArrayReader reader;
+    private IByteArrayReader reader;
 
     #endregion Private Fields
 
@@ -106,15 +109,32 @@ namespace UpkManager.Domain.Models {
 
     #region Domain Methods
 
-    public async Task ParseAsync() {
+    public async Task ReadHeaderAsync() {
       await readUpkHeader();
+
+      const CompressionTypes validCompression = CompressionTypes.LZO | CompressionTypes.LZO_ENC;
+
+      if (((CompressionTypes)CompressionFlags & validCompression) > 0 ) reader = await decompressChunks();
+      else if (CompressionFlags > 0) throw new Exception($"Unsupported compression type 0x{CompressionFlags:X8}.");
+
+      await readNameTable();
+
+      await readImportTable();
+
+      await readExportTable();
+
+      await readDependsTable();
+
+      await patchPointers();
+
+      await ExportTable.ForEachAsync(export => export.ReadRawObject(reader));
     }
 
     public DomainObjectTableEntry GetObjectTableEntry(int reference) {
+      if (reference == 0) return null;
+
       if (reference < 0 && -reference - 1 < ImportTableCount) return ImportTable[-reference - 1];
       if (reference > 0 &&  reference - 1 < ExportTableCount) return ExportTable[reference - 1];
-
-      if (reference == 0) return null;
 
       throw new Exception($"Object reference ({reference:X8}) is out of range of both the Import and Export Tables.");
     }
@@ -128,7 +148,7 @@ namespace UpkManager.Domain.Models {
 
       Signature = reader.ReadUInt32();
 
-      if (Signature == FileHeader.EncryptedSignature) await reader.DecryptByteArray();
+      if (Signature == FileHeader.EncryptedSignature) await reader.Decrypt();
       else if (Signature != FileHeader.Signature) throw new Exception("File is not a properly formatted UPK file.");
 
       Version  = reader.ReadUInt16();
@@ -197,6 +217,124 @@ namespace UpkManager.Domain.Models {
 
       return chunks;
     }
+
+    private async Task<IByteArrayReader> decompressChunks() {
+      int start = CompressedChunks.Min(ch => ch.UncompressedOffset);
+
+      int totalSize = CompressedChunks.SelectMany(ch => ch.Header.Blocks).Aggregate(start, (total, block) => total + block.UncompressedSize);
+
+      byte[] data = new byte[totalSize];
+
+      foreach(DomainCompressedChunk chunk in CompressedChunks) {
+        byte[] chunkData = new byte[chunk.Header.Blocks.Sum(block => block.UncompressedSize)];
+
+        int uncompressedOffset = 0;
+
+        foreach(DomainCompressedChunkBlock block in chunk.Header.Blocks) {
+          if (((CompressionTypes)CompressionFlags & CompressionTypes.LZO_ENC) > 0) await block.CompressedData.Decrypt();
+
+          byte[] decompressed = await block.CompressedData.Decompress(block.UncompressedSize);
+
+//        block.UncompressedOffset = chunk.UncompressedOffset + uncompressedOffset;
+
+          int offset = uncompressedOffset;
+
+          await Task.Run(() => Array.ConstrainedCopy(decompressed, 0, chunkData, offset, block.UncompressedSize));
+
+          uncompressedOffset += block.UncompressedSize;
+        }
+
+        await Task.Run(() => Array.ConstrainedCopy(chunkData, 0, data, chunk.UncompressedOffset, chunk.Header.UncompressedSize));
+      }
+
+      return reader.CreateNew(data, start);
+    }
+
+    private async Task readNameTable() {
+      reader.Seek(NameTableOffset);
+
+      for(int i = 0; i < NameTableCount; ++i) {
+        DomainNameTableEntry name = new DomainNameTableEntry { TableIndex = i };
+
+        await name.ReadNameTableEntry(reader);
+
+        NameTable.Add(name);
+      }
+    }
+
+    private async Task readImportTable() {
+      reader.Seek(ImportTableOffset);
+
+      for(int i = 0; i < ImportTableCount; ++i) {
+        DomainImportTableEntry import = new DomainImportTableEntry { TableIndex = -(i + 1) };
+
+        await import.ReadImportTableEntry(reader, this);
+
+        ImportTable.Add(import);
+      }
+
+      await ImportTable.ForEachAsync(import => Task.Run(() => import.ExpandReferences(this)));
+    }
+
+    private async Task readExportTable() {
+      reader.Seek(ExportTableOffset);
+
+      for(int i = 0; i < ExportTableCount; ++i) {
+        DomainExportTableEntry export = new DomainExportTableEntry { TableIndex = i + 1 };
+
+        await export.ReadExportTableEntry(reader, this);
+
+        ExportTable.Add(export);
+      }
+
+      await ExportTable.ForEachAsync(export => Task.Run(() => export.ExpandReferences(this)));
+    }
+
+    private async Task readDependsTable() {
+      reader.Seek(DependsTableOffset);
+
+      DependsTable = await reader.ReadBytes(Size - DependsTableOffset);
+    }
+
+    #region External Code
+
+    /// <summary>
+    /// https://github.com/gildor2/UModel/blob/c871f9d534e0bd42a17b4d4268c0ecc59dd7191e/Unreal/UnPackage.cpp#L1274
+    /// </summary>
+    private async Task patchPointers() {
+      uint code1 = ((uint)Size             & 0xffu) << 24
+                 | ((uint)NameTableCount   & 0xffu) << 16
+                 | ((uint)NameTableOffset  & 0xffu) << 8
+                 | ((uint)ExportTableCount & 0xffu);
+
+      int code2 = (ExportTableOffset + ImportTableCount + ImportTableOffset) & 0x1f;
+
+      await Task.Run(() => {
+        for(int i = 0; i < ExportTable.Count; ++i) {
+          uint size   = (uint)ExportTable[i].SerialDataSize;
+          uint offset = (uint)ExportTable[i].SerialDataOffset;
+
+          decodePointer(ref size,   code1, code2, i);
+          decodePointer(ref offset, code1, code2, i);
+
+          ExportTable[i].SerialDataSize   = (int)size;
+          ExportTable[i].SerialDataOffset = (int)offset;
+        }
+      });
+    }
+
+    private static void decodePointer(ref uint value, uint code1, int code2, int index) {
+      uint tmp1 = ror32(value, (index + code2) & 0x1f);
+      uint tmp2 = ror32(code1, index % 32);
+
+      value = tmp2 ^ tmp1;
+    }
+
+    private static uint ror32(uint val, int shift) {
+      return (val >> shift) | (val << (32 - shift));
+    }
+
+    #endregion External Code
 
     #endregion Private Methods
 

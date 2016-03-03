@@ -1,42 +1,34 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
 
-using STR.MvvmCommon;
+using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Tables {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.NonShared)]
-  public class DomainNameTableIndex : ObservableObject {
-
-    #region Private Fields
-
-    private int index;
-
-    private int numeric;
-
-    private string name;
-
-    #endregion Private Fields
+  public class DomainNameTableIndex {
 
     #region Properties
 
-    public int Index {
-      get { return index; }
-      set { SetField(ref index, value, () => Index); }
-    }
+    public int Index { get; set; }
 
-    public int Numeric {
-      get { return numeric; }
-      set { SetField(ref numeric, value, () => Numeric); }
-    }
+    public int Numeric { get; set; }
 
-    public string Name {
-      get { return name; }
-      set { SetField(ref name, value, () => Name); }
-    }
+    public string Name { get; set; }
 
     #endregion Properties
+
+    #region Public Methods
+
+    public void ReadNameTableIndex(IByteArrayReader reader, DomainHeader header) {
+      Index   = reader.ReadInt32();
+      Numeric = reader.ReadInt32();
+
+      if (Index < 0 || Index > header.NameTable.Count) throw new ArgumentOutOfRangeException(nameof(Index), $"Index ({Index:X8}) is out of range of the NameTable size.");
+
+      Name = Numeric > 0 ? $"{header.NameTable[Index].Name.String}_{Numeric - 1}" : $"{header.NameTable[Index].Name.String}";
+    }
+
+    #endregion Public Methods
 
   }
 

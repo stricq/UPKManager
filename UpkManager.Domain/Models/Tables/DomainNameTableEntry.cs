@@ -1,59 +1,33 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Threading.Tasks;
 
-using STR.MvvmCommon;
+using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Tables {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.Shared)]
-  public class DomainNameTableEntry : ObservableObject {
+  public class DomainNameTableEntry  {
 
-    #region Private Fields
-    //
-    // Repository Fields
-    //
-    private int tableIndex;
+    #region Public Fields
 
-    private DomainString name;
+    public int TableIndex { get; set; }
 
-    private ulong flags;
-    //
-    // Domain Fields
-    //
-    private bool isSelected;
+    public DomainString Name { get; set; }
 
-    #endregion Private Fields
+    public ulong Flags { get; set; }
 
-    #region Properties
+    #endregion Public Fields
 
-    public int TableIndex {
-      get { return tableIndex; }
-      set { SetField(ref tableIndex, value, () => TableIndex); }
+    #region Domain Methods
+
+    public async Task ReadNameTableEntry(IByteArrayReader reader) {
+      Name = new DomainString();
+
+      await Name.ReadString(reader);
+
+      Flags = reader.ReadUInt64();
     }
 
-    public DomainString Name {
-      get { return name; }
-      set { SetField(ref name, value, () => Name); }
-    }
-
-    public ulong Flags {
-      get { return flags; }
-      set { SetField(ref flags, value, () => Flags); }
-    }
-
-    #endregion Properties
-
-    #region Domain Properties
-
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
-    }
-
-    public string NameString => name?.String;
-
-    #endregion Domain Properties
+    #endregion Domain Methods
 
   }
 

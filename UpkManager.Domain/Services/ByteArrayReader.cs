@@ -2,6 +2,8 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
+using ManagedLZO;
+
 using UpkManager.Domain.Contracts;
 
 
@@ -20,6 +22,20 @@ namespace UpkManager.Domain.Services {
     #endregion Private Fields
 
     #region IByteArrayReader Implementation
+
+    public byte[] GetByteArray() {
+      return data;
+    }
+
+    public IByteArrayReader CreateNew(byte[] Data, int Index) {
+      ByteArrayReader reader = new ByteArrayReader();
+
+      if (Index < 0 || Index >= Data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
+
+      reader.Initialize(Data, Index);
+
+      return reader;
+    }
 
     public void Initialize(byte[] Data, int Index) {
       data = Data;
@@ -41,15 +57,29 @@ namespace UpkManager.Domain.Services {
       index += Count;
     }
 
-    public IByteArrayReader Splice(int Offset) {
+    public IByteArrayReader Branch(int Offset) {
       ByteArrayReader reader = new ByteArrayReader();
+
+      if (Offset < 0 || Offset >= data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
 
       reader.Initialize(data, Offset);
 
       return reader;
     }
 
+    public async Task<IByteArrayReader> ReadByteArray(int Length) {
+      if (index + Length < 0 || index + Length > data.Length) throw new ArgumentOutOfRangeException(nameof(Length), "Index + Length is out of the bounds of the byte array.");
+
+      ByteArrayReader reader = new ByteArrayReader();
+
+      reader.Initialize(await ReadBytes(Length), 0);
+
+      return reader;
+    }
+
     public async Task<IByteArrayReader> Splice(int Offset, int Length) {
+      if (Offset + Length < 0 || Offset + Length > data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Offset + Length is out of the bounds of the byte array.");
+
       ByteArrayReader reader = new ByteArrayReader();
 
       reader.Initialize(await ReadBytes(Offset, Length), 0);
@@ -57,7 +87,7 @@ namespace UpkManager.Domain.Services {
       return reader;
     }
 
-    public async Task DecryptByteArray() {
+    public async Task Decrypt() {
       if (data.Length < 32) return;
 
 //    const string key = "qiffjdlerdoqymvketdcl0er2subioxq";
@@ -65,6 +95,14 @@ namespace UpkManager.Domain.Services {
       byte[] key = { 0x71, 0x69, 0x66, 0x66, 0x6a, 0x64, 0x6c, 0x65, 0x72, 0x64, 0x6f, 0x71, 0x79, 0x6d, 0x76, 0x6b, 0x65, 0x74, 0x64, 0x63, 0x6c, 0x30, 0x65, 0x72, 0x32, 0x73, 0x75, 0x62, 0x69, 0x6f, 0x78, 0x71 };
 
       await Task.Run(() => { for(int i = 0; i < data.Length; ++i) data[i] ^= key[i % 32]; });
+    }
+
+    public async Task<byte[]> Decompress(int UncompressedSize) {
+      byte[] decompressed = new byte[UncompressedSize];
+
+      await Task.Run(() => MiniLZO.Decompress(data, decompressed));
+
+      return decompressed;
     }
 
     public short ReadInt16() {
@@ -103,18 +141,24 @@ namespace UpkManager.Domain.Services {
       return value;
     }
 
-    public async Task<byte[]> ReadBytes(int length) {
-      byte[] value = new byte[length];
+    public async Task<byte[]> ReadBytes(int Length) {
+      if (Length == 0) return new byte[0];
 
-      await Task.Run(() => { Array.ConstrainedCopy(data, index, value, 0, length); index += length; });
+      if (index + Length < 0 || index + Length > data.Length) throw new ArgumentOutOfRangeException(nameof(Length), "Index + Length is out of the bounds of the byte array.");
+
+      byte[] value = new byte[Length];
+
+      await Task.Run(() => { Array.ConstrainedCopy(data, index, value, 0, Length); index += Length; });
 
       return value;
     }
 
-    public async Task<byte[]> ReadBytes(int Offset, int length) {
-      byte[] value = new byte[length];
+    public async Task<byte[]> ReadBytes(int Offset, int Length) {
+      if (Offset + Length < 0 || Offset + Length > data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Offset + Length is out of the bounds of the byte array.");
 
-      await Task.Run(() => Array.ConstrainedCopy(data, Offset, value, 0, length));
+      byte[] value = new byte[Length];
+
+      await Task.Run(() => Array.ConstrainedCopy(data, Offset, value, 0, Length));
 
       return value;
     }

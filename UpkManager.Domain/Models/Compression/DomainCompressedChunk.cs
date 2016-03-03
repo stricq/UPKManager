@@ -32,7 +32,7 @@ namespace UpkManager.Domain.Models.Compression {
 
       Header = new DomainCompressedChunkHeader();
 
-      await Header.ReadCompressedChunkHeader(reader.Splice(CompressedOffset));
+      await Header.ReadCompressedChunkHeader(reader.Branch(CompressedOffset));
     }
 
     public virtual byte[] DecompressChunk(uint flags) {

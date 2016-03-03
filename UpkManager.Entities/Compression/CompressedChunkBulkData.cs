@@ -3,7 +3,7 @@ using System.Linq;
 
 using UpkManager.Entities.Constants;
 
-using ManagedLZO;
+//using ManagedLZO;
 
 
 namespace UpkManager.Entities.Compression {
@@ -45,7 +45,7 @@ namespace UpkManager.Entities.Compression {
 
         byte[] decompressed = new byte[block.UncompressedSize];
 
-        MiniLZO.Decompress(block.CompressedData, decompressed);
+//      MiniLZO.Decompress(block.CompressedData, decompressed);
 
 //      block.UncompressedOffset = chunk.UncompressedOffset + uncompressedOffset;
 

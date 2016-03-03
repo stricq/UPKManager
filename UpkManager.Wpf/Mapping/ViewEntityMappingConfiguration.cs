@@ -51,12 +51,21 @@ namespace UpkManager.Wpf.Mapping {
 
       #region Tables
 
-      config.CreateMap<DomainExportTableEntry, ExportTableEntryViewEntity>().ForMember(dest => dest.Guid, opt => opt.ResolveUsing(src => new Guid(src.Guid)));
+      config.CreateMap<DomainExportTableEntry, ExportTableEntryViewEntity>().ForMember(dest => dest.Guid,       opt => opt.ResolveUsing(src => new Guid(src.Guid)))
+                                                                            .ForMember(dest => dest.TypeName,   opt => opt.MapFrom(src => src.TypeReferenceNameIndex.Name))
+                                                                            .ForMember(dest => dest.Name,       opt => opt.MapFrom(src => src.NameIndex.Name))
+                                                                            .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
 
-      config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>().ForMember(dest => dest.IsErrored, opt => opt.Ignore());
+      config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>().ForMember(dest => dest.PackageName,        opt => opt.MapFrom(src => src.PackageNameIndex.Name))
+                                                                            .ForMember(dest => dest.TypeName,           opt => opt.MapFrom(src => src.TypeNameIndex.Name))
+                                                                            .ForMember(dest => dest.Name,               opt => opt.MapFrom(src => src.NameIndex.Name))
+                                                                            .ForMember(dest => dest.OwnerReferenceName, opt => opt.MapFrom(src => src.OwnerReferenceNameIndex.Name))
+                                                                            .ForMember(dest => dest.IsErrored,          opt => opt.Ignore())
+                                                                            .ForMember(dest => dest.IsSelected,         opt => opt.Ignore());
 
-      config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name,      opt => opt.MapFrom(src => src.Name.String))
-                                                                        .ForMember(dest => dest.IsErrored, opt => opt.Ignore());
+      config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name,       opt => opt.MapFrom(src => src.Name.String))
+                                                                        .ForMember(dest => dest.IsErrored,  opt => opt.Ignore())
+                                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
 
       config.CreateMap<DomainGenerationTableEntry, GenerationsTableEntryViewEntity>().ForMember(dest => dest.IsErrored,  opt => opt.Ignore())
                                                                                      .ForMember(dest => dest.IsSelected, opt => opt.Ignore());

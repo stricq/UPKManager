@@ -64,7 +64,6 @@
     <Compile Include="Constants\FileHeader.cs" />
     <Compile Include="Constants\ObjectType.cs" />
     <Compile Include="Constants\PropertyType.cs" />
-    <Compile Include="Helpers\MiniLZO.cs" />
     <Compile Include="ObjectTypes\ObjectDistributionBase.cs" />
     <Compile Include="ObjectTypes\ObjectObjectRedirector.cs" />
     <Compile Include="ObjectTypes\ObjectTexture2D.cs" />

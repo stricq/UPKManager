@@ -49,7 +49,7 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
-      if (message.ExportTableEntry.DomainObject.IsViewable) {
+      if (message.ExportTableEntry.DomainObject != null && message.ExportTableEntry.DomainObject.IsViewable) {
         Stream stream = repository.GetObjectStream(message.ExportTableEntry);
 
         if (stream != null) {

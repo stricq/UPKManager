@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -90,6 +91,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\CompressionFlags.cs" />
     <Compile Include="Constants\DialogNames.cs" />
     <Compile Include="Constants\FileHeader.cs" />
     <Compile Include="Constants\ObjectType.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Contracts\ISettingsRepository.cs" />
     <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
+    <Compile Include="Helpers\MiniLZO.cs" />
     <Compile Include="Models\DomainLoadProgress.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunk.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkBlock.cs" />

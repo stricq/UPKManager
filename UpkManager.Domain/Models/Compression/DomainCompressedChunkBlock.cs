@@ -13,7 +13,7 @@ namespace UpkManager.Domain.Models.Compression {
 
     public int UncompressedSize { get; set; }
 
-    public byte[] CompressedData { get; set; }
+    public IByteArrayReader CompressedData { get; set; }
 
     #endregion Properties
 
@@ -25,7 +25,7 @@ namespace UpkManager.Domain.Models.Compression {
     }
 
     public async Task ReadCompressedChunkBlockData(IByteArrayReader reader) {
-      CompressedData = await reader.ReadBytes(CompressedSize);
+      CompressedData = await reader.ReadByteArray(CompressedSize);
     }
 
     #endregion Domain Methods

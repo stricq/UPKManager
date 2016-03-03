@@ -1,52 +1,57 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Contracts;
 
 
 namespace UpkManager.Domain.Models.Tables {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.NonShared)]
   public class DomainImportTableEntry : DomainObjectTableEntry {
 
-    #region Private Fields
-    //
-    // Repository Fields
-    //
-    private DomainNameTableIndex packageNameIndex;
+    #region Constructor
 
-    private DomainNameTableIndex typeNameIndex;
-    //
-    // Domain Fields
-    //
-    private bool isSelected;
+    public DomainImportTableEntry() {
+      PackageNameIndex = new DomainNameTableIndex();
+      TypeNameIndex    = new DomainNameTableIndex();
+      NameIndex        = new DomainNameTableIndex();
+    }
 
-    #endregion Private Fields
+    #endregion Constructor
 
     #region Properties
 
-    public DomainNameTableIndex PackageNameIndex {
-      get { return packageNameIndex; }
-      set { SetField(ref packageNameIndex, value, () => PackageNameIndex); }
-    }
+    public DomainNameTableIndex PackageNameIndex { get; set; }
 
-    public DomainNameTableIndex TypeNameIndex {
-      get { return typeNameIndex; }
-      set { SetField(ref typeNameIndex, value, () => TypeNameIndex); }
-    }
-
+    public DomainNameTableIndex TypeNameIndex { get; set; }
+    //
+    // OwnerReference in ObjectTableEntry
+    //
+    // NameTableIndex in ObjectTableEntry
+    //
     #endregion Properties
 
     #region Domain Properties
 
-    public bool IsSelected {
-      get { return isSelected; }
-      set { SetField(ref isSelected, value, () => IsSelected); }
-    }
-
-    public string PackageName => packageNameIndex.Name;
-
-    public string TypeName => typeNameIndex.Name;
+    public DomainNameTableIndex OwnerReferenceNameIndex { get; set; }
 
     #endregion Domain Properties
+
+    #region Domain Methods
+
+    public async Task ReadImportTableEntry(IByteArrayReader reader, DomainHeader header) {
+      await Task.Run(() => PackageNameIndex.ReadNameTableIndex(reader, header));
+
+      await Task.Run(() => TypeNameIndex.ReadNameTableIndex(reader, header));
+
+      OwnerReference = reader.ReadInt32();
+
+      await Task.Run(() => NameIndex.ReadNameTableIndex(reader, header));
+    }
+
+    public void ExpandReferences(DomainHeader header) {
+      OwnerReferenceNameIndex = header.GetObjectTableEntry(OwnerReference)?.NameIndex;
+    }
+
+    #endregion Domain Methods
 
   }
 
