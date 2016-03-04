@@ -10,6 +10,7 @@ using STR.Common.Extensions;
 
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.FileListing;
@@ -24,6 +25,8 @@ namespace UpkManager.Wpf.Controllers.Tables {
   public class ExportTableController : IController {
 
     #region Private Fields
+
+    private DomainHeader header;
 
     private readonly List<DomainExportTableEntry> exportTableEntries;
 
@@ -69,6 +72,8 @@ namespace UpkManager.Wpf.Controllers.Tables {
     }
 
     private void onFileLoaded(FileLoadedMessage message) {
+      header = message.File.Header;
+
       viewModel.ExportTableEntries.AddRange(mapper.Map<IEnumerable<ExportTableEntryViewEntity>>(message.File.Header.ExportTable));
 
       exportTableEntries.AddRange(message.File.Header.ExportTable);
@@ -80,14 +85,22 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
     #region Private Methods
 
-    private void onExportTableEntryPropertyChanged(object sender, PropertyChangedEventArgs args) {
-      ExportTableEntryViewEntity export = sender as ExportTableEntryViewEntity;
+    private async void onExportTableEntryPropertyChanged(object sender, PropertyChangedEventArgs args) {
+      ExportTableEntryViewEntity exportEntity = sender as ExportTableEntryViewEntity;
 
-      if (export == null) return;
+      if (exportEntity == null) return;
 
       switch(args.PropertyName) {
         case "IsSelected": {
-          if (export.IsSelected) messenger.SendAsync(new ExportTableEntrySelectedMessage { ExportTableEntry = exportTableEntries.Single(et => et.TableIndex == export.TableIndex) });
+          if (exportEntity.IsSelected) {
+            viewModel.ExportTableEntries.Where(ex => ex != exportEntity).ForEach(ex => ex.IsSelected = false);
+
+            DomainExportTableEntry export = exportTableEntries.Single(et => et.TableIndex == exportEntity.TableIndex);
+
+            if (export.DomainObject == null) await export.ParseDomainObject(header, false, true);
+
+            await messenger.SendAsync(new ExportTableEntrySelectedMessage { ExportTableEntry = export });
+          }
 
           break;
         }

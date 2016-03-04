@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using STR.Common.Extensions;
 
 using UpkManager.Domain.Constants;
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.Compression;
 using UpkManager.Domain.Models.Tables;
 
@@ -18,13 +18,13 @@ namespace UpkManager.Domain.Models {
 
     #region Private Fields
 
-    private IByteArrayReader reader;
+    private ByteArrayReader reader;
 
     #endregion Private Fields
 
     #region Constructor
 
-    public DomainHeader(IByteArrayReader Reader) {
+    public DomainHeader(ByteArrayReader Reader) {
       reader = Reader;
 
       Group = new DomainString();
@@ -127,7 +127,7 @@ namespace UpkManager.Domain.Models {
 
       await patchPointers();
 
-      await ExportTable.ForEachAsync(export => export.ReadRawObject(reader));
+      await ExportTable.ForEachAsync(export => export.ReadDomainObject(reader));
     }
 
     public DomainObjectTableEntry GetObjectTableEntry(int reference) {
@@ -218,7 +218,7 @@ namespace UpkManager.Domain.Models {
       return chunks;
     }
 
-    private async Task<IByteArrayReader> decompressChunks() {
+    private async Task<ByteArrayReader> decompressChunks() {
       int start = CompressedChunks.Min(ch => ch.UncompressedOffset);
 
       int totalSize = CompressedChunks.SelectMany(ch => ch.Header.Blocks).Aggregate(start, (total, block) => total + block.UncompressedSize);
@@ -247,7 +247,7 @@ namespace UpkManager.Domain.Models {
         await Task.Run(() => Array.ConstrainedCopy(chunkData, 0, data, chunk.UncompressedOffset, chunk.Header.UncompressedSize));
       }
 
-      return reader.CreateNew(data, start);
+      return ByteArrayReader.CreateNew(data, start);
     }
 
     private async Task readNameTable() {

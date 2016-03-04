@@ -1,10 +1,21 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.Tables;
 
 
 namespace UpkManager.Domain.Models.Properties {
 
   public class DomainPropertyStructValue : DomainPropertyValueBase {
+
+    #region Constructor
+
+    public DomainPropertyStructValue() {
+      StructNameIndex = new DomainNameTableIndex();
+    }
+
+    #endregion Constructor
 
     #region Properties
 
@@ -14,13 +25,15 @@ namespace UpkManager.Domain.Models.Properties {
 
     #endregion Properties
 
-    #region Methods
+    #region Domain Methods
 
-    public override string ToString() {
-      return $"{StructNameIndex.Name}";
+    public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
+      await Task.Run(() => StructNameIndex.ReadNameTableIndex(reader, header));
+
+      await base.ReadPropertyValue(reader, size, header);
     }
 
-    #endregion Methods
+    #endregion Domain Methods
 
   }
 

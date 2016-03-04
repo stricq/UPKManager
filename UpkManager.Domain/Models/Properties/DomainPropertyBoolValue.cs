@@ -1,4 +1,7 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Properties {
@@ -7,7 +10,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Private Fields
 
-    private new uint data;
+    private uint boolValue;
 
     #endregion Private Fields
 
@@ -15,20 +18,17 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.BoolProperty;
 
-    public override object Value {
-      get { return data; }
-      set { data = (uint)value; }
-    }
+    public override object Value => boolValue;
 
     #endregion Properties
 
-    #region Methods
+    #region Domain Methods
 
-    public override string ToString() {
-      return $"{data != 0}";
+    public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
+      boolValue = await Task.Run(() => reader.ReadUInt32());
     }
 
-    #endregion Methods
+    #endregion Domain Methods
 
   }
 

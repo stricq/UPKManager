@@ -1,4 +1,4 @@
-﻿using UpkManager.Domain.Contracts;
+﻿using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Tables {
@@ -17,7 +17,7 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Domain Methods
 
-    public void ReadGenerationTableEntry(IByteArrayReader data) {
+    public void ReadGenerationTableEntry(ByteArrayReader data) {
       ExportTableCount = data.ReadInt32();
       NameTableCount   = data.ReadInt32();
       NetObjectCount   = data.ReadInt32();

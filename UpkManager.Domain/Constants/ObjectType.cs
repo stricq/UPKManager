@@ -6,15 +6,17 @@ namespace UpkManager.Domain.Constants {
 
     Unknown,
 
-    DistributionUnknown,
+    DistributionBase,
 
     DistributionFloatConstant,
     DistributionFloatConstantCurve,
+    DistributionFloatConstantCurveResource,
     DistributionFloatParticleParameter,
     DistributionFloatUniform,
     DistributionFloatUniformCurve,
     DistributionVectorConstant,
     DistributionVectorConstantCurve,
+    DistributionVectorParticleParameter,
     DistributionVectorUniform,
     DistributionVectorUniformCurve,
 

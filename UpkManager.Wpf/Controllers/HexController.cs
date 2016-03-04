@@ -81,10 +81,10 @@ namespace UpkManager.Wpf.Controllers {
       title = viewModel.Title;
 
       if (message.ExportTableEntry.DomainObject != null) {
-        await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalData, message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
+        await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetByteArray(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
       }
       else {
-        await buildHexDataAsync(message.ExportTableEntry.ObjectByteArrayReader.GetByteArray(), message.ExportTableEntry.SerialDataOffset, tokenSource.Token);
+        await buildHexDataAsync(message.ExportTableEntry.DomainObjectReader.GetByteArray(), message.ExportTableEntry.SerialDataOffset, tokenSource.Token);
       }
     }
 

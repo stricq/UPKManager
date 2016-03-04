@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.Objects;
 
 
@@ -50,7 +52,7 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Domain Properties
 
-    public IByteArrayReader ObjectByteArrayReader { get; set; }
+    public ByteArrayReader DomainObjectReader { get; set; }
 
     public DomainObjectBase DomainObject { get; set; }
 
@@ -68,7 +70,7 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Domain Methods
 
-    public async Task ReadExportTableEntry(IByteArrayReader reader, DomainHeader header) {
+    public async Task ReadExportTableEntry(ByteArrayReader reader, DomainHeader header) {
       TypeReference   = reader.ReadInt32();
       ParentReference = reader.ReadInt32();
       OwnerReference  = reader.ReadInt32();
@@ -101,11 +103,45 @@ namespace UpkManager.Domain.Models.Tables {
       ArchetypeReferenceNameIndex = header.GetObjectTableEntry(ArchetypeReference)?.NameIndex;
     }
 
-    public async Task ReadRawObject(IByteArrayReader reader) {
-      ObjectByteArrayReader = await reader.Splice(SerialDataOffset, SerialDataSize);
+    public async Task ReadDomainObject(ByteArrayReader reader) {
+      DomainObjectReader = await reader.Splice(SerialDataOffset, SerialDataSize);
+    }
+
+    public async Task ParseDomainObject(DomainHeader header, bool skipProperties, bool skipParse) {
+      DomainObject = objectTypeFactory();
+
+      await DomainObject.ReadDomainObject(DomainObjectReader, header, this, skipProperties, skipParse);
     }
 
     #endregion Domain Methods
+
+    #region Private Methods
+
+    private DomainObjectBase objectTypeFactory() {
+      ObjectType type;
+
+      Enum.TryParse(TypeReferenceNameIndex?.Name, true, out type);
+
+      switch(type) {
+        case ObjectType.DistributionFloatConstant:
+        case ObjectType.DistributionFloatConstantCurve:
+        case ObjectType.DistributionFloatConstantCurveResource:
+        case ObjectType.DistributionFloatParticleParameter:
+        case ObjectType.DistributionFloatUniform:
+        case ObjectType.DistributionFloatUniformCurve:
+        case ObjectType.DistributionVectorConstant:
+        case ObjectType.DistributionVectorConstantCurve:
+        case ObjectType.DistributionVectorParticleParameter:
+        case ObjectType.DistributionVectorUniform:
+        case ObjectType.DistributionVectorUniformCurve: return new DomainObjectDistributionBase(type);
+        case ObjectType.ObjectRedirector:               return new DomainObjectObjectRedirector();
+//      case ObjectType.Texture2D:                      return new ObjectTexture2D();
+
+        default: return new DomainObjectBase();
+      }
+    }
+
+    #endregion Private Methods
 
   }
 

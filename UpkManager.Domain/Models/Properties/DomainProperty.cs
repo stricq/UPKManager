@@ -1,62 +1,85 @@
-﻿using STR.MvvmCommon;
+﻿using System;
+using System.Threading.Tasks;
 
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.Tables;
 
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainProperty : ObservableObject {
+  public class DomainProperty {
 
-    #region Private Fields
+    #region Constructor
 
-    private DomainNameTableIndex nameIndex;
+    public DomainProperty() {
+      NameIndex = new DomainNameTableIndex();
 
-    private DomainNameTableIndex typeNameIndex;
+      TypeNameIndex = new DomainNameTableIndex();
+    }
 
-    private int size;
-
-    private int arrayIndex;
-
-    private DomainPropertyValueBase value;
-
-    #endregion Private Fields
+    #endregion Constructor
 
     #region Properties
 
-    public DomainNameTableIndex NameIndex {
-      get { return nameIndex; }
-      set { SetField(ref nameIndex, value, () => NameIndex); }
-    }
+    public DomainNameTableIndex NameIndex { get; set; }
 
-    public DomainNameTableIndex TypeNameIndex {
-      get { return typeNameIndex; }
-      set { SetField(ref typeNameIndex, value, () => TypeNameIndex); }
-    }
+    public DomainNameTableIndex TypeNameIndex { get; set; }
 
-    public int Size {
-      get { return size; }
-      set { SetField(ref size, value, () => Size); }
-    }
+    public int Size { get; set; }
 
-    public int ArrayIndex {
-      get { return arrayIndex; }
-      set { SetField(ref arrayIndex, value, () => ArrayIndex); }
-    }
+    public int ArrayIndex { get; set; }
 
-    public DomainPropertyValueBase Value {
-      get { return value; }
-      set { SetField(ref this.value, value, () => Value); }
-    }
+    public DomainPropertyValueBase Value { get; set; }
 
     #endregion Properties
 
-    #region Domain Properties
+    #region Domain Methods
 
-    public string Name => nameIndex.Name;
+    public async Task ReadProperty(ByteArrayReader reader, DomainHeader header) {
+      await Task.Run(() => NameIndex.ReadNameTableIndex(reader, header));
 
-    public string TypeName => typeNameIndex?.Name;
+      if (NameIndex.Name == ObjectType.None.ToString()) return;
 
-    #endregion Domain Properties
+      await Task.Run(() => TypeNameIndex.ReadNameTableIndex(reader, header));
+
+      Size       = reader.ReadInt32();
+      ArrayIndex = reader.ReadInt32();
+
+      Value = propertyValueFactory();
+
+      await Value.ReadPropertyValue(reader, Size, header);
+    }
+
+    #endregion Domain Methods
+
+    #region Private Methods
+
+    private DomainPropertyValueBase propertyValueFactory() {
+      PropertyType type;
+
+      Enum.TryParse(TypeNameIndex?.Name, true, out type);
+
+      switch(type) {
+        case PropertyType.BoolProperty:      return new DomainPropertyBoolValue();
+        case PropertyType.IntProperty:       return new DomainPropertyIntValue();
+        case PropertyType.FloatProperty:     return new DomainPropertyFloatValue();
+        case PropertyType.ObjectProperty:    return new DomainPropertyObjectValue();
+        case PropertyType.InterfaceProperty: return new DomainPropertyInterfaceValue();
+        case PropertyType.ComponentProperty: return new DomainPropertyComponentValue();
+        case PropertyType.ClassProperty:     return new DomainPropertyClassValue();
+        case PropertyType.GuidProperty:      return new DomainPropertyGuidValue();
+        case PropertyType.NameProperty:      return new DomainPropertyNameValue();
+        case PropertyType.ByteProperty:      return new DomainPropertyByteValue();
+        case PropertyType.StrProperty:       return new DomainPropertyStrValue();
+        case PropertyType.StructProperty:    return new DomainPropertyStructValue();
+        case PropertyType.ArrayProperty:     return new DomainPropertyArrayValue();
+
+        default: return new DomainPropertyValueBase();
+      }
+    }
+
+    #endregion Private Methods
 
   }
 

@@ -1,4 +1,7 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Properties {
@@ -7,28 +10,33 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Private Fields
 
-    private new DomainString data;
+    private readonly DomainString stringValue;
 
     #endregion Private Fields
 
-    #region Overrides
+    #region Constructor
+
+    public DomainPropertyStrValue() {
+      stringValue = new DomainString();
+    }
+
+    #endregion Constructor
+
+    #region Properties
 
     public override PropertyType PropertyType => PropertyType.StrProperty;
 
-    public override object Value {
-      get { return data; }
-      set { data = (DomainString)value; }
+    public override object Value => stringValue;
+
+    #endregion Properties
+
+    #region Domain Methods
+
+    public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
+      await stringValue.ReadString(reader);
     }
 
-    #endregion Overrides
-
-    #region Methods
-
-    public override string ToString() {
-      return data.String;
-    }
-
-    #endregion Methods
+    #endregion Domain Methods
 
   }
 

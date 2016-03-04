@@ -1,6 +1,6 @@
 ﻿using System;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Tables {
@@ -19,7 +19,7 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Public Methods
 
-    public void ReadNameTableIndex(IByteArrayReader reader, DomainHeader header) {
+    public void ReadNameTableIndex(ByteArrayReader reader, DomainHeader header) {
       Index   = reader.ReadInt32();
       Numeric = reader.ReadInt32();
 

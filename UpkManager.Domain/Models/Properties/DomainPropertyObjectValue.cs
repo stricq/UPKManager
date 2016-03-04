@@ -11,14 +11,6 @@ namespace UpkManager.Domain.Models.Properties {
 
     #endregion Overrides
 
-    #region Methods
-
-    public override string ToString() {
-      return $"0x{data:X8}";
-    }
-
-    #endregion Methods
-
   }
 
 }

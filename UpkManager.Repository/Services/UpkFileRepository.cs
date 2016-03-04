@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 
-using STR.Common.Contracts;
 using STR.Common.Extensions;
 
 using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Tables;
-using UpkManager.Domain.Services;
-
 using UpkManager.Entities;
 using UpkManager.Entities.Compression;
 using UpkManager.Entities.Tables;
@@ -30,8 +28,6 @@ namespace UpkManager.Repository.Services {
 
     #region Private Fields
 
-    private readonly IClassFactory classFactory;
-
     private readonly IMapper mapper;
 
     private readonly ILzoCompressor lzoCompressor;
@@ -41,9 +37,7 @@ namespace UpkManager.Repository.Services {
     #region Constructor
 
     [ImportingConstructor]
-    public UpkFileRepository(IClassFactory ClassFactory, IMapper Mapper, ILzoCompressor LzoCompressor) {
-      classFactory = ClassFactory;
-
+    public UpkFileRepository(IMapper Mapper, ILzoCompressor LzoCompressor) {
       mapper = Mapper;
 
       lzoCompressor = LzoCompressor;
@@ -54,11 +48,9 @@ namespace UpkManager.Repository.Services {
     #region IUpkFileRepository Implementation
 
     public async Task<DomainHeader> LoadUpkFile(string filename) {
-      IByteArrayReader reader = classFactory.Create<ByteArrayReader>();
-
       byte[] data = await Task.Run(() => File.ReadAllBytes(filename));
 
-      reader.Initialize(data, 0);
+      ByteArrayReader reader = ByteArrayReader.CreateNew(data, 0);
 
       DomainHeader header = new DomainHeader(reader) {
         FullFilename = filename,

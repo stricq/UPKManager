@@ -18,10 +18,10 @@
       <StackPanel Orientation="Horizontal">
         <Label Content="Search:" Padding="5,3,5,5" Foreground="{StaticResource ForegroundColor}" />
 
-        <TextBox Width="200" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+        <TextBox Width="200" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}" Height="19" VerticalContentAlignment="Center" />
 
-        <Button Content="&#x25C0;" Command="{Binding Path=SearchBackward}" Margin="6,0,0,0" Width="25" Height="23" />
-        <Button Content="&#x25B6;" Command="{Binding Path=SearchForward}"  Margin="6,0,0,0" Width="25" Height="23" />
+        <Button Content="&#x25C0;" Command="{Binding Path=SearchBackward}" Margin="6,0,0,0" Width="25" Height="19" />
+        <Button Content="&#x25B6;" Command="{Binding Path=SearchForward}"  Margin="6,0,0,0" Width="25" Height="19" />
       </StackPanel>
     </Grid>
 

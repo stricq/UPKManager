@@ -1,17 +1,12 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
 using ManagedLZO;
 
-using UpkManager.Domain.Contracts;
 
+namespace UpkManager.Domain.Helpers {
 
-namespace UpkManager.Domain.Services {
-
-  [Export(typeof(IByteArrayReader))]
-  [PartCreationPolicy(CreationPolicy.NonShared)]
-  public class ByteArrayReader : IByteArrayReader {
+  public class ByteArrayReader {
 
     #region Private Fields
 
@@ -21,13 +16,13 @@ namespace UpkManager.Domain.Services {
 
     #endregion Private Fields
 
-    #region IByteArrayReader Implementation
+    #region ByteArrayReader Implementation
 
     public byte[] GetByteArray() {
       return data;
     }
 
-    public IByteArrayReader CreateNew(byte[] Data, int Index) {
+    public static ByteArrayReader CreateNew(byte[] Data, int Index) {
       ByteArrayReader reader = new ByteArrayReader();
 
       if (Index < 0 || Index >= Data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
@@ -45,10 +40,10 @@ namespace UpkManager.Domain.Services {
       index = Index;
     }
 
-    public void Seek(int Index) {
-      if (Index < 0 || Index >= data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
+    public void Seek(int Offset) {
+      if (Offset < 0 || Offset >= data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
 
-      index = Index;
+      index = Offset;
     }
 
     public void Skip(int Count) {
@@ -57,7 +52,7 @@ namespace UpkManager.Domain.Services {
       index += Count;
     }
 
-    public IByteArrayReader Branch(int Offset) {
+    public ByteArrayReader Branch(int Offset) {
       ByteArrayReader reader = new ByteArrayReader();
 
       if (Offset < 0 || Offset >= data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
@@ -67,7 +62,7 @@ namespace UpkManager.Domain.Services {
       return reader;
     }
 
-    public async Task<IByteArrayReader> ReadByteArray(int Length) {
+    public async Task<ByteArrayReader> ReadByteArray(int Length) {
       if (index + Length < 0 || index + Length > data.Length) throw new ArgumentOutOfRangeException(nameof(Length), "Index + Length is out of the bounds of the byte array.");
 
       ByteArrayReader reader = new ByteArrayReader();
@@ -77,7 +72,11 @@ namespace UpkManager.Domain.Services {
       return reader;
     }
 
-    public async Task<IByteArrayReader> Splice(int Offset, int Length) {
+    public async Task<ByteArrayReader> Splice() {
+      return await Splice(index, data.Length - index);
+    }
+
+    public async Task<ByteArrayReader> Splice(int Offset, int Length) {
       if (Offset + Length < 0 || Offset + Length > data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Offset + Length is out of the bounds of the byte array.");
 
       ByteArrayReader reader = new ByteArrayReader();
@@ -141,6 +140,12 @@ namespace UpkManager.Domain.Services {
       return value;
     }
 
+    public float ReadSingle() {
+      float value = BitConverter.ToSingle(data, index); index += sizeof(float);
+
+      return value;
+    }
+
     public async Task<byte[]> ReadBytes(int Length) {
       if (Length == 0) return new byte[0];
 
@@ -163,7 +168,11 @@ namespace UpkManager.Domain.Services {
       return value;
     }
 
-    #endregion IByteArrayReader Implementation
+    public int CurrentOffset => index;
+
+    public int Remaining => data.Length - index;
+
+    #endregion ByteArrayReader Implementation
 
   }
 

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Compression {
@@ -23,7 +23,7 @@ namespace UpkManager.Domain.Models.Compression {
 
     #region Domain Methods
 
-    public virtual async Task ReadCompressedChunk(IByteArrayReader reader) {
+    public virtual async Task ReadCompressedChunk(ByteArrayReader reader) {
       UncompressedOffset = reader.ReadInt32();
       UncompressedSize   = reader.ReadInt32();
 

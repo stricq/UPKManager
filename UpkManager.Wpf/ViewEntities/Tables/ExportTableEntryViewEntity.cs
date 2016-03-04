@@ -15,8 +15,10 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
     private int parentReference;
     private int  ownerReference;
 
-    private string typeName;
-    private string     name;
+    private string archetypeName;
+    private string      typeName;
+    private string     ownerName;
+    private string          name;
 
     private int archetypeReference;
 
@@ -61,9 +63,19 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
       set { SetField(ref ownerReference, value, () => OwnerReference); }
     }
 
+    public string ArchetypeName {
+      get { return archetypeName; }
+      set { SetField(ref archetypeName, value, () => ArchetypeName); }
+    }
+
     public string TypeName {
       get { return typeName; }
       set { SetField(ref typeName, value, () => TypeName); }
+    }
+
+    public string OwnerName {
+      get { return ownerName; }
+      set { SetField(ref ownerName, value, () => OwnerName); }
     }
 
     public string Name {

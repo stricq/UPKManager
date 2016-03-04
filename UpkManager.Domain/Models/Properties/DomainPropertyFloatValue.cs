@@ -1,4 +1,7 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Properties {
@@ -7,7 +10,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Private Fields
 
-    private new float data;
+    private float floatValue;
 
     #endregion Private Fields
 
@@ -15,20 +18,17 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.FloatProperty;
 
-    public override object Value {
-      get { return data; }
-      set { data = (float)value; }
-    }
+    public override object Value => floatValue;
 
     #endregion Properties
 
-    #region Methods
+    #region Domain Methods
 
-    public override string ToString() {
-      return $"{data}";
+    public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
+      floatValue = await Task.Run(() => reader.ReadSingle());
     }
 
-    #endregion Methods
+    #endregion Domain Methods
 
   }
 

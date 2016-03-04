@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Tables {
@@ -37,7 +37,7 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Domain Methods
 
-    public async Task ReadImportTableEntry(IByteArrayReader reader, DomainHeader header) {
+    public async Task ReadImportTableEntry(ByteArrayReader reader, DomainHeader header) {
       await Task.Run(() => PackageNameIndex.ReadNameTableIndex(reader, header));
 
       await Task.Run(() => TypeNameIndex.ReadNameTableIndex(reader, header));

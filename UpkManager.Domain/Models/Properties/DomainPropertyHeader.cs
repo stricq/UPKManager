@@ -1,36 +1,48 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
-using STR.MvvmCommon;
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Properties {
 
-  [Export]
-  [PartCreationPolicy(CreationPolicy.NonShared)]
-  public class DomainPropertyHeader : ObservableObject {
+  public class DomainPropertyHeader {
 
-    #region Private Fields
+    #region Constructor
 
-    private uint index;
+    public DomainPropertyHeader() {
+      Properties = new List<DomainProperty>();
+    }
 
-    private ObservableCollection<DomainProperty> properties;
-
-    #endregion Private Fields
+    #endregion Constructor
 
     #region Properties
 
-    public uint Index {
-      get { return index; }
-      set { SetField(ref index, value, () => Index); }
-    }
+    public int TypeIndex { get; set; }
 
-    public ObservableCollection<DomainProperty> Properties {
-      get { return properties; }
-      set { SetField(ref properties, value, () => Properties); }
-    }
+    public List<DomainProperty> Properties { get; set; }
 
     #endregion Properties
+
+    #region Domain Methods
+
+    public async Task ReadPropertyHeader(ByteArrayReader reader, DomainHeader header) {
+      TypeIndex = reader.ReadInt32();
+
+      do {
+        DomainProperty property = new DomainProperty();
+
+        await property.ReadProperty(reader, header);
+
+        Properties.Add(property);
+
+        if (property.NameIndex.Name == ObjectType.None.ToString()) break;
+      }
+      while(true);
+    }
+
+    #endregion Domain Methods
 
   }
 

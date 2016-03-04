@@ -46,7 +46,7 @@
             </GridViewColumn.CellTemplate>
           </GridViewColumn>
 
-          <GridViewColumn Header="Owner Reference">
+          <GridViewColumn Header="Owner Name">
             <GridViewColumn.CellTemplate>
               <DataTemplate>
                 <TextBlock Text="{Binding Path=OwnerReferenceName}" TextAlignment="Left" />

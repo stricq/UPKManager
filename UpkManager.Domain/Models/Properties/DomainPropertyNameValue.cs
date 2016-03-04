@@ -1,4 +1,7 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.Tables;
 
 
@@ -6,30 +9,35 @@ namespace UpkManager.Domain.Models.Properties {
 
   public class DomainPropertyNameValue : DomainPropertyValueBase {
 
-    #region Private Fields
+    #region Protected Fields
 
-    protected new DomainNameTableIndex data;
+    protected DomainNameTableIndex NameIndexValue;
 
-    #endregion Private Fields
+    #endregion Protected Fields
+
+    #region Constructor
+
+    public DomainPropertyNameValue() {
+      NameIndexValue = new DomainNameTableIndex();
+    }
+
+    #endregion Constructor
 
     #region Properties
 
     public override PropertyType PropertyType => PropertyType.NameProperty;
 
-    public override object Value {
-      get { return data; }
-      set { data = (DomainNameTableIndex)value; }
-    }
+    public override object Value => NameIndexValue;
 
     #endregion Properties
 
-    #region Methods
+    #region Domain Methods
 
-    public override string ToString() {
-      return $"{data.Name}";
+    public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
+      await Task.Run(() => NameIndexValue.ReadNameTableIndex(reader, header));
     }
 
-    #endregion Methods
+    #endregion Domain Methods
 
   }
 

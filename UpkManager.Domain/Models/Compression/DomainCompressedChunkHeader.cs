@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Compression {
@@ -24,7 +24,7 @@ namespace UpkManager.Domain.Models.Compression {
 
     #region Domain Methods
 
-    public async Task ReadCompressedChunkHeader(IByteArrayReader reader) {
+    public async Task ReadCompressedChunkHeader(ByteArrayReader reader) {
       Signature = reader.ReadUInt32();
 
       BlockSize = reader.ReadInt32();

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Compression {
@@ -13,18 +13,18 @@ namespace UpkManager.Domain.Models.Compression {
 
     public int UncompressedSize { get; set; }
 
-    public IByteArrayReader CompressedData { get; set; }
+    public ByteArrayReader CompressedData { get; set; }
 
     #endregion Properties
 
     #region Domain Methods
 
-    public void ReadCompressedChunkBlock(IByteArrayReader reader) {
+    public void ReadCompressedChunkBlock(ByteArrayReader reader) {
       CompressedSize   = reader.ReadInt32();
       UncompressedSize = reader.ReadInt32();
     }
 
-    public async Task ReadCompressedChunkBlockData(IByteArrayReader reader) {
+    public async Task ReadCompressedChunkBlockData(ByteArrayReader reader) {
       CompressedData = await reader.ReadByteArray(CompressedSize);
     }
 

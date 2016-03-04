@@ -45,6 +45,22 @@
           </GridViewColumn.CellTemplate>
         </GridViewColumn>
 
+        <GridViewColumn Header="Owner Name">
+          <GridViewColumn.CellTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Path=OwnerName}" TextAlignment="Left" />
+            </DataTemplate>
+          </GridViewColumn.CellTemplate>
+        </GridViewColumn>
+
+        <GridViewColumn Header="Archetype Name">
+          <GridViewColumn.CellTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Path=ArchetypeName}" TextAlignment="Left" />
+            </DataTemplate>
+          </GridViewColumn.CellTemplate>
+        </GridViewColumn>
+
       </GridView>
     </ListView.View>
   </ListView>
