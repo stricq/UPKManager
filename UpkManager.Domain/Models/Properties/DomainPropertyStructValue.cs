@@ -23,6 +23,8 @@ namespace UpkManager.Domain.Models.Properties {
 
     public DomainNameTableIndex StructNameIndex { get; set; }
 
+    public override string PropertyString => StructNameIndex.Name;
+
     #endregion Properties
 
     #region Domain Methods

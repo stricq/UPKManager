@@ -27,7 +27,9 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.NameProperty;
 
-    public override object Value => NameIndexValue;
+    public override object PropertyValue => NameIndexValue;
+
+    public override string PropertyString => NameIndexValue.Name;
 
     #endregion Properties
 

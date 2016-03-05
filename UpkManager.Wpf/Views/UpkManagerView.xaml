@@ -34,7 +34,7 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TabControl Grid.Column="0" Margin="0,-1,8,0" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}"
+        <TabControl Grid.Column="0" Margin="0,-1,7,0" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}"
                     mvvm:FrameworkElementBehaviors.SizeChangedCommand="{Binding Path=SizeChanged}">
           <TabControl.Resources>
             <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />

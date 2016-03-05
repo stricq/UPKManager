@@ -15,7 +15,7 @@
     </Grid.RowDefinitions>
 
     <HeaderedContentControl Grid.Row="1" Header="Properties" Style="{StaticResource TallHeaderedContentStyle}">
-      <ListView ItemsSource="{Binding Path=Export.DomainObject.PropertyHeader.Properties}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}"
+      <ListView ItemsSource="{Binding Path=Properties}" BorderThickness="0" SelectionMode="Single" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}"
                 b:GridViewBehaviors.AutoResizeColumns="True">
         <ListView.View>
           <GridView>
@@ -55,7 +55,7 @@
             <GridViewColumn Header="Value">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Path=Value}" TextAlignment="Left" FontFamily="Consolas" />
+                  <TextBlock Text="{Binding Path=PropertyValue}" TextAlignment="Left" FontFamily="Consolas" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>

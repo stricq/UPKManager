@@ -18,7 +18,9 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.IntProperty;
 
-    public override object Value => IntValue;
+    public override object PropertyValue => IntValue;
+
+    public override string PropertyString => $"{IntValue:N0}";
 
     #endregion Properties
 

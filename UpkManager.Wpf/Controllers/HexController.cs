@@ -80,7 +80,7 @@ namespace UpkManager.Wpf.Controllers {
 
       title = viewModel.Title;
 
-      if (message.ExportTableEntry.DomainObject != null) {
+      if (message.ExportTableEntry.DomainObject != null && message.ExportTableEntry.DomainObject.AdditionalDataReader != null) {
         await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetByteArray(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
       }
       else {

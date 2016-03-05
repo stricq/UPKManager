@@ -106,7 +106,6 @@
     <Compile Include="Models\Compression\DomainCompressedChunkBlock.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkHeader.cs" />
     <Compile Include="Models\DomainHeader.cs" />
-    <Compile Include="Messages\HeaderTables\CompressedBlockSelectedMessage.cs" />
     <Compile Include="Models\DomainSettings.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
     <Compile Include="Models\Objects\DomainObjectDistributionBase.cs" />

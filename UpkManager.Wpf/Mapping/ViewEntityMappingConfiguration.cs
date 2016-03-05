@@ -7,6 +7,7 @@ using AutoMapper;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Compression;
+using UpkManager.Domain.Models.Properties;
 using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.Status;
@@ -80,6 +81,16 @@ namespace UpkManager.Wpf.Mapping {
       config.CreateMap<DomainCompressedChunkBlock, CompressionBlockViewEntity>().ForMember(dest => dest.IsSelected, opt => opt.Ignore());
 
       #endregion Tables
+
+      #region Properties
+
+      config.CreateMap<DomainProperty, PropertyViewEntity>().ForMember(dest => dest.Name,          opt => opt.MapFrom(src => src.NameIndex.Name))
+                                                            .ForMember(dest => dest.TypeName,      opt => opt.MapFrom(src => src.TypeNameIndex.Name))
+                                                            .ForMember(dest => dest.PropertyValue, opt => opt.MapFrom(src => src.Value.PropertyString))
+                                                            .ForMember(dest => dest.IsErrored,     opt => opt.Ignore())
+                                                            .ForMember(dest => dest.IsSelected,    opt => opt.Ignore());
+
+      #endregion Properties
 
     }
 

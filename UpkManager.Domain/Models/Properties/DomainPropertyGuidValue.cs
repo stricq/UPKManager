@@ -1,4 +1,6 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System;
+
+using UpkManager.Domain.Constants;
 
 
 namespace UpkManager.Domain.Models.Properties {
@@ -8,6 +10,8 @@ namespace UpkManager.Domain.Models.Properties {
     #region Overrides
 
     public override PropertyType PropertyType => PropertyType.GuidProperty;
+
+    public override string PropertyString => $"{new Guid(DataReader.GetByteArray()):B}";
 
     #endregion Overrides
 

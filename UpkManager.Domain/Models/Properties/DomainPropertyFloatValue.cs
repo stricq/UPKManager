@@ -18,7 +18,9 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.FloatProperty;
 
-    public override object Value => floatValue;
+    public override object PropertyValue => floatValue;
+
+    public override string PropertyString => $"{floatValue}";
 
     #endregion Properties
 

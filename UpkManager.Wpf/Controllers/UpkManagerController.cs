@@ -129,7 +129,7 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onSizeChanged(SizeChangedEventArgs args) {
-      viewModel.Settings.SplitterDistance = args.NewSize.Width + 8;
+      viewModel.Settings.SplitterDistance = args.NewSize.Width + 7;
     }
 
     private void onSettingsExecute() {

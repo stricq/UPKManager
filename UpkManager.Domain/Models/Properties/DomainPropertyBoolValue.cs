@@ -18,7 +18,9 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.BoolProperty;
 
-    public override object Value => boolValue;
+    public override object PropertyValue => boolValue;
+
+    public override string PropertyString => $"{boolValue != 0}";
 
     #endregion Properties
 

@@ -18,7 +18,9 @@ namespace UpkManager.Domain.Models.Properties {
 
     public virtual PropertyType PropertyType => PropertyType.UnknownProperty;
 
-    public virtual object Value => DataReader.GetByteArray();
+    public virtual object PropertyValue => DataReader.GetByteArray();
+
+    public virtual string PropertyString => $"{DataReader.GetByteArray().Length} Bytes of Data";
 
     #endregion Properties
 

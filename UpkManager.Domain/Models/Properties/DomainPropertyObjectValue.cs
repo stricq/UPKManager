@@ -1,15 +1,21 @@
-﻿using UpkManager.Domain.Constants;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Helpers;
+using UpkManager.Domain.Models.Tables;
 
 
 namespace UpkManager.Domain.Models.Properties {
 
   public class DomainPropertyObjectValue : DomainPropertyIntValue {
 
-    #region Overrides
+    #region Properties
 
     public override PropertyType PropertyType => PropertyType.ObjectProperty;
 
-    #endregion Overrides
+    public override string PropertyString => $"0x{IntValue:X8}";
+
+    #endregion Properties
 
   }
 

@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+
+using AutoMapper;
 
 using Ookii.Dialogs.Wpf;
 
@@ -7,8 +11,11 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Models.Tables;
+
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
+using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -19,10 +26,13 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
+    private DomainExportTableEntry export;
+
     private readonly PropertyViewModel     viewModel;
     private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
+    private readonly IMapper    mapper;
 
     private readonly IUpkFileRepository fileRepository;
 
@@ -31,11 +41,14 @@ namespace UpkManager.Wpf.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public PropertyController(PropertyViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IUpkFileRepository FileRepository) {
+    public PropertyController(PropertyViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository FileRepository) {
           viewModel = ViewModel;
       menuViewModel = MenuViewModel;
 
+      viewModel.Properties = new ObservableCollection<PropertyViewEntity>();
+
       messenger = Messenger;
+         mapper = Mapper;
 
       fileRepository = FileRepository;
 
@@ -54,11 +67,15 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
-      viewModel.Export = message.ExportTableEntry;
+      export = message.ExportTableEntry;
+
+      viewModel.Properties = new ObservableCollection<PropertyViewEntity>(mapper.Map<IEnumerable<PropertyViewEntity>>(export.DomainObject.PropertyHeader.Properties));
     }
 
     private void onFileLoading(FileLoadingMessage message) {
-      viewModel.Export = null;
+      viewModel.Properties.Clear();
+
+      export = null;
     }
 
     #endregion Messages
@@ -70,7 +87,7 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private bool canSaveObjectAsExecute() {
-      return viewModel.Export != null && viewModel.Export.DomainObject.IsExportable;
+      return export != null && export.DomainObject.IsExportable;
     }
 
     private async Task onSaveObjectAsExecute() {
@@ -84,7 +101,7 @@ namespace UpkManager.Wpf.Controllers {
 
       if (!result.HasValue || !result.Value) return;
 
-      await fileRepository.SaveObject(viewModel.Export, sfd.FileName);
+      await fileRepository.SaveObject(export, sfd.FileName);
     }
 
     #endregion Commands

@@ -5,11 +5,11 @@ namespace UpkManager.Domain.Models.Properties {
 
   public class DomainPropertyArrayValue : DomainPropertyValueBase {
 
-    #region Overrides
+    #region Properties
 
     public override PropertyType PropertyType => PropertyType.ArrayProperty;
 
-    #endregion Overrides
+    #endregion Properties
 
   }
 
