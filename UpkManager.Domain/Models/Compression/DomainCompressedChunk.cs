@@ -32,11 +32,7 @@ namespace UpkManager.Domain.Models.Compression {
 
       Header = new DomainCompressedChunkHeader();
 
-      await Header.ReadCompressedChunkHeader(reader.Branch(CompressedOffset));
-    }
-
-    public virtual byte[] DecompressChunk(uint flags) {
-      return new byte[0];
+      await Header.ReadCompressedChunkHeader(reader.Branch(CompressedOffset), 1, UncompressedSize, CompressedSize);
     }
 
     #endregion Domain Methods

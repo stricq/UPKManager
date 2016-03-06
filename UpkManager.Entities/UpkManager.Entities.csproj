@@ -56,49 +56,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compression\CompressedChunkBulkData.cs" />
-    <Compile Include="Compression\CompressedChunk.cs" />
-    <Compile Include="Compression\CompressedChunkBlock.cs" />
-    <Compile Include="Compression\CompressedChunkHeader.cs" />
-    <Compile Include="Constants\BulkDataFlag.cs" />
-    <Compile Include="Constants\FileHeader.cs" />
-    <Compile Include="Constants\ObjectType.cs" />
-    <Compile Include="Constants\PropertyType.cs" />
-    <Compile Include="ObjectTypes\ObjectDistributionBase.cs" />
-    <Compile Include="ObjectTypes\ObjectObjectRedirector.cs" />
-    <Compile Include="ObjectTypes\ObjectTexture2D.cs" />
-    <Compile Include="ObjectTypes\Texture2D\MipMap.cs" />
-    <Compile Include="Tables\ExportTableEntry.cs" />
-    <Compile Include="Tables\GenerationTableEntry.cs" />
-    <Compile Include="Tables\ImportTableEntry.cs" />
-    <Compile Include="Tables\NameTableEntry.cs" />
-    <Compile Include="Tables\NameTableIndex.cs" />
-    <Compile Include="PropertyTypes\Property.cs" />
-    <Compile Include="PropertyTypes\PropertyArrayValue.cs" />
-    <Compile Include="PropertyTypes\PropertyBoolValue.cs" />
-    <Compile Include="PropertyTypes\PropertyByteValue.cs" />
-    <Compile Include="PropertyTypes\PropertyClassValue.cs" />
-    <Compile Include="PropertyTypes\PropertyComponentValue.cs" />
-    <Compile Include="PropertyTypes\PropertyFloatValue.cs" />
-    <Compile Include="PropertyTypes\PropertyGuidValue.cs" />
-    <Compile Include="PropertyTypes\PropertyHeader.cs" />
-    <Compile Include="PropertyTypes\PropertyInterfaceValue.cs" />
-    <Compile Include="PropertyTypes\PropertyIntValue.cs" />
-    <Compile Include="PropertyTypes\PropertyNameValue.cs" />
-    <Compile Include="PropertyTypes\PropertyObjectValue.cs" />
-    <Compile Include="PropertyTypes\PropertyStructValue.cs" />
-    <Compile Include="PropertyTypes\PropertyStrValue.cs" />
-    <Compile Include="PropertyTypes\PropertyValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tables\ObjectTableEntry.cs" />
     <Compile Include="UpkFile.cs" />
-    <Compile Include="UpkHeader.cs" />
-    <Compile Include="UpkString.cs" />
-    <Compile Include="ObjectTypes\ObjectBase.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="EntityDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

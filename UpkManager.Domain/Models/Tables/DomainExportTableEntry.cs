@@ -135,7 +135,7 @@ namespace UpkManager.Domain.Models.Tables {
         case ObjectType.DistributionVectorUniform:
         case ObjectType.DistributionVectorUniformCurve: return new DomainObjectDistributionBase(type);
         case ObjectType.ObjectRedirector:               return new DomainObjectObjectRedirector();
-//      case ObjectType.Texture2D:                      return new ObjectTexture2D();
+        case ObjectType.Texture2D:                      return new DomainObjectTexture2D();
 
         default: return new DomainObjectBase();
       }

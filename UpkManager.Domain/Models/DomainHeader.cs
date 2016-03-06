@@ -235,8 +235,6 @@ namespace UpkManager.Domain.Models {
 
           byte[] decompressed = await block.CompressedData.Decompress(block.UncompressedSize);
 
-//        block.UncompressedOffset = chunk.UncompressedOffset + uncompressedOffset;
-
           int offset = uncompressedOffset;
 
           await Task.Run(() => Array.ConstrainedCopy(decompressed, 0, chunkData, offset, block.UncompressedSize));

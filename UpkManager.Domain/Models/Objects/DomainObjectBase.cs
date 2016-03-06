@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Helpers;
@@ -48,6 +49,14 @@ namespace UpkManager.Domain.Models.Objects {
       AdditionalDataOffset = export.SerialDataOffset + reader.CurrentOffset;
 
       AdditionalDataReader = await reader.Splice();
+    }
+
+    public virtual async Task SaveObject(string filename) {
+      await Task.FromResult(1);
+    }
+
+    public virtual Stream GetObjectStream() {
+      return null;
     }
 
     #endregion Domain Methods

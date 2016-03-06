@@ -16,6 +16,7 @@ using UpkManager.Domain.Models.Tables;
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewEntities.Tables;
+using UpkManager.Wpf.ViewModels;
 using UpkManager.Wpf.ViewModels.Tables;
 
 
@@ -30,7 +31,8 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
     private readonly List<DomainExportTableEntry> exportTableEntries;
 
-    private readonly ExportTableViewModel viewModel;
+    private readonly ExportTableViewModel  viewModel;
+    private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
     private readonly IMapper       mapper;
@@ -40,8 +42,9 @@ namespace UpkManager.Wpf.Controllers.Tables {
     #region Constructor
 
     [ImportingConstructor]
-    public ExportTableController(ExportTableViewModel ViewModel, IMessenger Messenger, IMapper Mapper) {
-      viewModel = ViewModel;
+    public ExportTableController(ExportTableViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper) {
+          viewModel =     ViewModel;
+      menuViewModel = MenuViewModel;
 
       viewModel.ExportTableEntries = new ObservableCollection<ExportTableEntryViewEntity>();
 
@@ -97,7 +100,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
             DomainExportTableEntry export = exportTableEntries.Single(et => et.TableIndex == exportEntity.TableIndex);
 
-            if (export.DomainObject == null) await export.ParseDomainObject(header, false, true);
+            if (export.DomainObject == null) await export.ParseDomainObject(header, menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing);
 
             await messenger.SendAsync(new ExportTableEntrySelectedMessage { ExportTableEntry = export });
           }

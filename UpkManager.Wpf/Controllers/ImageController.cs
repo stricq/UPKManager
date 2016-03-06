@@ -50,7 +50,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
       if (message.ExportTableEntry.DomainObject != null && message.ExportTableEntry.DomainObject.IsViewable) {
-        Stream stream = repository.GetObjectStream(message.ExportTableEntry);
+        Stream stream = message.ExportTableEntry.DomainObject.GetObjectStream();
 
         if (stream != null) {
           ImageEngineImage image = new ImageEngineImage(stream);

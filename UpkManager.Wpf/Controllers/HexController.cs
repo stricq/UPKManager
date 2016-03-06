@@ -56,14 +56,16 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<FileLoadingMessage>(this, onFileLoadingMessage);
+      messenger.Register<FileLoadingMessage>(this, onFileLoading);
 
-      messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportTableEntrySelectedMessage);
+      messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportTableEntrySelected);
+
+      messenger.RegisterAsync<PropertySelectedMessage>(this, onPropertySelected);
 
       messenger.Register<ApplicationClosingMessage>(this, onApplicationClosing);
     }
 
-    private void onFileLoadingMessage(FileLoadingMessage message) {
+    private void onFileLoading(FileLoadingMessage message) {
       tokenSource?.Cancel();
 
       viewModel.HexData.Clear();
@@ -71,7 +73,7 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Title = "No Display";
     }
 
-    private async Task onExportTableEntrySelectedMessage(ExportTableEntrySelectedMessage message) {
+    private async Task onExportTableEntrySelected(ExportTableEntrySelectedMessage message) {
       tokenSource?.Cancel();
 
       tokenSource = new CancellationTokenSource();
@@ -80,12 +82,28 @@ namespace UpkManager.Wpf.Controllers {
 
       title = viewModel.Title;
 
-      if (message.ExportTableEntry.DomainObject != null && message.ExportTableEntry.DomainObject.AdditionalDataReader != null) {
+      if (message.ExportTableEntry.DomainObject?.AdditionalDataReader != null) {
         await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetByteArray(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
       }
       else {
         await buildHexDataAsync(message.ExportTableEntry.DomainObjectReader.GetByteArray(), message.ExportTableEntry.SerialDataOffset, tokenSource.Token);
       }
+    }
+
+    private async Task onPropertySelected(PropertySelectedMessage message) {
+      byte[] data = message.Property.Value?.PropertyValue as byte[];
+
+      if (data == null) return;
+
+      tokenSource?.Cancel();
+
+      tokenSource = new CancellationTokenSource();
+
+      viewModel.Title = message.Property.NameIndex.Name;
+
+      title = viewModel.Title;
+
+      await buildHexDataAsync(data, 0, tokenSource.Token);
     }
 
     private void onApplicationClosing(ApplicationClosingMessage message) {

@@ -1,16 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
 
 using Ookii.Dialogs.Wpf;
 
+using STR.Common.Extensions;
+
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Models.Properties;
 using UpkManager.Domain.Models.Tables;
 
 using UpkManager.Wpf.Messages.FileListing;
@@ -34,14 +38,12 @@ namespace UpkManager.Wpf.Controllers {
     private readonly IMessenger messenger;
     private readonly IMapper    mapper;
 
-    private readonly IUpkFileRepository fileRepository;
-
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public PropertyController(PropertyViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository FileRepository) {
+    public PropertyController(PropertyViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper) {
           viewModel = ViewModel;
       menuViewModel = MenuViewModel;
 
@@ -49,8 +51,6 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger = Messenger;
          mapper = Mapper;
-
-      fileRepository = FileRepository;
 
       registerMessages();
       registerCommands();
@@ -61,21 +61,27 @@ namespace UpkManager.Wpf.Controllers {
     #region Messages
 
     private void registerMessages() {
-      messenger.Register<ExportTableEntrySelectedMessage>(this, onExportObjectSelected);
-
       messenger.Register<FileLoadingMessage>(this, onFileLoading);
+
+      messenger.Register<ExportTableEntrySelectedMessage>(this, onExportObjectSelected);
+    }
+
+    private void onFileLoading(FileLoadingMessage message) {
+      viewModel.Properties.ForEach(p => p.PropertyChanged -= onPropertyChanged);
+
+      viewModel.Properties.Clear();
+
+      export = null;
     }
 
     private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
       export = message.ExportTableEntry;
 
+      viewModel.Properties.ForEach(p => p.PropertyChanged -= onPropertyChanged);
+
       viewModel.Properties = new ObservableCollection<PropertyViewEntity>(mapper.Map<IEnumerable<PropertyViewEntity>>(export.DomainObject.PropertyHeader.Properties));
-    }
 
-    private void onFileLoading(FileLoadingMessage message) {
-      viewModel.Properties.Clear();
-
-      export = null;
+      viewModel.Properties.ForEach(p => p.PropertyChanged += onPropertyChanged);
     }
 
     #endregion Messages
@@ -101,10 +107,38 @@ namespace UpkManager.Wpf.Controllers {
 
       if (!result.HasValue || !result.Value) return;
 
-      await fileRepository.SaveObject(export, sfd.FileName);
+      await export.DomainObject.SaveObject(sfd.FileName);
     }
 
     #endregion Commands
+
+    #region Private Methods
+
+    private async void onPropertyChanged(object sender, PropertyChangedEventArgs args) {
+      PropertyViewEntity propertyViewEntity = sender as PropertyViewEntity;
+
+      if (propertyViewEntity == null) return;
+
+      switch(args.PropertyName) {
+        case "IsSelected": {
+          if (propertyViewEntity.IsSelected) {
+            DomainProperty property = export.DomainObject.PropertyHeader.Properties.FirstOrDefault(p => p.NameIndex.Name == propertyViewEntity.Name
+                                                                                                     && p.ArrayIndex     == propertyViewEntity.ArrayIndex);
+
+            if (property == null) return;
+
+            await messenger.SendAsync(new PropertySelectedMessage { Property = property });
+          }
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+
+    #endregion Private Methods
 
   }
 

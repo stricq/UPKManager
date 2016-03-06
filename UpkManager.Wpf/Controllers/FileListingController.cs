@@ -425,7 +425,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private async Task scanUpkFile(DomainUpkFile file) {
       try {
-        file.Header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), true, true, null);
+        file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
       }
       catch(Exception ex) {
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = "Error Scanning UPK File.", Exception = ex, HeaderText = "Scan Error" });
@@ -440,7 +440,7 @@ namespace UpkManager.Wpf.Controllers {
 
         if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
-        DomainHeader header = await repository.LoadAndParseUpk(Path.Combine(settings.PathToGame, file.GameFilename), false, false, null);
+        DomainHeader header = file.Header ?? await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
 
         if (header.IsErrored) file.IsErrored = true;
 
@@ -453,7 +453,9 @@ namespace UpkManager.Wpf.Controllers {
 
           messenger.Send(message);
 
-          await repository.SaveObject(export, filename);
+          if (export.DomainObject == null) await export.ParseDomainObject(header, false, false);
+
+          await export.DomainObject.SaveObject(filename);
         }
       }
 

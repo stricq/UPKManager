@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using UpkManager.Domain.Constants;
@@ -40,6 +42,10 @@ namespace UpkManager.Domain.Models.Properties {
         if (property.NameIndex.Name == ObjectType.None.ToString()) break;
       }
       while(true);
+    }
+
+    public List<DomainProperty> GetProperty(string name) {
+      return Properties.Where(p => p.NameIndex.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
     }
 
     #endregion Domain Methods
