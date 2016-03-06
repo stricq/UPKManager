@@ -7,7 +7,6 @@ using CSharpImageLibrary.General;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Helpers;
-using UpkManager.Domain.Models.Compression;
 using UpkManager.Domain.Models.Objects.Texture2D;
 using UpkManager.Domain.Models.Properties;
 using UpkManager.Domain.Models.Tables;
@@ -15,7 +14,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models.Objects {
 
-  public class DomainObjectTexture2D : DomainObjectBase {
+  public class DomainObjectTexture2D : DomainObjectCompressionBase {
 
     #region Constructor
 
@@ -26,12 +25,6 @@ namespace UpkManager.Domain.Models.Objects {
     #endregion Constructor
 
     #region Properties
-
-    public byte[] Unknown1 { get; set; }
-
-    public int CompressedChunkOffset { get; set; }
-
-    public int CompressedChunkCount { get; set; }
 
     public List<DomainMipMap> MipMaps { get; set; }
 
@@ -52,16 +45,7 @@ namespace UpkManager.Domain.Models.Objects {
 
       if (skipParse) return;
 
-      Unknown1 = await reader.ReadBytes(3 * sizeof(uint));
-
-      CompressedChunkOffset = reader.ReadInt32();
-      CompressedChunkCount  = reader.ReadInt32();
-
-      for(int i = 0; i < CompressedChunkCount; ++i) {
-        DomainCompressedChunkBulkData bulkChunk = new DomainCompressedChunkBulkData();
-
-        await bulkChunk.ReadCompressedChunk(reader);
-
+      await ProcessCompressedBulkData(reader, async bulkChunk => {
         DomainMipMap mip = new DomainMipMap {
           Width  = reader.ReadInt32(),
           Height = reader.ReadInt32()
@@ -70,7 +54,7 @@ namespace UpkManager.Domain.Models.Objects {
         if (mip.Width >= 4 && mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
 
         MipMaps.Add(mip);
-      }
+      });
 
       Guid = await reader.ReadBytes(16);
     }

@@ -109,8 +109,9 @@
     <Compile Include="Models\Compression\DomainCompressedChunkHeader.cs" />
     <Compile Include="Models\DomainHeader.cs" />
     <Compile Include="Models\DomainSettings.cs" />
+    <Compile Include="Models\Objects\DomainObjectArchetypeBase.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
-    <Compile Include="Models\Objects\DomainObjectDistributionBase.cs" />
+    <Compile Include="Models\Objects\DomainObjectCompressionBase.cs" />
     <Compile Include="Models\Objects\DomainObjectObjectRedirector.cs" />
     <Compile Include="Models\Objects\DomainObjectTexture2D.cs" />
     <Compile Include="Models\Objects\Texture2D\DomainMipMap.cs" />

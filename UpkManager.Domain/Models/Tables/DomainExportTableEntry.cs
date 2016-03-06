@@ -122,20 +122,17 @@ namespace UpkManager.Domain.Models.Tables {
 
       Enum.TryParse(TypeReferenceNameIndex?.Name, true, out type);
 
+      if (type == ObjectType.Unknown && TypeReferenceNameIndex != null) {
+        if (TypeReferenceNameIndex.Name.StartsWith("CustomUIComp", StringComparison.CurrentCultureIgnoreCase) ||
+            TypeReferenceNameIndex.Name.StartsWith("Distribution", StringComparison.CurrentCultureIgnoreCase) ||
+            TypeReferenceNameIndex.Name.StartsWith("UIComp",       StringComparison.CurrentCultureIgnoreCase) ||
+            TypeReferenceNameIndex.Name.EndsWith("Component",      StringComparison.CurrentCultureIgnoreCase)) type = ObjectType.ArchetypeObjectReference;
+      }
+
       switch(type) {
-        case ObjectType.DistributionFloatConstant:
-        case ObjectType.DistributionFloatConstantCurve:
-        case ObjectType.DistributionFloatConstantCurveResource:
-        case ObjectType.DistributionFloatParticleParameter:
-        case ObjectType.DistributionFloatUniform:
-        case ObjectType.DistributionFloatUniformCurve:
-        case ObjectType.DistributionVectorConstant:
-        case ObjectType.DistributionVectorConstantCurve:
-        case ObjectType.DistributionVectorParticleParameter:
-        case ObjectType.DistributionVectorUniform:
-        case ObjectType.DistributionVectorUniformCurve: return new DomainObjectDistributionBase(type);
-        case ObjectType.ObjectRedirector:               return new DomainObjectObjectRedirector();
-        case ObjectType.Texture2D:                      return new DomainObjectTexture2D();
+        case ObjectType.ArchetypeObjectReference: return new DomainObjectArchetypeBase();
+        case ObjectType.ObjectRedirector:         return new DomainObjectObjectRedirector();
+        case ObjectType.Texture2D:                return new DomainObjectTexture2D();
 
         default: return new DomainObjectBase();
       }

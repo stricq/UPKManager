@@ -20,7 +20,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public virtual object PropertyValue => DataReader.GetByteArray();
 
-    public virtual string PropertyString => $"{DataReader.GetByteArray().Length} Bytes of Data";
+    public virtual string PropertyString => $"{DataReader.GetByteArray().Length:N0} Bytes of Data";
 
     #endregion Properties
 

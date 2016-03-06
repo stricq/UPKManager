@@ -25,7 +25,7 @@ namespace UpkManager.Domain.Helpers {
     public static ByteArrayReader CreateNew(byte[] Data, int Index) {
       ByteArrayReader reader = new ByteArrayReader();
 
-      if (Index < 0 || Index >= Data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
+      if (Index < 0 || Index > Data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
 
       reader.Initialize(Data, Index);
 
@@ -35,7 +35,7 @@ namespace UpkManager.Domain.Helpers {
     public void Initialize(byte[] Data, int Index) {
       data = Data;
 
-      if (Index < 0 || Index >= data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
+      if (Index < 0 || Index > data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
 
       index = Index;
     }
@@ -102,6 +102,12 @@ namespace UpkManager.Domain.Helpers {
       await Task.Run(() => MiniLZO.Decompress(data, decompressed));
 
       return decompressed;
+    }
+
+    public byte ReadByte() {
+      byte value = data[index]; index += sizeof(byte);
+
+      return value;
     }
 
     public short ReadInt16() {

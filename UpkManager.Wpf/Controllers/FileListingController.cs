@@ -386,7 +386,7 @@ namespace UpkManager.Wpf.Controllers {
     private async Task loadUpkFile(DomainUpkFile file) {
       file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
 
-      await file.Header.ReadHeaderAsync();
+      await Task.Run(() => file.Header.ReadHeaderAsync());
 
       file.IsErrored = file.Header.IsErrored;
     }
@@ -440,20 +440,37 @@ namespace UpkManager.Wpf.Controllers {
 
         if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
-        DomainHeader header = file.Header ?? await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+        DomainHeader header = file.Header;
+
+        if (header == null) {
+          header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+
+          await Task.Run(() => header.ReadHeaderAsync());
+        }
 
         if (header.IsErrored) file.IsErrored = true;
 
         message.Current += 1;
 
-        foreach(DomainExportTableEntry export in header.ExportTable.Where(e => !e.IsErrored && e.DomainObject.IsExportable)) {
+        foreach(DomainExportTableEntry export in header.ExportTable) {
+          if (export.DomainObject == null) {
+            try {
+              await export.ParseDomainObject(header, false, false);
+            }
+            catch(Exception ex) {
+              messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Parsing Object", ErrorMessage = $"Filename: {header.Filename}\nExport Name: {export.NameIndex.Name}, Type: {export.TypeReferenceNameIndex.Name}", Exception = ex });
+
+              return;
+            }
+          }
+
+          if (export.IsErrored || !export.DomainObject.IsExportable) continue;
+
           string filename = Path.Combine(directory, $"{export.NameIndex.Name}.dds");
 
           message.StatusText = filename;
 
           messenger.Send(message);
-
-          if (export.DomainObject == null) await export.ParseDomainObject(header, false, false);
 
           await export.DomainObject.SaveObject(filename);
         }
