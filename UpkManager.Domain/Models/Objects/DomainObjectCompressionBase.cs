@@ -16,8 +16,6 @@ namespace UpkManager.Domain.Models.Objects {
 
     public int CompressedChunkOffset { get; set; }
 
-    public int CompressedChunkCount { get; set; }
-
     #endregion Properties
 
     #region Domain Methods
@@ -30,17 +28,14 @@ namespace UpkManager.Domain.Models.Objects {
       Unknown1 = await reader.ReadBytes(3 * sizeof(uint));
 
       CompressedChunkOffset = reader.ReadInt32();
-      CompressedChunkCount  = reader.ReadInt32();
     }
 
     public virtual async Task ProcessCompressedBulkData(ByteArrayReader reader, Func<DomainCompressedChunkBulkData, Task> chunkHandler) {
-      for(int i = 0; i < CompressedChunkCount; ++i) {
-        DomainCompressedChunkBulkData bulkChunk = new DomainCompressedChunkBulkData();
+      DomainCompressedChunkBulkData bulkChunk = new DomainCompressedChunkBulkData();
 
-        await bulkChunk.ReadCompressedChunk(reader);
+      await bulkChunk.ReadCompressedChunk(reader);
 
-        await chunkHandler(bulkChunk);
-      }
+      await chunkHandler(bulkChunk);
     }
 
     #endregion Domain Methods

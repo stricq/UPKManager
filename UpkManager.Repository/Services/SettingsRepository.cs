@@ -3,8 +3,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 
-using AutoMapper;
-
 using Newtonsoft.Json;
 
 using STR.Common.Extensions;
@@ -17,21 +15,6 @@ namespace UpkManager.Repository.Services {
 
   [Export(typeof(ISettingsRepository))]
   public class SettingsRepository : ISettingsRepository {
-
-    #region Private Fields
-
-    private readonly IMapper mapper;
-
-    #endregion Private Fields
-
-    #region Constructor
-
-    [ImportingConstructor]
-    public SettingsRepository(IMapper Mapper) {
-      mapper = Mapper;
-    }
-
-    #endregion Constructor
 
     #region ISettingsRepository Implementation
 

@@ -19,12 +19,9 @@ namespace UpkManager.Repository.Mapping {
 
       #region DTOs
 
-      config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.IsSelected,           opt => opt.Ignore())
-                                                .ForMember(dest => dest.IsErrored,            opt => opt.Ignore())
-                                                .ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
+      config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.IsErrored,            opt => opt.Ignore())
                                                 .ForMember(dest => dest.ContainsTargetObject, opt => opt.Ignore())
                                                 .ForMember(dest => dest.Filename,             opt => opt.Ignore())
-                                                .ForMember(dest => dest.NotesColumn,          opt => opt.Ignore())
                                                 .ForMember(dest => dest.ModdedFiles,          opt => opt.Ignore())
                                                 .ForMember(dest => dest.IsModded,             opt => opt.Ignore())
                                                 .ForMember(dest => dest.Header,               opt => opt.Ignore())

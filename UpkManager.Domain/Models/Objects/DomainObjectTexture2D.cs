@@ -26,6 +26,8 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Properties
 
+    public int MipMapsCount { get; set; }
+
     public List<DomainMipMap> MipMaps { get; set; }
 
     public byte[] Guid { get; set; }
@@ -45,16 +47,20 @@ namespace UpkManager.Domain.Models.Objects {
 
       if (skipParse) return;
 
-      await ProcessCompressedBulkData(reader, async bulkChunk => {
-        DomainMipMap mip = new DomainMipMap {
-          Width  = reader.ReadInt32(),
-          Height = reader.ReadInt32()
-        };
+      MipMapsCount = reader.ReadInt32();
 
-        if (mip.Width >= 4 && mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
+      for(int i = 0; i < MipMapsCount; ++i) {
+        await ProcessCompressedBulkData(reader, async bulkChunk => {
+          DomainMipMap mip = new DomainMipMap {
+            Width  = reader.ReadInt32(),
+            Height = reader.ReadInt32()
+          };
 
-        MipMaps.Add(mip);
-      });
+          if (mip.Width >= 4 && mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
+
+          MipMaps.Add(mip);
+        });
+      }
 
       Guid = await reader.ReadBytes(16);
     }

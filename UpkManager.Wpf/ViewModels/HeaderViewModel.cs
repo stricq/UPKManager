@@ -2,8 +2,6 @@
 
 using STR.MvvmCommon;
 
-using UpkManager.Domain.Models;
-
 using UpkManager.Wpf.ViewEntities;
 
 
@@ -17,7 +15,7 @@ namespace UpkManager.Wpf.ViewModels {
 
     private RelayCommandAsync saveNotes;
 
-    private DomainUpkFile file;
+    private FileViewEntity file;
 
     private HeaderViewEntity header;
 
@@ -30,7 +28,7 @@ namespace UpkManager.Wpf.ViewModels {
       set { SetField(ref saveNotes, value, () => SaveNotes); }
     }
 
-    public DomainUpkFile File {
+    public FileViewEntity File {
       get { return file; }
       set { SetField(ref file, value, () => File, () => AreNotesEnabled); }
     }

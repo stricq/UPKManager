@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -7,6 +8,7 @@ using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
+using UpkManager.Domain.Models;
 
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.ViewEntities;
@@ -20,7 +22,7 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
-    private string oldNotes;
+    private DomainUpkFile upkfile;
 
     private readonly HeaderViewModel viewModel;
 
@@ -59,13 +61,15 @@ namespace UpkManager.Wpf.Controllers {
     private void onHeaderLoading(FileLoadingMessage message) {
       viewModel.File   = null;
       viewModel.Header = null;
+
+      upkfile = null;
     }
 
     private void onFileLoaded(FileLoadedMessage message) {
-      viewModel.File   = message.File;
+      viewModel.File   = message.FileViewEntity;
       viewModel.Header = mapper.Map<HeaderViewEntity>(message.File.Header);
 
-      oldNotes = viewModel.File.Notes;
+      upkfile = message.File;
     }
 
     #endregion Messages
@@ -79,13 +83,13 @@ namespace UpkManager.Wpf.Controllers {
     #region SaveNotes Command
 
     private bool canSaveNotesExecute() {
-      return viewModel.File?.Notes != oldNotes;
+      return String.Compare(viewModel.File?.Notes, upkfile?.Notes, StringComparison.CurrentCultureIgnoreCase) != 0;
     }
 
     private async Task onSaveNotesExecute() {
-      oldNotes = viewModel.File.Notes;
+      upkfile.Notes = viewModel.File.Notes;
 
-      await remoteRepository.SaveUpkFile(viewModel.File);
+      await remoteRepository.SaveUpkFile(upkfile);
     }
 
     #endregion SaveNotes Command

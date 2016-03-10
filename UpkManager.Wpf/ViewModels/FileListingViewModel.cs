@@ -3,7 +3,7 @@ using System.ComponentModel.Composition;
 
 using STR.MvvmCommon;
 
-using UpkManager.Domain.Models;
+using UpkManager.Wpf.ViewEntities;
 
 
 namespace UpkManager.Wpf.ViewModels {
@@ -18,9 +18,7 @@ namespace UpkManager.Wpf.ViewModels {
 
     private string selectedType;
 
-    private ObservableCollection<DomainUpkFile> allFiles;
-
-    private ObservableCollection<DomainUpkFile> files;
+    private ObservableCollection<FileViewEntity> files;
 
     private ObservableCollection<string> allTypes;
 
@@ -29,9 +27,7 @@ namespace UpkManager.Wpf.ViewModels {
     #region Constructor
 
     public FileListingViewModel() {
-      AllFiles = new ObservableCollection<DomainUpkFile>();
-
-      Files = new ObservableCollection<DomainUpkFile>();
+      files = new ObservableCollection<FileViewEntity>();
     }
 
     #endregion Constructor
@@ -48,12 +44,7 @@ namespace UpkManager.Wpf.ViewModels {
       set { SetField(ref selectedType, value, () => SelectedType); }
     }
 
-    public ObservableCollection<DomainUpkFile> AllFiles {
-      get { return allFiles; }
-      set { SetField(ref allFiles, value, () => AllFiles); }
-    }
-
-    public ObservableCollection<DomainUpkFile> Files {
+    public ObservableCollection<FileViewEntity> Files {
       get { return files; }
       set { SetField(ref files, value, () => Files); }
     }

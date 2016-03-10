@@ -92,6 +92,14 @@ namespace UpkManager.Wpf.Mapping {
 
       #endregion Properties
 
+      #region DTOs
+
+      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
+                                                       .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
+                                                       .ForMember(dest => dest.IsErrored,  opt => opt.Ignore());
+
+      #endregion DTOs
+
     }
 
     #endregion IAutoMapperConfiguration Implementation

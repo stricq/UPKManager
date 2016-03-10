@@ -141,6 +141,7 @@
     <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="Messages\Tables\ExportTableEntrySelectedMessage.cs" />
     <Compile Include="Messages\Tables\PropertySelectedMessage.cs" />
+    <Compile Include="ViewEntities\FileViewEntity.cs" />
     <Compile Include="ViewEntities\PropertyViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\CompressionBlockViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\CompressionTableEntryViewEntity.cs" />
