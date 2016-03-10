@@ -98,8 +98,8 @@ namespace UpkManager.Wpf.Controllers {
 
     private async Task onSaveObjectAsExecute() {
       VistaSaveFileDialog sfd = new VistaSaveFileDialog {
-        DefaultExt = ".dds",
-        Filter = "DirectDraw Surface|*.dds",
+        DefaultExt = export.DomainObject.FileExtension,
+        Filter = $"{export.DomainObject.FileTypeDesc}|*{export.DomainObject.FileExtension}",
         Title = "Save Object As..."
       };
 

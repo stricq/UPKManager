@@ -86,6 +86,8 @@ namespace UpkManager.Wpf.Controllers {
       messenger.RegisterAsync<AppLoadedMessage>(this, onApplicationLoaded);
 
       messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
+
+      messenger.RegisterAsync<StatusTickMessage>(this, onStatusTick);
     }
 
     private async Task onApplicationLoaded(AppLoadedMessage message) {
@@ -109,6 +111,17 @@ namespace UpkManager.Wpf.Controllers {
       }
 
       oldPathToGame = settings.PathToGame;
+    }
+
+    private async Task onStatusTick(StatusTickMessage message) {
+      await Task.Run(() => {
+        allFiles.ForEach(f => {
+          if (f.LastAccess.HasValue && (DateTime.Now - f.LastAccess.Value).Minutes > 2) {
+            f.Header     = null;
+            f.LastAccess = null;
+          }
+        });
+      });
     }
 
     #endregion Messages
@@ -335,7 +348,9 @@ namespace UpkManager.Wpf.Controllers {
 
             DomainUpkFile upkFile = allFiles.Single(f => f.Id == file.Id);
 
-            if (upkFile.Header == null) await loadUpkFile(upkFile);
+            if (upkFile.Header == null) await loadUpkFile(file, upkFile);
+
+            upkFile.LastAccess = DateTime.Now;
 
             messenger.Send(new FileLoadedMessage { FileViewEntity = file, File = upkFile });
           }
@@ -401,55 +416,79 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Files.AddRange(fileEntities);
     }
 
-    private async Task loadUpkFile(DomainUpkFile file) {
-      file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+    private async Task loadUpkFile(FileViewEntity file, DomainUpkFile upkFile) {
+      upkFile.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, upkFile.GameFilename));
 
-      await Task.Run(() => file.Header.ReadHeaderAsync());
+      try {
+        await Task.Run(() => upkFile.Header.ReadHeaderAsync(onLoadProgress));
 
-      file.IsErrored = file.Header.IsErrored;
+        file.IsErrored = false;
+      }
+      catch(Exception ex) {
+        file.IsErrored = true;
+
+        messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", Exception = ex });
+      }
     }
 
     private void onLoadProgress(DomainLoadProgress progress) {
       messenger.Send(mapper.Map<LoadProgressMessage>(progress));
     }
 
-    private async Task scanUpkFiles(List<DomainUpkFile> fileEntities) {
-      LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = fileEntities.Count };
+    private async Task scanUpkFiles(List<DomainUpkFile> upkFiles) {
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
-      foreach(DomainUpkFile file in fileEntities) {
-        message.Current   += 1;
+      List<DomainUpkFile> saveCache = new List<DomainUpkFile>();
+
+      foreach(DomainUpkFile file in upkFiles) {
+        FileViewEntity fileEntity = viewModel.Files.SingleOrDefault(fe => fe.Id == file.Id) ?? mapper.Map<FileViewEntity>(file);
+
+        message.Current++;
         message.StatusText = Path.Combine(settings.PathToGame, file.GameFilename);
 
         messenger.Send(message);
 
-        await scanUpkFile(file);
+        await scanUpkFile(fileEntity, file);
 
-        file.FileSize  = file.Header.FileSize;
-
-        file.FileSize  = file.Header.FileSize;
-        file.IsErrored = file.Header.IsErrored;
-
+        file.FileSize    = file.Header.FileSize;
         file.ExportTypes = new List<string>(file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s));
+
+        fileEntity.FileSize    = file.Header.FileSize;
+        fileEntity.ExportTypes = new ObservableCollection<string>(file.ExportTypes);
 
         file.Header = null;
 
         string path = Path.GetDirectoryName(file.GameFilename);
 
-        if (path != null && path.ToLowerInvariant().EndsWith("cookedpc")) await remoteRepository.SaveUpkFile(file);
+        if (path != null && path.ToLowerInvariant().EndsWith("cookedpc")) {
+          saveCache.Add(file);
+
+          if (saveCache.Count == 50) {
+            remoteRepository.SaveUpkFile(saveCache).FireAndForget();
+
+            saveCache.Clear();
+          }
+        }
       }
 
-      filterFiles();
+      if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache).FireAndForget();
 
       message.IsComplete = true;
 
       messenger.Send(message);
     }
 
-    private async Task scanUpkFile(DomainUpkFile file) {
+    private async Task scanUpkFile(FileViewEntity file, DomainUpkFile upkFile) {
       try {
-        file.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+        upkFile.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, upkFile.GameFilename));
+
+        await Task.Run(() => upkFile.Header.ReadHeaderAsync(null));
+
+        file.IsErrored = false;
       }
       catch(Exception ex) {
+        file.IsErrored = true;
+
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = "Error Scanning UPK File.", Exception = ex, HeaderText = "Scan Error" });
       }
     }
@@ -458,6 +497,8 @@ namespace UpkManager.Wpf.Controllers {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Exporting...", Total = files.Count };
 
       foreach(DomainUpkFile file in files) {
+        FileViewEntity fileEntity = viewModel.Files.Single(fe => fe.Id == file.Id);
+
         string directory = Path.Combine(settings.ExportPath, Path.GetDirectoryName(file.GameFilename), Path.GetFileNameWithoutExtension(file.GameFilename));
 
         if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
@@ -465,12 +506,19 @@ namespace UpkManager.Wpf.Controllers {
         DomainHeader header = file.Header;
 
         if (header == null) {
-          header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+          try {
+            header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
 
-          await Task.Run(() => header.ReadHeaderAsync());
+            await Task.Run(() => header.ReadHeaderAsync(null));
+          }
+          catch(Exception ex) {
+            messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", ErrorMessage = $"Filename: {file.GameFilename}", Exception = ex });
+
+            fileEntity.IsErrored = true;
+
+            continue;
+          }
         }
-
-        if (header.IsErrored) file.IsErrored = true;
 
         message.Current += 1;
 
@@ -480,15 +528,17 @@ namespace UpkManager.Wpf.Controllers {
               await export.ParseDomainObject(header, false, false);
             }
             catch(Exception ex) {
-              messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Parsing Object", ErrorMessage = $"Filename: {header.Filename}\nExport Name: {export.NameIndex.Name}, Type: {export.TypeReferenceNameIndex.Name}", Exception = ex });
+              messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Parsing Object", ErrorMessage = $"Filename: {header.Filename}\nExport Name: {export.NameIndex.Name}\nType: {export.TypeReferenceNameIndex.Name}", Exception = ex });
 
-              return;
+              fileEntity.IsErrored = true;
+
+              continue;
             }
           }
 
-          if (export.IsErrored || !export.DomainObject.IsExportable) continue;
+          if (!export.DomainObject.IsExportable) continue;
 
-          string filename = Path.Combine(directory, $"{export.NameIndex.Name}.dds");
+          string filename = Path.Combine(directory, $"{export.NameIndex.Name}{export.DomainObject.FileExtension}");
 
           message.StatusText = filename;
 

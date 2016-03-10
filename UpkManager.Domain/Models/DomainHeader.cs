@@ -97,8 +97,6 @@ namespace UpkManager.Domain.Models {
 
     #region Domain Properties
 
-    public bool IsErrored { get; set; }
-
     public string FullFilename { get; set; }
 
     public string Filename => Path.GetFileName(FullFilename);
@@ -109,25 +107,54 @@ namespace UpkManager.Domain.Models {
 
     #region Domain Methods
 
-    public async Task ReadHeaderAsync() {
+    public async Task ReadHeaderAsync(Action<DomainLoadProgress> progress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Parsing Header..." };
+
+      progress?.Invoke(message);
+
       await readUpkHeader();
 
       const CompressionTypes validCompression = CompressionTypes.LZO | CompressionTypes.LZO_ENC;
 
-      if (((CompressionTypes)CompressionFlags & validCompression) > 0 ) reader = await decompressChunks();
+      if (((CompressionTypes)CompressionFlags & validCompression) > 0 ) {
+        message.Text = "Decompressing...";
+
+        progress?.Invoke(message);
+
+        reader = await decompressChunks();
+      }
       else if (CompressionFlags > 0) throw new Exception($"Unsupported compression type 0x{CompressionFlags:X8}.");
 
-      await readNameTable();
+      await readNameTable(progress);
 
-      await readImportTable();
+      await readImportTable(progress);
 
-      await readExportTable();
+      await readExportTable(progress);
+
+      message.Text = "Slicing and Dicing...";
+
+      progress?.Invoke(message);
 
       await readDependsTable();
 
       await patchPointers();
 
-      await ExportTable.ForEachAsync(export => export.ReadDomainObject(reader));
+      message.Text  = "Reading Objects...";
+      message.Total = ExportTableCount;
+
+      progress?.Invoke(message);
+
+      await ExportTable.ForEachAsync(export => {
+        return export.ReadDomainObject(reader).ContinueWith(t => {
+          message.IncrementCurrent();
+
+          if (ExportTableCount > 100) progress?.Invoke(message);
+        });
+      });
+
+      message.IsComplete = true;
+
+      progress?.Invoke(message);
     }
 
     public DomainObjectTableEntry GetObjectTableEntry(int reference) {
@@ -248,7 +275,9 @@ namespace UpkManager.Domain.Models {
       return ByteArrayReader.CreateNew(data, start);
     }
 
-    private async Task readNameTable() {
+    private async Task readNameTable(Action<DomainLoadProgress> progress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Name Table...", Current = 0, Total = NameTableCount };
+
       reader.Seek(NameTableOffset);
 
       for(int i = 0; i < NameTableCount; ++i) {
@@ -257,10 +286,16 @@ namespace UpkManager.Domain.Models {
         await name.ReadNameTableEntry(reader);
 
         NameTable.Add(name);
+
+        message.IncrementCurrent();
+
+        if (NameTableCount > 100) progress?.Invoke(message);
       }
     }
 
-    private async Task readImportTable() {
+    private async Task readImportTable(Action<DomainLoadProgress> progress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Import Table...", Current = 0, Total = ImportTableCount };
+
       reader.Seek(ImportTableOffset);
 
       for(int i = 0; i < ImportTableCount; ++i) {
@@ -269,12 +304,24 @@ namespace UpkManager.Domain.Models {
         await import.ReadImportTableEntry(reader, this);
 
         ImportTable.Add(import);
+
+        message.IncrementCurrent();
+
+        if (ImportTableCount > 100) progress?.Invoke(message);
       }
+
+      message.Text    = "Expanding References...";
+      message.Current = 0;
+      message.Total   = 0;
+
+      progress?.Invoke(message);
 
       await ImportTable.ForEachAsync(import => Task.Run(() => import.ExpandReferences(this)));
     }
 
-    private async Task readExportTable() {
+    private async Task readExportTable(Action<DomainLoadProgress> progress) {
+      DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Export Table...", Current = 0, Total = ExportTableCount };
+
       reader.Seek(ExportTableOffset);
 
       for(int i = 0; i < ExportTableCount; ++i) {
@@ -283,7 +330,17 @@ namespace UpkManager.Domain.Models {
         await export.ReadExportTableEntry(reader, this);
 
         ExportTable.Add(export);
+
+        message.IncrementCurrent();
+
+        if (ExportTableCount > 100) progress?.Invoke(message);
       }
+
+      message.Text    = "Expanding References...";
+      message.Current = 0;
+      message.Total   = 0;
+
+      progress?.Invoke(message);
 
       await ExportTable.ForEachAsync(export => Task.Run(() => export.ExpandReferences(this)));
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -39,11 +40,11 @@ namespace UpkManager.Domain.Models {
 
     public bool ContainsTargetObject { get; set; }
 
-    public bool IsErrored { get; set; }
-
     public List<DomainUpkFile> ModdedFiles { get; set; }
 
     public bool IsModded => ModdedFiles.Any();
+
+    public DateTime? LastAccess { get; set; }
 
     #endregion Domain Properties
 

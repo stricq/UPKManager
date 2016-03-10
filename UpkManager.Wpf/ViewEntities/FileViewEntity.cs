@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
 
 using STR.MvvmCommon;
 
@@ -21,6 +21,8 @@ namespace UpkManager.Wpf.ViewEntities {
     private string     filename;
 
     private string notes;
+
+    private ObservableCollection<string> exportTypes;
 
     #endregion Private Fields
 
@@ -67,6 +69,11 @@ namespace UpkManager.Wpf.ViewEntities {
     }
 
     public string NotesColumn => (Notes?.Length > 50 ? Notes.Substring(0, 50) : Notes)?.Replace("\r\n", " ").Replace('\t', ' ');
+
+    public ObservableCollection<string> ExportTypes {
+      get { return exportTypes; }
+      set { SetField(ref exportTypes, value, () => ExportTypes); }
+    }
 
     #endregion Properties
 

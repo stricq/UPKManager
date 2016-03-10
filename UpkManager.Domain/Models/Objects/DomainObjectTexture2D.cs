@@ -38,6 +38,10 @@ namespace UpkManager.Domain.Models.Objects {
 
     public override ObjectType ObjectType => ObjectType.Texture2D;
 
+    public override string FileExtension => ".dds";
+
+    public override string FileTypeDesc => "Direct Draw Surface";
+
     #endregion Properties
 
     #region Domain Methods
@@ -56,7 +60,7 @@ namespace UpkManager.Domain.Models.Objects {
             Height = reader.ReadInt32()
           };
 
-          if (mip.Width >= 4 && mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
+          if (mip.Width >= 4 || mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
 
           MipMaps.Add(mip);
         });

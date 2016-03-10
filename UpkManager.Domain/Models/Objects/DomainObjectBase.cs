@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using UpkManager.Domain.Constants;
@@ -36,6 +37,10 @@ namespace UpkManager.Domain.Models.Objects {
     public virtual bool IsViewable => false;
 
     public virtual ObjectType ObjectType => ObjectType.Unknown;
+
+    public virtual string FileExtension => String.Empty;
+
+    public virtual string FileTypeDesc => String.Empty;
 
     #endregion Domain Properties
 

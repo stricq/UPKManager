@@ -17,6 +17,8 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
+    private int lastCurrent;
+
     private readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
 
     private readonly StatusBarViewModel viewModel;
@@ -70,13 +72,21 @@ namespace UpkManager.Wpf.Controllers {
         viewModel.JobProgress           = 0.0;
         viewModel.JobProgressText       = "Idle";
 
+        lastCurrent = 0;
+
         return;
       }
 
       viewModel.JobProgressVisibility = message.Total > 0;
       viewModel.JobProgressText       = message.Total > 0 ? $"{message.Text} [{message.Current} / {message.Total}]" : message.Text;
 
-      if (message.Current > 0 && message.Total > 0) viewModel.JobProgress = message.Current / message.Total * 100.0;
+      if (message.Current == 0) lastCurrent = 0;
+
+      if (message.Current > 0 && message.Total > 0 && message.Current > lastCurrent) {
+        viewModel.JobProgress = message.Current / message.Total * 100.0;
+
+        lastCurrent = message.Current;
+      }
 
       if (message.StatusText != null) viewModel.StatusText = message.StatusText;
     }

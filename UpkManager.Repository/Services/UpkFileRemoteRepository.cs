@@ -7,6 +7,8 @@ using AutoMapper;
 
 using RestSharp;
 
+using STR.Common.Extensions;
+
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Entities;
@@ -56,6 +58,10 @@ namespace UpkManager.Repository.Services {
       IRestResponse<string> response = await client.ExecuteTaskAsync<string>(request);
 
       File.Id = response.Data;
+    }
+
+    public async Task SaveUpkFile(List<DomainUpkFile> Files) {
+      await Files.ForEachAsync(SaveUpkFile);
     }
 
     #endregion IUpkFileRemoteRepository Implementation

@@ -41,7 +41,7 @@ namespace UpkManager.Domain.Helpers {
     }
 
     public void Seek(int Offset) {
-      if (Offset < 0 || Offset >= data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
+      if (Offset < 0 || Offset > data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
 
       index = Offset;
     }
