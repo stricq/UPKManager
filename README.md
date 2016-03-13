@@ -16,7 +16,7 @@ Name: STR Programming Services
 Source: http://nuget.stricq.com/nuget
 
 # Download
-[UPK Manager v1.0](https://bns.stricq.com/Files/UpkManager.Installer.msi)
+[UPK Manager v1.1](https://bns.stricq.com/Files/UpkManager.Installer.msi)
 
 # Instructions for Viewing and Saving Textures
 ### Settings
