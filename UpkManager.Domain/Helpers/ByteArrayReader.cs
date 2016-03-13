@@ -47,7 +47,7 @@ namespace UpkManager.Domain.Helpers {
     }
 
     public void Skip(int Count) {
-      if (index + Count < 0 || index + Count >= data.Length) throw new ArgumentOutOfRangeException(nameof(Count), "Index + Count is out of the bounds of the byte array.");
+      if (index + Count < 0 || index + Count > data.Length) throw new ArgumentOutOfRangeException(nameof(Count), "Index + Count is out of the bounds of the byte array.");
 
       index += Count;
     }
@@ -55,7 +55,7 @@ namespace UpkManager.Domain.Helpers {
     public ByteArrayReader Branch(int Offset) {
       ByteArrayReader reader = new ByteArrayReader();
 
-      if (Offset < 0 || Offset >= data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
+      if (Offset < 0 || Offset > data.Length) throw new ArgumentOutOfRangeException(nameof(Offset), "Index value is outside the bounds of the byte array.");
 
       reader.Initialize(data, Offset);
 

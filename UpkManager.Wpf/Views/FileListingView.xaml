@@ -52,6 +52,14 @@
               </GridViewColumn.CellTemplate>
             </GridViewColumn>
 
+            <GridViewColumn Header="Version">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
             <GridViewColumn Header="Notes">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Configuration;
+using System.Net;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -11,6 +13,7 @@ using STR.Common.Extensions;
 
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
+
 using UpkManager.Entities;
 
 
@@ -40,10 +43,14 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRemoteRepository Implementation
 
-    public async Task<List<DomainUpkFile>> LoadUpkFiles() {
-      RestRequest request = new RestRequest("UpkFile", Method.GET) { RequestFormat = DataFormat.Json };
+    public async Task<List<DomainUpkFile>> LoadUpkFiles(int GameVersion) {
+      RestRequest request = new RestRequest("UpkFile/{Version}", Method.GET) { RequestFormat = DataFormat.Json };
+
+      request.AddParameter("Version", GameVersion, ParameterType.UrlSegment);
 
       IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request);
+
+      if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
 
       return await Task.Run(() => mapper.Map<List<DomainUpkFile>>(response.Data));
     }

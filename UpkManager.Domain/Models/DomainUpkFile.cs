@@ -20,9 +20,11 @@ namespace UpkManager.Domain.Models {
 
     #region Properties
 
+    public string Id { get; set; }
+
     public long FileSize { get; set; }
 
-    public string Id { get; set; }
+    public int GameVersion { get; set; }
 
     public string GameFilename { get; set; }
 

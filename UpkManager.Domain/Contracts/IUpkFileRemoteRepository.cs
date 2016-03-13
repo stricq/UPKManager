@@ -8,7 +8,7 @@ namespace UpkManager.Domain.Contracts {
 
   public interface IUpkFileRemoteRepository {
 
-    Task<List<DomainUpkFile>> LoadUpkFiles();
+    Task<List<DomainUpkFile>> LoadUpkFiles(int GameVersion);
 
     Task SaveUpkFile(DomainUpkFile File);
 

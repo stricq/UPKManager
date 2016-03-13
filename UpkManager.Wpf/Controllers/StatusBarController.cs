@@ -78,7 +78,7 @@ namespace UpkManager.Wpf.Controllers {
       }
 
       viewModel.JobProgressVisibility = message.Total > 0;
-      viewModel.JobProgressText       = message.Total > 0 ? $"{message.Text} [{message.Current} / {message.Total}]" : message.Text;
+      viewModel.JobProgressText       = message.Total > 0 ? $"{message.Text} [{message.Current:N0} / {message.Total:N0}]" : message.Text;
 
       if (message.Current == 0) lastCurrent = 0;
 

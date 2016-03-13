@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -25,6 +26,26 @@ namespace UpkManager.Repository.Services {
       };
 
       return header;
+    }
+
+    public async Task<int> GetGameVersion(string gamePath) {
+      StreamReader stream = new StreamReader(File.OpenRead(Path.Combine(gamePath, @"..\VersionInfo_BnS.ini")));
+
+      int version = 0;
+
+      string line;
+
+      while((line = await stream.ReadLineAsync()) != null) {
+        if (line.StartsWith("GlobalVersion", StringComparison.CurrentCultureIgnoreCase)) {
+          string[] parts = line.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+
+          if (parts.Length > 1) Int32.TryParse(parts[1], out version);
+
+          break;
+        }
+      }
+
+      return version;
     }
 
     #endregion IUpkFileRepository Implementation

@@ -9,6 +9,8 @@ namespace UpkManager.Entities {
 
     public long FileSize { get; set; }
 
+    public int GameVersion { get; set; }
+
     public string GameFilename { get; set; }
 
     public List<string> ExportTypes { get; set; }

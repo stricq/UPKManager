@@ -9,6 +9,8 @@ namespace UpkManager.Domain.Contracts {
 
     Task<DomainHeader> LoadUpkFile(string filename);
 
+    Task<int> GetGameVersion(string gamePath);
+
   }
 
 }

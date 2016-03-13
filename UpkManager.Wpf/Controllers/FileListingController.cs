@@ -41,7 +41,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private DomainSettings settings;
 
-    private List<DomainUpkFile> allFiles;
+    private readonly List<DomainUpkFile> allFiles;
 
     private readonly FileListingViewModel viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -210,7 +210,9 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      List<DomainUpkFile> localFiles = await loadGameFiles();
+      int version = await repository.GetGameVersion(settings.PathToGame);
+
+      List<DomainUpkFile> localFiles = await loadGameFiles(version);
 
       if (!localFiles.Any()) {
         progress.IsComplete = true;
@@ -232,21 +234,26 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      List<DomainUpkFile> remoteFiles = await remoteRepository.LoadUpkFiles();
+      List<DomainUpkFile> remoteFiles = await remoteRepository.LoadUpkFiles(version);
 
       List<DomainUpkFile> matches = (from row1 in localFiles
                                      join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
-                                    where row1.FileSize == row2.FileSize
+                                    where row1.GameVersion == row2.GameVersion
                                    select row2).ToList();
 
       if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> changes = (from row1 in localFiles
-                                  join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
-                                 where row1.FileSize != row2.FileSize
-                                select row2).ToList();
+                                     join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
+                                    where row1.GameVersion != row2.GameVersion
+                                   select row2).ToList();
 
       if (changes.Any()) {
+        changes.ForEach(f => {
+          f.GameVersion = version;
+          f.Id          = null;
+        });
+
         allFiles.AddRange(changes.OrderBy(f => f.Filename));
 
         allFiles.Sort(domainUpkfileComparison);
@@ -283,17 +290,17 @@ namespace UpkManager.Wpf.Controllers {
       return String.Compare(left.Filename, right.Filename, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private async Task<List<DomainUpkFile>> loadGameFiles() {
+    private async Task<List<DomainUpkFile>> loadGameFiles(int version) {
       List<DomainUpkFile> files = new List<DomainUpkFile>();
 
       if (String.IsNullOrEmpty(settings.PathToGame)) return files;
 
-      await loadDirectoryAsync(files, settings.PathToGame);
+      await loadDirectoryAsync(files, version, settings.PathToGame);
 
       return files;
     }
 
-    private async Task loadDirectoryAsync(List<DomainUpkFile> parent, string path) {
+    private async Task loadDirectoryAsync(List<DomainUpkFile> parent, int version, string path) {
       DirectoryInfo   dirInfo;
       DirectoryInfo[] dirInfos;
 
@@ -313,7 +320,7 @@ namespace UpkManager.Wpf.Controllers {
         foreach(DomainUpkFile upkFile in dirs.ToList()) {
           List<DomainUpkFile> children = new List<DomainUpkFile>();
 
-          await loadDirectoryAsync(children, Path.Combine(settings.PathToGame, upkFile.GameFilename));
+          await loadDirectoryAsync(children, version, Path.Combine(settings.PathToGame, upkFile.GameFilename));
 
           if (children.Count == 0) dirs.Remove(upkFile);
           else parent.AddRange(children);
@@ -324,7 +331,7 @@ namespace UpkManager.Wpf.Controllers {
         FileInfo[] files = await Task.Run(() => dirInfo.GetFiles("*.upk"));
 
         if (files.Length > 0) {
-          List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length }).ToList();
+          List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length, GameVersion = version }).ToList();
 
           parent.AddRange(upkFiles);
         }
