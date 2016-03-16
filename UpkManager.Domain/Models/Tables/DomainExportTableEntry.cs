@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.Objects;
+using UpkManager.Domain.Models.Objects.Sounds;
+using UpkManager.Domain.Models.Objects.Textures;
 
 
 namespace UpkManager.Domain.Models.Tables {
@@ -146,6 +148,7 @@ namespace UpkManager.Domain.Models.Tables {
       switch(type) {
         case ObjectType.ArchetypeObjectReference: return new DomainObjectArchetypeBase();
         case ObjectType.ObjectRedirector:         return new DomainObjectObjectRedirector();
+        case ObjectType.SoundNodeWave:            return new DomainObjectSoundNodeWave();
         case ObjectType.Texture2D:                return new DomainObjectTexture2D();
 
         default: return new DomainObjectBase();

@@ -1,6 +1,6 @@
 ﻿
 
-namespace UpkManager.Domain.Models.Objects.Texture2D {
+namespace UpkManager.Domain.Models.Objects.Textures {
 
   public class DomainMipMap {
 

@@ -7,12 +7,11 @@ using CSharpImageLibrary.General;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Helpers;
-using UpkManager.Domain.Models.Objects.Texture2D;
 using UpkManager.Domain.Models.Properties;
 using UpkManager.Domain.Models.Tables;
 
 
-namespace UpkManager.Domain.Models.Objects {
+namespace UpkManager.Domain.Models.Objects.Textures {
 
   public class DomainObjectTexture2D : DomainObjectCompressionBase {
 

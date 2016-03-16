@@ -38,9 +38,9 @@ namespace UpkManager.Domain.Models.Compression {
     }
 
     public async Task<ByteArrayReader> DecompressChunk(uint flags) {
-      if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.Unused) > 0) return null;
+      const BulkDataCompressionTypes nothingTodo = BulkDataCompressionTypes.Unused | BulkDataCompressionTypes.StoreInSeparatefile;
 
-      if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.StoreInSeparatefile) > 0) return null;
+      if (((BulkDataCompressionTypes)BulkDataFlags & nothingTodo) > 0) return null;
 
       byte[] chunkData = new byte[Header.Blocks.Sum(block => block.UncompressedSize)];
 

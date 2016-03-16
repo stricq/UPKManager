@@ -84,8 +84,9 @@
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
     <Compile Include="Models\Objects\DomainObjectCompressionBase.cs" />
     <Compile Include="Models\Objects\DomainObjectObjectRedirector.cs" />
-    <Compile Include="Models\Objects\DomainObjectTexture2D.cs" />
-    <Compile Include="Models\Objects\Texture2D\DomainMipMap.cs" />
+    <Compile Include="Models\Objects\Sounds\DomainObjectSoundNodeWave.cs" />
+    <Compile Include="Models\Objects\Textures\DomainObjectTexture2D.cs" />
+    <Compile Include="Models\Objects\Textures\DomainMipMap.cs" />
     <Compile Include="Models\Properties\DomainPropertyArrayValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyClassValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyComponentValue.cs" />
