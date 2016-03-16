@@ -5,7 +5,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Compression {
 
-  public class DomainCompressedChunk {
+  public class DomainCompressedChunk : DomainUpkBuilderBase {
 
     #region Properties
 
@@ -36,6 +36,16 @@ namespace UpkManager.Domain.Models.Compression {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int) * 4;
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

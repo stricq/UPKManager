@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models {
 
-  public class DomainString {
+  public class DomainString : DomainUpkBuilderBase {
 
     #region Properties
 
@@ -45,6 +46,27 @@ namespace UpkManager.Domain.Models {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int)
+                  + getStringSize();
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
+
+    #region Private Methods
+
+    private int getStringSize() {
+      const int maxAnsiCode = 255;
+
+      return String.Any(c => c > maxAnsiCode) ? String.Length * 2 : String.Length;
+    }
+
+    #endregion Private Methods
 
   }
 

@@ -3,7 +3,7 @@
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainGenerationTableEntry {
+  public class DomainGenerationTableEntry : DomainUpkBuilderBase {
 
     #region Properties
 
@@ -24,6 +24,16 @@ namespace UpkManager.Domain.Models.Tables {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int) * 3;
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

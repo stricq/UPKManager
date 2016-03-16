@@ -14,7 +14,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models {
 
-  public class DomainHeader {
+  public class DomainHeader : DomainUpkBuilderBase {
 
     #region Private Fields
 
@@ -167,6 +167,24 @@ namespace UpkManager.Domain.Models {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      if (CompressedChunks.Any()) throw new Exception("Cannot rebuild compressed files.");
+
+      BuilderSize = sizeof(uint)   * 7
+                  + sizeof(ushort) * 2
+                  + sizeof(int)    * 8
+                  + Group.GetBuilderSize()
+                  + Guid.Length
+                  + sizeof(int) + Generations.Sum(gen => gen.GetBuilderSize())
+                  + sizeof(int) + CompressedChunks.Sum(chunk => chunk.GetBuilderSize());
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
     #region Private Methods
 

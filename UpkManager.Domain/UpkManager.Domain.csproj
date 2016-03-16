@@ -79,6 +79,7 @@
     <Compile Include="Models\Compression\DomainCompressedChunkHeader.cs" />
     <Compile Include="Models\DomainHeader.cs" />
     <Compile Include="Models\DomainSettings.cs" />
+    <Compile Include="Models\DomainUpkBuilderBase.cs" />
     <Compile Include="Models\Objects\DomainObjectArchetypeBase.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
     <Compile Include="Models\Objects\DomainObjectCompressionBase.cs" />
