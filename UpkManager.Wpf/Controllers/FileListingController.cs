@@ -238,14 +238,14 @@ namespace UpkManager.Wpf.Controllers {
 
       List<DomainUpkFile> matches = (from row1 in localFiles
                                      join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
-                                    where row1.GameVersion == row2.GameVersion
+                                    where row1.FileSize == row2.FileSize
                                    select row2).ToList();
 
       if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> changes = (from row1 in localFiles
                                      join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
-                                    where row1.GameVersion != row2.GameVersion
+                                    where row1.FileSize != row2.FileSize
                                    select row2).ToList();
 
       if (changes.Any()) {
