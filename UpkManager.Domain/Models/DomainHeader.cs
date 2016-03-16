@@ -29,7 +29,7 @@ namespace UpkManager.Domain.Models {
 
       Group = new DomainString();
 
-      Generations = new List<DomainGenerationTableEntry>();
+      GenerationTable = new List<DomainGenerationTableEntry>();
 
       CompressedChunks = new List<DomainCompressedChunk>();
 
@@ -71,13 +71,17 @@ namespace UpkManager.Domain.Models {
 
     public byte[] Guid { get; set; }
 
-    public List<DomainGenerationTableEntry> Generations { get; set; }
+    public int GenerationTableCount { get; set; }
+
+    public List<DomainGenerationTableEntry> GenerationTable { get; set; }
 
     public uint EngineVersion { get; set; }
 
     public uint CookerVersion { get; set; }
 
     public uint CompressionFlags { get; set; }
+
+    public int CompressionTableCount { get; set; }
 
     public List<DomainCompressedChunk> CompressedChunks { get; set; }
 
@@ -91,7 +95,7 @@ namespace UpkManager.Domain.Models {
 
     public List<DomainImportTableEntry> ImportTable { get; set; }
 
-    public byte[] DependsTable { get; set; } // (Size - DependsOffset) bytes of data
+    public byte[] DependsTable { get; set; } // (Size - DependsOffset) bytes; or ExportTableCount * 4 bytes;
 
     #endregion Properties
 
@@ -171,15 +175,19 @@ namespace UpkManager.Domain.Models {
     #region DomainUpkBuilderBase Implementation
 
     public override int GetBuilderSize() {
-      if (CompressedChunks.Any()) throw new Exception("Cannot rebuild compressed files.");
+      if (CompressedChunks.Any()) throw new Exception("Cannot rebuild compressed files. Yet.");
 
       BuilderSize = sizeof(uint)   * 7
                   + sizeof(ushort) * 2
-                  + sizeof(int)    * 8
+                  + sizeof(int)    * 10
                   + Group.GetBuilderSize()
                   + Guid.Length
-                  + sizeof(int) + Generations.Sum(gen => gen.GetBuilderSize())
-                  + sizeof(int) + CompressedChunks.Sum(chunk => chunk.GetBuilderSize());
+                  + GenerationTable.Sum(gen => gen.GetBuilderSize())
+                  + CompressedChunks.Sum(chunk => chunk.GetBuilderSize())
+                  + NameTable.Sum(name => name.GetBuilderSize())
+                  + ExportTable.Sum(export => export.GetBuilderSize())
+                  + ImportTable.Sum(import => import.GetBuilderSize())
+                  + DependsTable.Length;
 
       return BuilderSize;
     }
@@ -218,12 +226,16 @@ namespace UpkManager.Domain.Models {
 
       Guid = await reader.ReadBytes(16);
 
-      Generations = await readGenerationsTable();
+      GenerationTableCount = reader.ReadInt32();
+
+      GenerationTable = await readGenerationsTable();
 
       EngineVersion = reader.ReadUInt32();
       CookerVersion = reader.ReadUInt32();
 
       CompressionFlags = reader.ReadUInt32();
+
+      CompressionTableCount = reader.ReadInt32();
 
       CompressedChunks = await readCompressedChunksTable();
 
@@ -232,11 +244,9 @@ namespace UpkManager.Domain.Models {
     }
 
     private async Task<List<DomainGenerationTableEntry>> readGenerationsTable() {
-      int count = reader.ReadInt32();
-
       List<DomainGenerationTableEntry> generations = new List<DomainGenerationTableEntry>();
 
-      for(int i = 0; i < count; ++i) {
+      for(int i = 0; i < GenerationTableCount; ++i) {
         DomainGenerationTableEntry info = new DomainGenerationTableEntry();
 
         await Task.Run(() => info.ReadGenerationTableEntry(reader));
@@ -248,11 +258,9 @@ namespace UpkManager.Domain.Models {
     }
 
     private async Task<List<DomainCompressedChunk>> readCompressedChunksTable() {
-      int count = reader.ReadInt32();
-
       List<DomainCompressedChunk> chunks = new List<DomainCompressedChunk>();
 
-      for(int i = 0; i < count; ++i) {
+      for(int i = 0; i < CompressionTableCount; ++i) {
         DomainCompressedChunk chunk = new DomainCompressedChunk();
 
         await chunk.ReadCompressedChunk(reader);

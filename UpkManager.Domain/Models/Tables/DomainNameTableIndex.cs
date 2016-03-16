@@ -5,7 +5,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainNameTableIndex {
+  public class DomainNameTableIndex : DomainUpkBuilderBase {
 
     #region Properties
 
@@ -13,9 +13,13 @@ namespace UpkManager.Domain.Models.Tables {
 
     public int Numeric { get; set; }
 
+    #endregion Properties
+
+    #region Domain Properties
+
     public string Name { get; set; }
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Public Methods
 
@@ -29,6 +33,16 @@ namespace UpkManager.Domain.Models.Tables {
     }
 
     #endregion Public Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int) * 2;
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

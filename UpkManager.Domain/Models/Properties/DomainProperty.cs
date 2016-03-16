@@ -71,7 +71,7 @@ namespace UpkManager.Domain.Models.Properties {
         case PropertyType.GuidProperty:      return new DomainPropertyGuidValue();
         case PropertyType.NameProperty:      return new DomainPropertyNameValue();
         case PropertyType.ByteProperty:      return new DomainPropertyByteValue();
-        case PropertyType.StrProperty:       return new DomainPropertyStrValue();
+        case PropertyType.StringProperty:       return new DomainPropertyStringValue();
         case PropertyType.StructProperty:    return new DomainPropertyStructValue();
         case PropertyType.ArrayProperty:     return new DomainPropertyArrayValue();
 

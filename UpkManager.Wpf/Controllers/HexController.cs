@@ -57,6 +57,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private void registerMessages() {
       messenger.Register<FileLoadingMessage>(this, onFileLoading);
+      messenger.Register<FileLoadedMessage>(this, onFileLoaded);
 
       messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportTableEntrySelected);
 
@@ -71,6 +72,18 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.HexData.Clear();
 
       viewModel.Title = "No Display";
+    }
+
+    private async void onFileLoaded(FileLoadedMessage message) {
+      tokenSource?.Cancel();
+
+      tokenSource = new CancellationTokenSource();
+
+      viewModel.Title = "Depends Table";
+
+      title = viewModel.Title;
+
+      await buildHexDataAsync(message.File.Header.DependsTable, message.File.Header.DependsTableOffset, tokenSource.Token);
     }
 
     private async Task onExportTableEntrySelected(ExportTableEntrySelectedMessage message) {

@@ -126,9 +126,9 @@ namespace UpkManager.Wpf.ViewEntities {
       set { SetField(ref guid, value, () => Guid); }
     }
 
-    public int GenerationsCount {
+    public int GenerationTableCount {
       get { return generationsCount; }
-      set { SetField(ref generationsCount, value, () => GenerationsCount); }
+      set { SetField(ref generationsCount, value, () => GenerationTableCount); }
     }
 
     public uint EngineVersion {
@@ -146,9 +146,9 @@ namespace UpkManager.Wpf.ViewEntities {
       set { SetField(ref compressionFlags, value, () => CompressionFlags); }
     }
 
-    public int CompressedChunksCount {
+    public int CompressionTableCount {
       get { return compressedChunksCount; }
-      set { SetField(ref compressedChunksCount, value, () => CompressedChunksCount); }
+      set { SetField(ref compressedChunksCount, value, () => CompressionTableCount); }
     }
 
     public uint Unknown1 {

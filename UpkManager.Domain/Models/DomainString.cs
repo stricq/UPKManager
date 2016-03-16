@@ -63,7 +63,7 @@ namespace UpkManager.Domain.Models {
     private int getStringSize() {
       const int maxAnsiCode = 255;
 
-      return String.Any(c => c > maxAnsiCode) ? String.Length * 2 : String.Length;
+      return String.Any(c => c > maxAnsiCode) ? String.Length * 2 : String.Length + 1;
     }
 
     #endregion Private Methods

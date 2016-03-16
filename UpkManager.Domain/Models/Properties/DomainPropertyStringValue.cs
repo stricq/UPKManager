@@ -6,7 +6,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyStrValue : DomainPropertyValueBase {
+  public class DomainPropertyStringValue : DomainPropertyValueBase {
 
     #region Private Fields
 
@@ -16,7 +16,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Constructor
 
-    public DomainPropertyStrValue() {
+    public DomainPropertyStringValue() {
       stringValue = new DomainString();
     }
 
@@ -24,7 +24,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public override PropertyType PropertyType => PropertyType.StrProperty;
+    public override PropertyType PropertyType => PropertyType.StringProperty;
 
     public override object PropertyValue => stringValue;
 

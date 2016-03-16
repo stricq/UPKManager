@@ -107,7 +107,7 @@
     <Compile Include="Models\Properties\DomainPropertyNameValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyObjectValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyStructValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyStrValue.cs" />
+    <Compile Include="Models\Properties\DomainPropertyStringValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\DomainUpkFile.cs" />

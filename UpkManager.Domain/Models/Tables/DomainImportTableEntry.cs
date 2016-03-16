@@ -53,6 +53,18 @@ namespace UpkManager.Domain.Models.Tables {
 
     #endregion Domain Methods
 
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = base.GetBuilderSize()
+                  + PackageNameIndex.GetBuilderSize()
+                  + TypeNameIndex.GetBuilderSize();
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
+
   }
 
 }

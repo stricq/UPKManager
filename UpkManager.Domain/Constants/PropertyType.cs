@@ -18,7 +18,7 @@ namespace UpkManager.Domain.Constants {
 
     NameProperty, ByteProperty, // DomainNameIndex : 8 bytes
 
-    StrProperty, // uint + string : 4 + value of uint
+    StringProperty, // uint + string : 4 + value of uint
 
     StructProperty, // variable : depends on structNameIndex
 

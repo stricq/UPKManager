@@ -55,7 +55,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
     }
 
     private void onFileLoaded(FileLoadedMessage message) {
-      viewModel.GenerationsTableEntries.AddRange(mapper.Map<IEnumerable<GenerationsTableEntryViewEntity>>(message.File.Header.Generations));
+      viewModel.GenerationsTableEntries.AddRange(mapper.Map<IEnumerable<GenerationsTableEntryViewEntity>>(message.File.Header.GenerationTable));
     }
 
     #endregion Messages

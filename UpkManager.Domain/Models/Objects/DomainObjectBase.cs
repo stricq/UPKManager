@@ -24,13 +24,13 @@ namespace UpkManager.Domain.Models.Objects {
 
     public DomainPropertyHeader PropertyHeader { get; set; }
 
-    public int AdditionalDataOffset { get; set; }
-
     public ByteArrayReader AdditionalDataReader { get; set; }
 
     #endregion Properties
 
     #region Domain Properties
+
+    public int AdditionalDataOffset { get; set; }
 
     public virtual bool IsExportable => false;
 

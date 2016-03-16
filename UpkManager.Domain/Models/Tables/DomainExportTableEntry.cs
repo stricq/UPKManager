@@ -115,6 +115,20 @@ namespace UpkManager.Domain.Models.Tables {
 
     #endregion Domain Methods
 
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = base.GetBuilderSize()
+                  + sizeof(int) * 6
+                  + sizeof(uint) * 4
+                  + Guid.Length
+                  + Unknown2.Length;
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
+
     #region Private Methods
 
     private DomainObjectBase objectTypeFactory() {
