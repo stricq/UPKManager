@@ -1,6 +1,7 @@
 # UPKManager
 Blade and Soul UPK File Manager
-Unreal Engine v3 Object Viewer and disector.
+
+Unreal Engine v3 (UE3) View and Extract Textures and Sounds.  Rebuild UPK files with new textures for use in game.
 
 Extract and re-integrate Texture2D and other object types.
 
@@ -16,7 +17,7 @@ Name: STR Programming Services
 Source: http://nuget.stricq.com/nuget
 
 # Download
-[UPK Manager v1.1](https://bns.stricq.com/Files/UpkManager.Installer.msi)
+[UPK Manager v1.1.1](https://bns.stricq.com/Files/UpkManager.Installer.msi)
 
 # Instructions for Viewing and Saving Textures
 ### Settings
