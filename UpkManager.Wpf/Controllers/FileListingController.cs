@@ -358,7 +358,7 @@ namespace UpkManager.Wpf.Controllers {
             if (upkFile.Header == null) {
               await loadUpkFile(file, upkFile);
 
-              await repository.SaveUpkFile(upkFile.Header, Path.Combine(@"V:\", Path.GetFileName(upkFile.Filename)));
+//            await repository.SaveUpkFile(upkFile.Header, Path.Combine(@"V:\", Path.GetFileName(upkFile.Filename)));
             }
 
             upkFile.LastAccess = DateTime.Now;

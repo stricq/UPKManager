@@ -24,7 +24,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public override PropertyType PropertyType => PropertyType.StringProperty;
+    public override PropertyType PropertyType => PropertyType.StrProperty;
 
     public override object PropertyValue => stringValue;
 

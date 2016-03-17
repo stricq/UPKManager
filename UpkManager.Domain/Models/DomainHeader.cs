@@ -334,8 +334,8 @@ namespace UpkManager.Domain.Models {
     }
 
     private async Task writeGenerationTable() {
-      foreach(DomainGenerationTableEntry gen in GenerationTable) {
-        await gen.WriteBuffer(writer);
+      foreach(DomainGenerationTableEntry entry in GenerationTable) {
+        await entry.WriteBuffer(writer);
       }
     }
 
