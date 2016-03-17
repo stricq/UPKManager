@@ -14,7 +14,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models {
 
-  public class DomainHeader : DomainHeaderBuilderBase {
+  public sealed class DomainHeader : DomainHeaderBuilderBase {
 
     #region Private Fields
 
@@ -495,10 +495,10 @@ namespace UpkManager.Domain.Models {
     /// https://github.com/gildor2/UModel/blob/c871f9d534e0bd42a17b4d4268c0ecc59dd7191e/Unreal/UnPackage.cpp#L1274
     /// </summary>
     private async Task decodePointers() {
-      uint code1 = ((uint)Size             & 0xffu) << 24
-                 | ((uint)NameTableCount   & 0xffu) << 16
-                 | ((uint)NameTableOffset  & 0xffu) << 8
-                 | ((uint)ExportTableCount & 0xffu);
+      uint code1 = (((uint)Size             & 0xffu) << 24)
+                 | (((uint)NameTableCount   & 0xffu) << 16)
+                 | (((uint)NameTableOffset  & 0xffu) << 8)
+                 |  ((uint)ExportTableCount & 0xffu);
 
       int code2 = (ExportTableOffset + ImportTableCount + ImportTableOffset) & 0x1f;
 
@@ -508,10 +508,10 @@ namespace UpkManager.Domain.Models {
     }
 
     private async Task encodePointers() {
-      uint code1 = ((uint)BuilderSize             & 0xffu) << 24
-                 | ((uint)NameTable.Count         & 0xffu) << 16
-                 | ((uint)BuilderNameTableOffset  & 0xffu) << 8
-                 | ((uint)ExportTable.Count       & 0xffu);
+      uint code1 = (((uint)BuilderSize             & 0xffu) << 24)
+                 | (((uint)NameTable.Count         & 0xffu) << 16)
+                 | (((uint)BuilderNameTableOffset  & 0xffu) << 8)
+                 |  ((uint)ExportTable.Count       & 0xffu);
 
       int code2 = (BuilderExportTableOffset + ImportTable.Count + BuilderImportTableOffset) & 0x1f;
 

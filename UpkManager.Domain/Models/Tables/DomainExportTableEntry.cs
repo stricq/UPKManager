@@ -14,7 +14,7 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Constructor
 
-    public DomainExportTableEntry() {
+    internal DomainExportTableEntry() {
       NameTableIndex = new DomainNameTableIndex();
     }
 
@@ -54,25 +54,23 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Domain Properties
 
-    public ByteArrayReader DomainObjectReader { get; set; }
+    public ByteArrayReader DomainObjectReader { get; private set; }
 
-    public DomainObjectBase DomainObject { get; set; }
+    public DomainObjectBase DomainObject { get; private set; }
 
-    public DomainNameTableIndex TypeReferenceNameIndex { get; set; }
+    public DomainNameTableIndex TypeReferenceNameIndex { get; private set; }
 
-    public DomainNameTableIndex ParentReferenceNameIndex { get; set; }
+    public DomainNameTableIndex ParentReferenceNameIndex { get; private set; }
 
-    public DomainNameTableIndex OwnerReferenceNameIndex { get; set; }
+    public DomainNameTableIndex OwnerReferenceNameIndex { get; private set; }
 
-    public DomainNameTableIndex ArchetypeReferenceNameIndex { get; set; }
-
-    public bool IsErrored { get; set; }
+    public DomainNameTableIndex ArchetypeReferenceNameIndex { get; private set; }
 
     #endregion Domain Properties
 
     #region Domain Methods
 
-    public async Task ReadExportTableEntry(ByteArrayReader reader, DomainHeader header) {
+    internal async Task ReadExportTableEntry(ByteArrayReader reader, DomainHeader header) {
       TypeReference   = reader.ReadInt32();
       ParentReference = reader.ReadInt32();
       OwnerReference  = reader.ReadInt32();
@@ -98,7 +96,7 @@ namespace UpkManager.Domain.Models.Tables {
       Unknown2 = await reader.ReadBytes(sizeof(uint) * NetObjectCount);
     }
 
-    public void DecodePointer(uint code1, int code2, int index) {
+    internal void DecodePointer(uint code1, int code2, int index) {
       uint size   = (uint)SerialDataSize;
       uint offset = (uint)SerialDataOffset;
 
@@ -109,7 +107,7 @@ namespace UpkManager.Domain.Models.Tables {
       SerialDataOffset = (int)offset;
     }
 
-    public void EncodePointer(uint code1, int code2, int index) {
+    internal void EncodePointer(uint code1, int code2, int index) {
       uint size   = (uint)SerialDataSize;
       uint offset = (uint)SerialDataOffset;
 
@@ -120,14 +118,14 @@ namespace UpkManager.Domain.Models.Tables {
       BuilderSerialDataOffset = (int)offset;
     }
 
-    public void ExpandReferences(DomainHeader header) {
+    internal void ExpandReferences(DomainHeader header) {
            TypeReferenceNameIndex = header.GetObjectTableEntry(TypeReference)?.NameTableIndex;
          ParentReferenceNameIndex = header.GetObjectTableEntry(ParentReference)?.NameTableIndex;
           OwnerReferenceNameIndex = header.GetObjectTableEntry(OwnerReference)?.NameTableIndex;
       ArchetypeReferenceNameIndex = header.GetObjectTableEntry(ArchetypeReference)?.NameTableIndex;
     }
 
-    public async Task ReadDomainObject(ByteArrayReader reader) {
+    internal async Task ReadDomainObject(ByteArrayReader reader) {
       DomainObjectReader = await reader.Splice(SerialDataOffset, SerialDataSize);
     }
 
