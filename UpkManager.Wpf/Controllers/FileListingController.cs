@@ -355,7 +355,11 @@ namespace UpkManager.Wpf.Controllers {
 
             DomainUpkFile upkFile = allFiles.Single(f => f.Id == file.Id);
 
-            if (upkFile.Header == null) await loadUpkFile(file, upkFile);
+            if (upkFile.Header == null) {
+              await loadUpkFile(file, upkFile);
+
+              await repository.SaveUpkFile(upkFile.Header, Path.Combine(@"V:\", Path.GetFileName(upkFile.Filename)));
+            }
 
             upkFile.LastAccess = DateTime.Now;
 
@@ -535,7 +539,7 @@ namespace UpkManager.Wpf.Controllers {
               await export.ParseDomainObject(header, false, false);
             }
             catch(Exception ex) {
-              messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Parsing Object", ErrorMessage = $"Filename: {header.Filename}\nExport Name: {export.NameIndex.Name}\nType: {export.TypeReferenceNameIndex.Name}", Exception = ex });
+              messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Parsing Object", ErrorMessage = $"Filename: {header.Filename}\nExport Name: {export.NameTableIndex.Name}\nType: {export.TypeReferenceNameIndex.Name}", Exception = ex });
 
               fileEntity.IsErrored = true;
 
@@ -545,7 +549,7 @@ namespace UpkManager.Wpf.Controllers {
 
           if (!export.DomainObject.IsExportable) continue;
 
-          string filename = Path.Combine(directory, $"{export.NameIndex.Name}{export.DomainObject.FileExtension}");
+          string filename = Path.Combine(directory, $"{export.NameTableIndex.Name}{export.DomainObject.FileExtension}");
 
           message.StatusText = filename;
 

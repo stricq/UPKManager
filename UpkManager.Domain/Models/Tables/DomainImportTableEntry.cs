@@ -5,27 +5,27 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainImportTableEntry : DomainObjectTableEntry {
+  public sealed class DomainImportTableEntry : DomainObjectTableEntryBase {
 
     #region Constructor
 
     public DomainImportTableEntry() {
       PackageNameIndex = new DomainNameTableIndex();
       TypeNameIndex    = new DomainNameTableIndex();
-      NameIndex        = new DomainNameTableIndex();
+      NameTableIndex        = new DomainNameTableIndex();
     }
 
     #endregion Constructor
 
     #region Properties
 
-    public DomainNameTableIndex PackageNameIndex { get; set; }
+    public DomainNameTableIndex PackageNameIndex { get; }
 
-    public DomainNameTableIndex TypeNameIndex { get; set; }
+    public DomainNameTableIndex TypeNameIndex { get; }
     //
-    // OwnerReference in ObjectTableEntry
+    // OwnerReference in ObjectTableEntryBase
     //
-    // NameTableIndex in ObjectTableEntry
+    // NameTableIndex in ObjectTableEntryBase
     //
     #endregion Properties
 
@@ -44,11 +44,11 @@ namespace UpkManager.Domain.Models.Tables {
 
       OwnerReference = reader.ReadInt32();
 
-      await Task.Run(() => NameIndex.ReadNameTableIndex(reader, header));
+      await Task.Run(() => NameTableIndex.ReadNameTableIndex(reader, header));
     }
 
     public void ExpandReferences(DomainHeader header) {
-      OwnerReferenceNameIndex = header.GetObjectTableEntry(OwnerReference)?.NameIndex;
+      OwnerReferenceNameIndex = header.GetObjectTableEntry(OwnerReference)?.NameTableIndex;
     }
 
     #endregion Domain Methods
@@ -56,11 +56,22 @@ namespace UpkManager.Domain.Models.Tables {
     #region DomainUpkBuilderBase Implementation
 
     public override int GetBuilderSize() {
-      BuilderSize = base.GetBuilderSize()
-                  + PackageNameIndex.GetBuilderSize()
-                  + TypeNameIndex.GetBuilderSize();
+      BuilderSize = PackageNameIndex.GetBuilderSize()
+                  + TypeNameIndex.GetBuilderSize()
+                  + sizeof(int)
+                  + NameTableIndex.GetBuilderSize();
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await PackageNameIndex.WriteBuffer(Writer);
+
+      await TypeNameIndex.WriteBuffer(Writer);
+
+      Writer.WriteInt32(OwnerReference);
+
+      await NameTableIndex.WriteBuffer(Writer);
     }
 
     #endregion DomainUpkBuilderBase Implementation

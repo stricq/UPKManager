@@ -59,7 +59,7 @@ namespace UpkManager.Domain.Models.Objects.Textures {
             Height = reader.ReadInt32()
           };
 
-          if (mip.Width >= 4 || mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
+          if (mip.Width >= 4 || mip.Height >= 4) mip.ImageData = (await bulkChunk.DecompressChunk(0))?.GetBytes();
 
           MipMaps.Add(mip);
         });

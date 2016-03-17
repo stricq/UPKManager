@@ -5,7 +5,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainNameTableEntry : DomainUpkBuilderBase {
+  public sealed class DomainNameTableEntry : DomainUpkBuilderBase {
 
     #region Constructor
 
@@ -17,9 +17,9 @@ namespace UpkManager.Domain.Models.Tables {
 
     #region Properties
 
-    public DomainString Name { get; set; }
+    public DomainString Name { get; }
 
-    public ulong Flags { get; set; }
+    public ulong Flags { get; private set; }
 
     #endregion Properties
 
@@ -46,6 +46,12 @@ namespace UpkManager.Domain.Models.Tables {
                   + sizeof(ulong);
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Name.WriteBuffer(Writer);
+
+      Writer.WriteUInt64(Flags);
     }
 
     #endregion DomainUpkBuilderBase Implementation

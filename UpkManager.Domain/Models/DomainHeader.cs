@@ -14,11 +14,13 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models {
 
-  public class DomainHeader : DomainUpkBuilderBase {
+  public class DomainHeader : DomainHeaderBuilderBase {
 
     #region Private Fields
 
     private ByteArrayReader reader;
+
+    private ByteArrayWriter writer;
 
     #endregion Private Fields
 
@@ -43,59 +45,59 @@ namespace UpkManager.Domain.Models {
 
     #region Properties
 
-    public uint Signature { get; set; }
+    public uint Signature { get; private set; }
 
-    public ushort Version  { get; set; }
+    public ushort Version  { get; private set; }
 
-    public ushort Licensee { get; set; }
+    public ushort Licensee { get; private set; }
 
-    public int Size { get; set; }
+    public int Size { get; private set; }
 
-    public DomainString Group { get; set; }
+    public DomainString Group { get; }
 
-    public uint Flags { get; set; }
+    public uint Flags { get; private set; }
 
-    public int NameTableCount { get; set; }
+    public int NameTableCount { get; private set; }
 
-    public int NameTableOffset { get; set; }
+    public int NameTableOffset { get; private set; }
 
-    public int ExportTableCount { get; set; }
+    public int ExportTableCount { get; private set; }
 
-    public int ExportTableOffset { get; set; }
+    public int ExportTableOffset { get; private set; }
 
-    public int ImportTableCount { get; set; }
+    public int ImportTableCount { get; private set; }
 
-    public int ImportTableOffset { get; set; }
+    public int ImportTableOffset { get; private set; }
 
-    public int DependsTableOffset { get; set; }
+    public int DependsTableOffset { get; private set; }
 
-    public byte[] Guid { get; set; }
+    public byte[] Guid { get; private set; }
 
-    public int GenerationTableCount { get; set; }
+    public int GenerationTableCount { get; private set; }
 
-    public List<DomainGenerationTableEntry> GenerationTable { get; set; }
+    public List<DomainGenerationTableEntry> GenerationTable { get; private set; }
 
-    public uint EngineVersion { get; set; }
+    public uint EngineVersion { get; private set; }
 
-    public uint CookerVersion { get; set; }
+    public uint CookerVersion { get; private set; }
 
-    public uint CompressionFlags { get; set; }
+    public uint CompressionFlags { get; private set; }
 
-    public int CompressionTableCount { get; set; }
+    public int CompressionTableCount { get; private set; }
 
-    public List<DomainCompressedChunk> CompressedChunks { get; set; }
+    public List<DomainCompressedChunk> CompressedChunks { get; private set; }
 
-    public uint Unknown1 { get; set; }
+    public uint Unknown1 { get; private set; }
 
-    public uint Unknown2 { get; set; }
+    public uint Unknown2 { get; private set; }
 
-    public List<DomainNameTableEntry> NameTable { get; set; }
+    public List<DomainNameTableEntry> NameTable { get; }
 
-    public List<DomainExportTableEntry> ExportTable { get; set; }
+    public List<DomainExportTableEntry> ExportTable { get; }
 
-    public List<DomainImportTableEntry> ImportTable { get; set; }
+    public List<DomainImportTableEntry> ImportTable { get; }
 
-    public byte[] DependsTable { get; set; } // (Size - DependsOffset) bytes; or ExportTableCount * 4 bytes;
+    public byte[] DependsTable { get; private set; } // (Size - DependsOffset) bytes; or ExportTableCount * 4 bytes;
 
     #endregion Properties
 
@@ -141,7 +143,7 @@ namespace UpkManager.Domain.Models {
 
       await readDependsTable();
 
-      await patchPointers();
+      await decodePointers();
 
       message.Text  = "Reading Objects...";
       message.Total = ExportTableCount;
@@ -161,7 +163,7 @@ namespace UpkManager.Domain.Models {
       progress?.Invoke(message);
     }
 
-    public DomainObjectTableEntry GetObjectTableEntry(int reference) {
+    public DomainObjectTableEntryBase GetObjectTableEntry(int reference) {
       if (reference == 0) return null;
 
       if (reference < 0 && -reference - 1 < ImportTableCount) return ImportTable[-reference - 1];
@@ -175,7 +177,9 @@ namespace UpkManager.Domain.Models {
     #region DomainUpkBuilderBase Implementation
 
     public override int GetBuilderSize() {
-      if (CompressedChunks.Any()) throw new Exception("Cannot rebuild compressed files. Yet.");
+      if (CompressedChunks.Any()) throw new NotSupportedException("Cannot rebuild compressed files. Yet.");
+
+      if (Signature == FileHeader.EncryptedSignature) throw new NotSupportedException("Cannot rebuild fully encrypted files. Yet.");
 
       BuilderSize = sizeof(uint)   * 7
                   + sizeof(ushort) * 2
@@ -183,13 +187,41 @@ namespace UpkManager.Domain.Models {
                   + Group.GetBuilderSize()
                   + Guid.Length
                   + GenerationTable.Sum(gen => gen.GetBuilderSize())
-                  + CompressedChunks.Sum(chunk => chunk.GetBuilderSize())
-                  + NameTable.Sum(name => name.GetBuilderSize())
-                  + ExportTable.Sum(export => export.GetBuilderSize())
-                  + ImportTable.Sum(import => import.GetBuilderSize())
-                  + DependsTable.Length;
+                  + CompressedChunks.Sum(chunk => chunk.GetBuilderSize());
+
+      BuilderNameTableOffset = BuilderSize;
+
+      BuilderSize += NameTable.Sum(name => name.GetBuilderSize());
+
+      BuilderImportTableOffset = BuilderSize;
+
+      BuilderSize += ImportTable.Sum(import => import.GetBuilderSize());
+
+      BuilderExportTableOffset = BuilderSize;
+
+      BuilderSize += ExportTable.Sum(export => export.GetBuilderSize());
+
+      BuilderDependsTableOffset = BuilderSize;
+
+      BuilderSize += DependsTable.Length;
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      writer = Writer;
+
+      await writeUpkHeader();
+
+      await writeNameTable();
+
+      await writeImportTable();
+
+      await encodePointers();
+
+      await writeExportTable();
+
+      await writeDependsTable();
     }
 
     #endregion DomainUpkBuilderBase Implementation
@@ -228,7 +260,7 @@ namespace UpkManager.Domain.Models {
 
       GenerationTableCount = reader.ReadInt32();
 
-      GenerationTable = await readGenerationsTable();
+      GenerationTable = await readGenerationTable();
 
       EngineVersion = reader.ReadUInt32();
       CookerVersion = reader.ReadUInt32();
@@ -243,7 +275,51 @@ namespace UpkManager.Domain.Models {
       Unknown2 = reader.ReadUInt32();
     }
 
-    private async Task<List<DomainGenerationTableEntry>> readGenerationsTable() {
+    private async Task writeUpkHeader() {
+      writer.Seek(0);
+
+      writer.WriteUInt32(Signature);
+
+      writer.WriteUInt16(Version);
+      writer.WriteUInt16(Licensee);
+
+      writer.WriteInt32(BuilderSize);
+
+      await Group.WriteBuffer(writer);
+
+      writer.WriteUInt32(Flags);
+
+      writer.WriteInt32(NameTable.Count);
+      writer.WriteInt32(BuilderNameTableOffset);
+
+      writer.WriteInt32(ExportTable.Count);
+      writer.WriteInt32(BuilderExportTableOffset);
+
+      writer.WriteInt32(ImportTable.Count);
+      writer.WriteInt32(BuilderImportTableOffset);
+
+      writer.WriteInt32(BuilderDependsTableOffset);
+
+      await writer.WriteBytes(Guid);
+
+      writer.WriteInt32(GenerationTable.Count);
+
+      await writeGenerationTable();
+
+      writer.WriteUInt32(EngineVersion);
+      writer.WriteUInt32(CookerVersion);
+
+      writer.WriteUInt32(CompressionFlags);
+
+      writer.WriteInt32(CompressedChunks.Count);
+
+      await writeCompressedChunks();
+
+      writer.WriteUInt32(Unknown1);
+      writer.WriteUInt32(Unknown2);
+    }
+
+    private async Task<List<DomainGenerationTableEntry>> readGenerationTable() {
       List<DomainGenerationTableEntry> generations = new List<DomainGenerationTableEntry>();
 
       for(int i = 0; i < GenerationTableCount; ++i) {
@@ -255,6 +331,12 @@ namespace UpkManager.Domain.Models {
       }
 
       return generations;
+    }
+
+    private async Task writeGenerationTable() {
+      foreach(DomainGenerationTableEntry gen in GenerationTable) {
+        await gen.WriteBuffer(writer);
+      }
     }
 
     private async Task<List<DomainCompressedChunk>> readCompressedChunksTable() {
@@ -269,6 +351,12 @@ namespace UpkManager.Domain.Models {
       }
 
       return chunks;
+    }
+
+    private async Task writeCompressedChunks() {
+      foreach(DomainCompressedChunk chunk in CompressedChunks) {
+        await chunk.WriteBuffer(writer);
+      }
     }
 
     private async Task<ByteArrayReader> decompressChunks() {
@@ -319,6 +407,12 @@ namespace UpkManager.Domain.Models {
       }
     }
 
+    private async Task writeNameTable() {
+      foreach(DomainNameTableEntry entry in NameTable) {
+        await entry.WriteBuffer(writer);
+      }
+    }
+
     private async Task readImportTable(Action<DomainLoadProgress> progress) {
       DomainLoadProgress message = new DomainLoadProgress { Text = "Reading Import Table...", Current = 0, Total = ImportTableCount };
 
@@ -343,6 +437,12 @@ namespace UpkManager.Domain.Models {
       progress?.Invoke(message);
 
       await ImportTable.ForEachAsync(import => Task.Run(() => import.ExpandReferences(this)));
+    }
+
+    private async Task writeImportTable() {
+      foreach(DomainImportTableEntry entry in ImportTable) {
+        await entry.WriteBuffer(writer);
+      }
     }
 
     private async Task readExportTable(Action<DomainLoadProgress> progress) {
@@ -371,10 +471,22 @@ namespace UpkManager.Domain.Models {
       await ExportTable.ForEachAsync(export => Task.Run(() => export.ExpandReferences(this)));
     }
 
+    private async Task writeExportTable() {
+      foreach(DomainExportTableEntry entry in ExportTable) {
+        await entry.WriteBuffer(writer);
+      }
+    }
+
     private async Task readDependsTable() {
       reader.Seek(DependsTableOffset);
 
-      DependsTable = await reader.ReadBytes(Size - DependsTableOffset);
+      DependsTable = await reader.ReadBytes(ExportTableCount * sizeof(uint));
+    }
+
+    private async Task writeDependsTable() {
+      byte[] bytes = Enumerable.Repeat((byte)0, ExportTable.Count * sizeof(uint)).ToArray();
+
+      await writer.WriteBytes(bytes);
     }
 
     #region External Code
@@ -382,7 +494,7 @@ namespace UpkManager.Domain.Models {
     /// <summary>
     /// https://github.com/gildor2/UModel/blob/c871f9d534e0bd42a17b4d4268c0ecc59dd7191e/Unreal/UnPackage.cpp#L1274
     /// </summary>
-    private async Task patchPointers() {
+    private async Task decodePointers() {
       uint code1 = ((uint)Size             & 0xffu) << 24
                  | ((uint)NameTableCount   & 0xffu) << 16
                  | ((uint)NameTableOffset  & 0xffu) << 8
@@ -391,28 +503,21 @@ namespace UpkManager.Domain.Models {
       int code2 = (ExportTableOffset + ImportTableCount + ImportTableOffset) & 0x1f;
 
       await Task.Run(() => {
-        for(int i = 0; i < ExportTable.Count; ++i) {
-          uint size   = (uint)ExportTable[i].SerialDataSize;
-          uint offset = (uint)ExportTable[i].SerialDataOffset;
-
-          decodePointer(ref size,   code1, code2, i);
-          decodePointer(ref offset, code1, code2, i);
-
-          ExportTable[i].SerialDataSize   = (int)size;
-          ExportTable[i].SerialDataOffset = (int)offset;
-        }
+        for(int i = 0; i < ExportTable.Count; ++i) ExportTable[i].DecodePointer(code1, code2, i);
       });
     }
 
-    private static void decodePointer(ref uint value, uint code1, int code2, int index) {
-      uint tmp1 = ror32(value, (index + code2) & 0x1f);
-      uint tmp2 = ror32(code1, index % 32);
+    private async Task encodePointers() {
+      uint code1 = ((uint)BuilderSize             & 0xffu) << 24
+                 | ((uint)NameTable.Count         & 0xffu) << 16
+                 | ((uint)BuilderNameTableOffset  & 0xffu) << 8
+                 | ((uint)ExportTable.Count       & 0xffu);
 
-      value = tmp2 ^ tmp1;
-    }
+      int code2 = (BuilderExportTableOffset + ImportTable.Count + BuilderImportTableOffset) & 0x1f;
 
-    private static uint ror32(uint val, int shift) {
-      return (val >> shift) | (val << (32 - shift));
+      await Task.Run(() => {
+        for(int i = 0; i < ExportTable.Count; ++i) ExportTable[i].EncodePointer(code1, code2, i);
+      });
     }
 
     #endregion External Code

@@ -15,21 +15,33 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRepository Implementation
 
-    public async Task<DomainHeader> LoadUpkFile(string filename) {
-      byte[] data = await Task.Run(() => File.ReadAllBytes(filename));
+    public async Task<DomainHeader> LoadUpkFile(string Filename) {
+      byte[] data = await Task.Run(() => File.ReadAllBytes(Filename));
 
       ByteArrayReader reader = ByteArrayReader.CreateNew(data, 0);
 
       DomainHeader header = new DomainHeader(reader) {
-        FullFilename = filename,
+        FullFilename = Filename,
         FileSize     = data.LongLength
       };
 
       return header;
     }
 
-    public async Task<int> GetGameVersion(string gamePath) {
-      StreamReader stream = new StreamReader(File.OpenRead(Path.Combine(gamePath, @"..\VersionInfo_BnS.ini")));
+    public async Task SaveUpkFile(DomainHeader Header, string Filename) {
+      if (Header == null) return;
+
+      int headerSize = Header.GetBuilderSize();
+
+      ByteArrayWriter writer = ByteArrayWriter.CreateNew(headerSize);
+
+      await Header.WriteBuffer(writer);
+
+      await Task.Run(() => File.WriteAllBytes(Filename, writer.GetBytes()));
+    }
+
+    public async Task<int> GetGameVersion(string GamePath) {
+      StreamReader stream = new StreamReader(File.OpenRead(Path.Combine(GamePath, @"..\VersionInfo_BnS.ini")));
 
       int version = 0;
 

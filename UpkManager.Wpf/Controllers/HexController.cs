@@ -91,15 +91,15 @@ namespace UpkManager.Wpf.Controllers {
 
       tokenSource = new CancellationTokenSource();
 
-      viewModel.Title = message.ExportTableEntry.NameIndex.Name;
+      viewModel.Title = message.ExportTableEntry.NameTableIndex.Name;
 
       title = viewModel.Title;
 
       if (message.ExportTableEntry.DomainObject?.AdditionalDataReader != null) {
-        await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetByteArray(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
+        await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetBytes(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, tokenSource.Token);
       }
       else {
-        await buildHexDataAsync(message.ExportTableEntry.DomainObjectReader.GetByteArray(), message.ExportTableEntry.SerialDataOffset, tokenSource.Token);
+        await buildHexDataAsync(message.ExportTableEntry.DomainObjectReader.GetBytes(), message.ExportTableEntry.SerialDataOffset, tokenSource.Token);
       }
     }
 

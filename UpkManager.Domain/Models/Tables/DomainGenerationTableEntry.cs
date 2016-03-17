@@ -1,17 +1,19 @@
-﻿using UpkManager.Domain.Helpers;
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainGenerationTableEntry : DomainUpkBuilderBase {
+  public sealed class DomainGenerationTableEntry : DomainUpkBuilderBase {
 
     #region Properties
 
-    public int ExportTableCount { get; set; }
+    public int ExportTableCount { get; private set; }
 
-    public int NameTableCount { get; set; }
+    public int NameTableCount { get; private set; }
 
-    public int NetObjectCount { get; set; }
+    public int NetObjectCount { get; private set; }
 
     #endregion Properties
 
@@ -31,6 +33,16 @@ namespace UpkManager.Domain.Models.Tables {
       BuilderSize = sizeof(int) * 3;
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Task.Run(() => {
+        Writer.WriteInt32(ExportTableCount);
+
+        Writer.WriteInt32(NameTableCount);
+
+        Writer.WriteInt32(NetObjectCount);
+      });
     }
 
     #endregion DomainUpkBuilderBase Implementation

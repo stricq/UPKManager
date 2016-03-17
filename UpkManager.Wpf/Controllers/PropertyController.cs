@@ -98,7 +98,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private async Task onSaveObjectAsExecute() {
       VistaSaveFileDialog sfd = new VistaSaveFileDialog {
-        FileName   = export.NameIndex.Name,
+        FileName   = export.NameTableIndex.Name,
         DefaultExt = export.DomainObject.FileExtension,
         Filter     = $"{export.DomainObject.FileTypeDesc}|*{export.DomainObject.FileExtension}",
         Title      = "Save Object As..."

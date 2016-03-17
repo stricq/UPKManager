@@ -32,7 +32,7 @@ namespace UpkManager.Domain.Models.Objects {
 
       ObjectTableReference = reader.ReadInt32();
 
-      ObjectReferenceNameIndex = header.GetObjectTableEntry(ObjectTableReference)?.NameIndex;
+      ObjectReferenceNameIndex = header.GetObjectTableEntry(ObjectTableReference)?.NameTableIndex;
     }
 
     #endregion Overrides

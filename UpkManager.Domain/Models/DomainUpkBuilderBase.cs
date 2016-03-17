@@ -1,14 +1,19 @@
-﻿
+﻿using System.Threading.Tasks;
+
+using UpkManager.Domain.Helpers;
+
 
 namespace UpkManager.Domain.Models {
 
   public abstract class DomainUpkBuilderBase {
 
-    public int BuilderSize { get; set; }
+    protected int BuilderSize { get; set; }
 
-    public int BuilderOffset { get; set; }
+    protected int BuilderOffset { get; set; }
 
     public abstract int GetBuilderSize();
+
+    public abstract Task WriteBuffer(ByteArrayWriter Writer);
 
   }
 

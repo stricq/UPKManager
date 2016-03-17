@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using UpkManager.Domain.Constants;
@@ -46,7 +47,7 @@ namespace UpkManager.Domain.Models.Objects.Sounds {
 
       do {
         await ProcessCompressedBulkData(reader, async bulkChunk => {
-          byte[] ogg = (await bulkChunk.DecompressChunk(0))?.GetByteArray();
+          byte[] ogg = (await bulkChunk.DecompressChunk(0))?.GetBytes();
 
           if (ogg == null || ogg.Length == 0) {
             done = true;
@@ -60,18 +61,26 @@ namespace UpkManager.Domain.Models.Objects.Sounds {
     }
 
     public override async Task SaveObject(string filename) {
-      if (Sounds.Count == 1) await Task.Run(() => File.WriteAllBytes(filename, Sounds[0]));
+      if (!Sounds.Any()) return;
+
+      await Task.Run(() => File.WriteAllBytes(filename, Sounds[0]));
+
+      if (Sounds.Count == 1) return;
 
       string name = Path.GetFileNameWithoutExtension(filename);
       string ext  = Path.GetExtension(filename);
 
-      for(int i = 0; i < Sounds.Count; ++i) {
-        string soundFilename = Path.Combine(Path.GetFullPath(filename), $"{name}_{i}{ext}");
+      for(int i = 1; i < Sounds.Count; ++i) {
+        string soundFilename = Path.Combine(Path.GetDirectoryName(filename), $"{name}_{i}{ext}");
 
         int i1 = i;
 
         await Task.Run(() => File.WriteAllBytes(soundFilename, Sounds[i1]));
       }
+    }
+
+    public override Stream GetObjectStream() {
+      return Sounds.Any() ? new MemoryStream(Sounds[0]) : null;
     }
 
     #endregion Domain Methods

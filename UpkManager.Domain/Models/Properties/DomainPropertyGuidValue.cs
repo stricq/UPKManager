@@ -11,7 +11,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override PropertyType PropertyType => PropertyType.GuidProperty;
 
-    public override string PropertyString => $"{new Guid(DataReader.GetByteArray()):B}";
+    public override string PropertyString => $"{new Guid(DataReader.GetBytes()):B}";
 
     #endregion Overrides
 

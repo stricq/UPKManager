@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using UpkManager.Domain.Helpers;
 
@@ -9,15 +10,15 @@ namespace UpkManager.Domain.Models.Compression {
 
     #region Properties
 
-    public int UncompressedOffset { get; set; }
+    public int UncompressedOffset { get; protected set; }
 
-    public int UncompressedSize { get; set; }
+    public int UncompressedSize { get; protected set; }
 
-    public int CompressedOffset { get; set; }
+    public int CompressedOffset { get; protected set; }
 
-    public int CompressedSize { get; set; }
+    public int CompressedSize { get; protected set; }
 
-    public DomainCompressedChunkHeader Header { get; set; }
+    public DomainCompressedChunkHeader Header { get; protected set; }
 
     #endregion Properties
 
@@ -43,6 +44,10 @@ namespace UpkManager.Domain.Models.Compression {
       BuilderSize = sizeof(int) * 4;
 
       return BuilderSize;
+    }
+
+    public override Task WriteBuffer(ByteArrayWriter Writer) {
+      throw new NotSupportedException("Cannot currently write compressed data.");
     }
 
     #endregion DomainUpkBuilderBase Implementation

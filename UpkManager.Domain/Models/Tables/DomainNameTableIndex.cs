@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainNameTableIndex : DomainUpkBuilderBase {
+  public sealed class DomainNameTableIndex : DomainUpkBuilderBase {
 
     #region Properties
 
-    public int Index { get; set; }
+    public int Index { get; private set; }
 
-    public int Numeric { get; set; }
+    public int Numeric { get; private set; }
 
     #endregion Properties
 
@@ -40,6 +41,14 @@ namespace UpkManager.Domain.Models.Tables {
       BuilderSize = sizeof(int) * 2;
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Task.Run(() => {
+        Writer.WriteInt32(Index);
+
+        Writer.WriteInt32(Numeric);
+      });
     }
 
     #endregion DomainUpkBuilderBase Implementation

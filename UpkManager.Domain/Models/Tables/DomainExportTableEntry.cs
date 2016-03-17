@@ -10,45 +10,45 @@ using UpkManager.Domain.Models.Objects.Textures;
 
 namespace UpkManager.Domain.Models.Tables {
 
-  public class DomainExportTableEntry : DomainObjectTableEntry {
+  public sealed class DomainExportTableEntry : DomainExportTableEntryBuilderBase {
 
     #region Constructor
 
     public DomainExportTableEntry() {
-      NameIndex = new DomainNameTableIndex();
+      NameTableIndex = new DomainNameTableIndex();
     }
 
     #endregion Constructor
 
     #region Properties
 
-    public int TypeReference { get; set; }
+    public int TypeReference { get; private set; }
 
-    public int ParentReference { get; set; }
+    public int ParentReference { get; private set; }
     //
-    // OwnerReference in UpkObject
+    // OwnerReference in ObjectTableEntryBase
     //
-    // NameTableIndex in UpkObject
+    // NameTableIndex in ObjectTableEntryBase
     //
-    public int ArchetypeReference { get; set; }
+    public int ArchetypeReference { get; private set; }
 
-    public uint FlagsHigh { get; set; }
+    public uint FlagsHigh { get; private set; }
 
-    public uint FlagsLow { get; set; }
+    public uint FlagsLow { get; private set; }
 
-    public int SerialDataSize { get; set; }
+    public int SerialDataSize { get; private set; }
 
-    public int SerialDataOffset { get; set; }
+    public int SerialDataOffset { get; private set; }
 
-    public uint ExportFlags { get; set; }
+    public uint ExportFlags { get; private set; }
 
-    public int NetObjectCount { get; set; }
+    public int NetObjectCount { get; private set; }
 
-    public byte[] Guid { get; set; }
+    public byte[] Guid { get; private set; }
 
-    public uint Unknown1 { get; set; }
+    public uint Unknown1 { get; private set; }
 
-    public byte[] Unknown2 { get; set; } // 4 * NetObjectCount bytes
+    public byte[] Unknown2 { get; private set; } // 4 * NetObjectCount bytes
 
     #endregion Properties
 
@@ -77,7 +77,7 @@ namespace UpkManager.Domain.Models.Tables {
       ParentReference = reader.ReadInt32();
       OwnerReference  = reader.ReadInt32();
 
-      NameIndex.ReadNameTableIndex(reader, header);
+      NameTableIndex.ReadNameTableIndex(reader, header);
 
       ArchetypeReference = reader.ReadInt32();
 
@@ -98,11 +98,33 @@ namespace UpkManager.Domain.Models.Tables {
       Unknown2 = await reader.ReadBytes(sizeof(uint) * NetObjectCount);
     }
 
+    public void DecodePointer(uint code1, int code2, int index) {
+      uint size   = (uint)SerialDataSize;
+      uint offset = (uint)SerialDataOffset;
+
+      decodePointer(ref size,   code1, code2, index);
+      decodePointer(ref offset, code1, code2, index);
+
+      SerialDataSize   = (int)size;
+      SerialDataOffset = (int)offset;
+    }
+
+    public void EncodePointer(uint code1, int code2, int index) {
+      uint size   = (uint)SerialDataSize;
+      uint offset = (uint)SerialDataOffset;
+
+      encodePointer(ref size,   code1, code2, index);
+      encodePointer(ref offset, code1, code2, index);
+
+      BuilderSerialDataSize   = (int)size;
+      BuilderSerialDataOffset = (int)offset;
+    }
+
     public void ExpandReferences(DomainHeader header) {
-           TypeReferenceNameIndex = header.GetObjectTableEntry(TypeReference)?.NameIndex;
-         ParentReferenceNameIndex = header.GetObjectTableEntry(ParentReference)?.NameIndex;
-          OwnerReferenceNameIndex = header.GetObjectTableEntry(OwnerReference)?.NameIndex;
-      ArchetypeReferenceNameIndex = header.GetObjectTableEntry(ArchetypeReference)?.NameIndex;
+           TypeReferenceNameIndex = header.GetObjectTableEntry(TypeReference)?.NameTableIndex;
+         ParentReferenceNameIndex = header.GetObjectTableEntry(ParentReference)?.NameTableIndex;
+          OwnerReferenceNameIndex = header.GetObjectTableEntry(OwnerReference)?.NameTableIndex;
+      ArchetypeReferenceNameIndex = header.GetObjectTableEntry(ArchetypeReference)?.NameTableIndex;
     }
 
     public async Task ReadDomainObject(ByteArrayReader reader) {
@@ -120,13 +142,39 @@ namespace UpkManager.Domain.Models.Tables {
     #region DomainUpkBuilderBase Implementation
 
     public override int GetBuilderSize() {
-      BuilderSize = base.GetBuilderSize()
-                  + sizeof(int) * 6
+      BuilderSize = sizeof(int) * 7
                   + sizeof(uint) * 4
+                  + NameTableIndex.GetBuilderSize()
                   + Guid.Length
                   + Unknown2.Length;
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      Writer.WriteInt32(TypeReference);
+      Writer.WriteInt32(ParentReference);
+      Writer.WriteInt32(OwnerReference);
+
+      await NameTableIndex.WriteBuffer(Writer);
+
+      Writer.WriteInt32(ArchetypeReference);
+
+      Writer.WriteUInt32(FlagsHigh);
+      Writer.WriteUInt32(FlagsLow);
+
+      Writer.WriteInt32(BuilderSerialDataSize);
+      Writer.WriteInt32(BuilderSerialDataOffset);
+
+      Writer.WriteUInt32(ExportFlags);
+
+      Writer.WriteInt32(NetObjectCount);
+
+      await Writer.WriteBytes(Guid);
+
+      Writer.WriteUInt32(Unknown1);
+
+      await Writer.WriteBytes(Unknown2);
     }
 
     #endregion DomainUpkBuilderBase Implementation
@@ -153,6 +201,29 @@ namespace UpkManager.Domain.Models.Tables {
 
         default: return new DomainObjectBase();
       }
+    }
+
+    private static void decodePointer(ref uint value, uint code1, int code2, int index) {
+      uint tmp1 = ror32(value, (index + code2) & 0x1f);
+      uint tmp2 = ror32(code1, index % 32);
+
+      value = tmp2 ^ tmp1;
+    }
+
+    private static void encodePointer(ref uint value, uint code1, int code2, int index) {
+      uint tmp2 = ror32(code1, index % 32);
+
+      uint tmp1 = value ^ tmp2;
+
+      value = rol32(tmp1, (index + code2) & 0x1f);
+    }
+
+    private static uint ror32(uint val, int shift) {
+      return val >> shift | val << (32 - shift);
+    }
+
+    private static uint rol32(uint val, int shift) {
+      return val >> (32 - shift) | val << shift;
     }
 
     #endregion Private Methods

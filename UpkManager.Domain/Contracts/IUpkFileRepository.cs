@@ -7,9 +7,11 @@ namespace UpkManager.Domain.Contracts {
 
   public interface IUpkFileRepository {
 
-    Task<DomainHeader> LoadUpkFile(string filename);
+    Task<DomainHeader> LoadUpkFile(string Filename);
 
-    Task<int> GetGameVersion(string gamePath);
+    Task SaveUpkFile(DomainHeader Header, string Filename);
+
+    Task<int> GetGameVersion(string GamePath);
 
   }
 

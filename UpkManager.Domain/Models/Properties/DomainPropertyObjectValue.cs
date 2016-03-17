@@ -24,7 +24,7 @@ namespace UpkManager.Domain.Models.Properties {
     public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
       await base.ReadPropertyValue(reader, size, header);
 
-      ObjectIndexName = header.GetObjectTableEntry(IntValue)?.NameIndex;
+      ObjectIndexName = header.GetObjectTableEntry(IntValue)?.NameTableIndex;
     }
 
     #endregion Domain Methods

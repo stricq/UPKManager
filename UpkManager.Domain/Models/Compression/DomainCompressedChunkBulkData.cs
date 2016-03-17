@@ -55,7 +55,7 @@ namespace UpkManager.Domain.Models.Compression {
 
         if (((BulkDataCompressionTypes)BulkDataFlags & validCompression) > 0) decompressed = await block.CompressedData.Decompress(block.UncompressedSize);
         else {
-          if (BulkDataFlags == 0) decompressed = block.CompressedData.GetByteArray();
+          if (BulkDataFlags == 0) decompressed = block.CompressedData.GetBytes();
           else throw new Exception($"Unsupported bulk data compression type 0x{BulkDataFlags:X8}");
         }
 

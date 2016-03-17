@@ -71,8 +71,10 @@
     <Compile Include="Contracts\ISettingsRepository.cs" />
     <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
+    <Compile Include="Helpers\ByteArrayWriter.cs" />
     <Compile Include="Helpers\MiniLZO.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkBulkData.cs" />
+    <Compile Include="Models\DomainHeaderBuilderBase.cs" />
     <Compile Include="Models\DomainLoadProgress.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunk.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkBlock.cs" />
@@ -92,9 +94,10 @@
     <Compile Include="Models\Properties\DomainPropertyComponentValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyGuidValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyInterfaceValue.cs" />
+    <Compile Include="Models\Tables\DomainExportTableEntryBuilderBase.cs" />
     <Compile Include="Models\Tables\DomainGenerationTableEntry.cs" />
     <Compile Include="Models\DomainString.cs" />
-    <Compile Include="Models\Tables\DomainObjectTableEntry.cs" />
+    <Compile Include="Models\Tables\DomainObjectTableEntryBase.cs" />
     <Compile Include="Models\Tables\DomainNameTableIndex.cs" />
     <Compile Include="Models\Tables\DomainExportTableEntry.cs" />
     <Compile Include="Models\Tables\DomainImportTableEntry.cs" />

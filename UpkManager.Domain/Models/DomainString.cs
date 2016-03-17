@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,9 +11,9 @@ namespace UpkManager.Domain.Models {
 
     #region Properties
 
-    public int Size { get; set; }
+    public int Size { get; private set;}
 
-    public string String { get; set; }
+    public string String { get; private set; }
 
     #endregion Properties
 
@@ -51,20 +50,31 @@ namespace UpkManager.Domain.Models {
 
     public override int GetBuilderSize() {
       BuilderSize = sizeof(int)
-                  + getStringSize();
+                  + (Size < 0 ? String.Length * 2 : String.Length + 1);
 
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      Writer.WriteInt32(Size);
+
+      if (Size < 0) await Writer.WriteBytes(Encoding.Unicode.GetBytes(String));
+      else {
+        await Writer.WriteBytes(Encoding.ASCII.GetBytes(String));
+
+        Writer.WriteByte(0);
+      }
     }
 
     #endregion DomainUpkBuilderBase Implementation
 
     #region Private Methods
 
-    private int getStringSize() {
-      const int maxAnsiCode = 255;
+    //private bool isUnicode() {
+    //  const int maxAnsiCode = 255;
 
-      return String.Any(c => c > maxAnsiCode) ? String.Length * 2 : String.Length + 1;
-    }
+    //  return String.Any(c => c > maxAnsiCode);
+    //}
 
     #endregion Private Methods
 

@@ -24,7 +24,7 @@ namespace UpkManager.Domain.Models.Objects {
     public override async Task ReadDomainObject(ByteArrayReader reader, DomainHeader header, DomainExportTableEntry export, bool skipProperties, bool skipParse) {
       ArchetypeObjectReference = reader.ReadInt32();
 
-      ArchetypeObjectNameIndex = header.GetObjectTableEntry(ArchetypeObjectReference)?.NameIndex;
+      ArchetypeObjectNameIndex = header.GetObjectTableEntry(ArchetypeObjectReference)?.NameTableIndex;
 
       await base.ReadDomainObject(reader, header, export, skipProperties, skipParse);
     }

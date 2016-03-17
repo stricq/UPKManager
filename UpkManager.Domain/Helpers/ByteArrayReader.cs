@@ -16,9 +16,9 @@ namespace UpkManager.Domain.Helpers {
 
     #endregion Private Fields
 
-    #region ByteArrayReader Implementation
+    #region Public Methods
 
-    public byte[] GetByteArray() {
+    public byte[] GetBytes() {
       return data;
     }
 
@@ -178,7 +178,7 @@ namespace UpkManager.Domain.Helpers {
 
     public int Remaining => data.Length - index;
 
-    #endregion ByteArrayReader Implementation
+    #endregion Public Methods
 
   }
 
