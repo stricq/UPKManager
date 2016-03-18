@@ -10,7 +10,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models.Objects {
 
-  public class DomainObjectBase {
+  public class DomainObjectBase : DomainUpkBuilderBase {
 
     #region Constructor
 
@@ -22,15 +22,15 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Properties
 
-    public DomainPropertyHeader PropertyHeader { get; set; }
+    public DomainPropertyHeader PropertyHeader { get; }
 
-    public ByteArrayReader AdditionalDataReader { get; set; }
+    public ByteArrayReader AdditionalDataReader { get; private set; }
 
     #endregion Properties
 
     #region Domain Properties
 
-    public int AdditionalDataOffset { get; set; }
+    public int AdditionalDataOffset { get; private set; }
 
     public virtual bool IsExportable => false;
 
@@ -65,6 +65,23 @@ namespace UpkManager.Domain.Models.Objects {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = PropertyHeader.GetBuilderSize()
+                  + AdditionalDataReader?.GetBytes().Length ?? 0;
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await PropertyHeader.WriteBuffer(Writer);
+
+      await Writer.WriteBytes(AdditionalDataReader?.GetBytes());
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

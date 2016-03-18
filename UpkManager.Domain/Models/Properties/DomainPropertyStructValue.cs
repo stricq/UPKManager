@@ -7,7 +7,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyStructValue : DomainPropertyValueBase {
+  public sealed class DomainPropertyStructValue : DomainPropertyValueBase {
 
     #region Constructor
 
@@ -19,13 +19,17 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public override PropertyType PropertyType => PropertyType.StructProperty;
-
     public DomainNameTableIndex StructNameIndex { get; set; }
+
+    #endregion Properties
+
+    #region Domain Properties
+
+    public override PropertyType PropertyType => PropertyType.StructProperty;
 
     public override string PropertyString => StructNameIndex.Name;
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -36,6 +40,23 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = StructNameIndex.GetBuilderSize()
+                  + base.GetBuilderSize();
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await StructNameIndex.WriteBuffer(Writer);
+
+      await base.WriteBuffer(Writer);
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

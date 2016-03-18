@@ -9,12 +9,6 @@ namespace UpkManager.Domain.Models.Properties {
 
   public class DomainPropertyNameValue : DomainPropertyValueBase {
 
-    #region Protected Fields
-
-    protected DomainNameTableIndex NameIndexValue;
-
-    #endregion Protected Fields
-
     #region Constructor
 
     public DomainPropertyNameValue() {
@@ -25,13 +19,19 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
+    protected DomainNameTableIndex NameIndexValue { get; set; }
+
+    #endregion Properties
+
+    #region Domain Properties
+
     public override PropertyType PropertyType => PropertyType.NameProperty;
 
     public override object PropertyValue => NameIndexValue;
 
     public override string PropertyString => NameIndexValue.Name;
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -40,6 +40,20 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = NameIndexValue.GetBuilderSize();
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await NameIndexValue.WriteBuffer(Writer);
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

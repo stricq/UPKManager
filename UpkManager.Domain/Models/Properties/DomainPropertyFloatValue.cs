@@ -6,15 +6,15 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyFloatValue : DomainPropertyValueBase {
-
-    #region Private Fields
-
-    private float floatValue;
-
-    #endregion Private Fields
+  public sealed class DomainPropertyFloatValue : DomainPropertyValueBase {
 
     #region Properties
+
+    private float floatValue { get; set; }
+
+    #endregion Properties
+
+    #region Domain Properties
 
     public override PropertyType PropertyType => PropertyType.FloatProperty;
 
@@ -22,7 +22,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override string PropertyString => $"{floatValue}";
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -31,6 +31,20 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(float);
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Task.Run(() => Writer.WriteSingle(floatValue));
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

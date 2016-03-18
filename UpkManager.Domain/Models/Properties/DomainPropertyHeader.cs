@@ -9,7 +9,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyHeader {
+  public sealed class DomainPropertyHeader : DomainUpkBuilderBase {
 
     #region Constructor
 
@@ -21,9 +21,9 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public int TypeIndex { get; set; }
+    public int TypeIndex { get; private set; }
 
-    public List<DomainProperty> Properties { get; set; }
+    public List<DomainProperty> Properties { get; }
 
     #endregion Properties
 
@@ -49,6 +49,23 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int)
+                  + Properties.Sum(p => p.GetBuilderSize());
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      Writer.WriteInt32(TypeIndex);
+
+      foreach(DomainProperty property in Properties) await property.WriteBuffer(Writer);
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

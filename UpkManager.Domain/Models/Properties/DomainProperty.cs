@@ -8,7 +8,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainProperty {
+  public sealed class DomainProperty : DomainUpkBuilderBase {
 
     #region Constructor
 
@@ -22,15 +22,15 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public DomainNameTableIndex NameIndex { get; set; }
+    public DomainNameTableIndex NameIndex { get; }
 
-    public DomainNameTableIndex TypeNameIndex { get; set; }
+    public DomainNameTableIndex TypeNameIndex { get; }
 
-    public int Size { get; set; }
+    public int Size { get; private set; }
 
-    public int ArrayIndex { get; set; }
+    public int ArrayIndex { get; private set; }
 
-    public DomainPropertyValueBase Value { get; set; }
+    public DomainPropertyValueBase Value { get; private set; }
 
     #endregion Properties
 
@@ -52,6 +52,31 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = NameIndex.GetBuilderSize()
+                  + TypeNameIndex.GetBuilderSize()
+                  + sizeof(int) * 2
+                  + Value.GetBuilderSize();
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await NameIndex.WriteBuffer(Writer);
+
+      await TypeNameIndex.WriteBuffer(Writer);
+
+      Writer.WriteInt32(Size);
+
+      Writer.WriteInt32(ArrayIndex);
+
+      await Value.WriteBuffer(Writer);
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
     #region Private Methods
 

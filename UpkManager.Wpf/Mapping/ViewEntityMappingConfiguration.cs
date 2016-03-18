@@ -57,7 +57,8 @@ namespace UpkManager.Wpf.Mapping {
                                                                             .ForMember(dest => dest.OwnerName,     opt => opt.MapFrom(src => src.OwnerReferenceNameIndex.Name))
                                                                             .ForMember(dest => dest.TypeName,      opt => opt.MapFrom(src => src.TypeReferenceNameIndex.Name))
                                                                             .ForMember(dest => dest.Name,          opt => opt.MapFrom(src => src.NameTableIndex.Name))
-                                                                            .ForMember(dest => dest.IsSelected,    opt => opt.Ignore());
+                                                                            .ForMember(dest => dest.IsSelected,    opt => opt.Ignore())
+                                                                            .ForMember(dest => dest.IsErrored,     opt => opt.Ignore());
 
       config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>().ForMember(dest => dest.PackageName,        opt => opt.MapFrom(src => src.PackageNameIndex.Name))
                                                                             .ForMember(dest => dest.TypeName,           opt => opt.MapFrom(src => src.TypeNameIndex.Name))

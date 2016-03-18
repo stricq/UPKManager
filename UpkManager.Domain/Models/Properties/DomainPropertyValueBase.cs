@@ -6,15 +6,15 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyValueBase {
-
-    #region Protected Fields
-
-    protected ByteArrayReader DataReader;
-
-    #endregion Protected Fields
+  public class DomainPropertyValueBase : DomainUpkBuilderBase {
 
     #region Properties
+
+    protected ByteArrayReader DataReader { get; set; }
+
+    #endregion Properties
+
+    #region Domain Properties
 
     public virtual PropertyType PropertyType => PropertyType.UnknownProperty;
 
@@ -22,7 +22,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public virtual string PropertyString => $"{DataReader.GetBytes().Length:N0} Bytes of Data";
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -31,6 +31,20 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = DataReader?.GetBytes().Length ?? 0;
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Writer.WriteBytes(DataReader?.GetBytes());
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

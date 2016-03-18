@@ -3,13 +3,13 @@
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyInterfaceValue : DomainPropertyObjectValue {
+  public sealed class DomainPropertyInterfaceValue : DomainPropertyObjectValue {
 
-    #region Overrides
+    #region Domain Properties
 
     public override PropertyType PropertyType => PropertyType.InterfaceProperty;
 
-    #endregion Overrides
+    #endregion Domain Properties
 
   }
 

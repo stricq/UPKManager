@@ -5,15 +5,15 @@ using UpkManager.Domain.Constants;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyGuidValue : DomainPropertyValueBase {
+  public sealed class DomainPropertyGuidValue : DomainPropertyValueBase {
 
-    #region Overrides
+    #region Domain Properties
 
     public override PropertyType PropertyType => PropertyType.GuidProperty;
 
     public override string PropertyString => $"{new Guid(DataReader.GetBytes()):B}";
 
-    #endregion Overrides
+    #endregion Domain Properties
 
   }
 

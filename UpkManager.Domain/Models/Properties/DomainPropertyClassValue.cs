@@ -3,7 +3,7 @@
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyClassValue : DomainPropertyObjectValue {
+  public sealed class DomainPropertyClassValue : DomainPropertyObjectValue {
 
     #region Overrides
 

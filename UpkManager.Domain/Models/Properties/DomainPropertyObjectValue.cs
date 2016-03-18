@@ -11,7 +11,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public DomainNameTableIndex ObjectIndexName { get; set; }
+    public DomainNameTableIndex ObjectIndexName { get; private set; }
 
     public override PropertyType PropertyType => PropertyType.ObjectProperty;
 

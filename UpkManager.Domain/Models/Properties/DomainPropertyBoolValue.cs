@@ -6,15 +6,15 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Properties {
 
-  public class DomainPropertyBoolValue : DomainPropertyValueBase {
-
-    #region Private Fields
-
-    private uint boolValue;
-
-    #endregion Private Fields
+  public sealed class DomainPropertyBoolValue : DomainPropertyValueBase {
 
     #region Properties
+
+    private uint boolValue { get; set; }
+
+    #endregion Properties
+
+    #region Domain Properties
 
     public override PropertyType PropertyType => PropertyType.BoolProperty;
 
@@ -22,7 +22,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override string PropertyString => $"{boolValue != 0}";
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -31,6 +31,20 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(uint);
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Task.Run(() => Writer.WriteUInt32(boolValue));
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

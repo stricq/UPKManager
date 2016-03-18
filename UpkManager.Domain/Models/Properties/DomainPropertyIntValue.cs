@@ -8,13 +8,13 @@ namespace UpkManager.Domain.Models.Properties {
 
   public class DomainPropertyIntValue : DomainPropertyValueBase {
 
-    #region Protected Fields
-
-    protected int IntValue;
-
-    #endregion Protected Fields
-
     #region Properties
+
+    protected int IntValue { get; set; }
+
+    #endregion Properties
+
+    #region Domain Properties
 
     public override PropertyType PropertyType => PropertyType.IntProperty;
 
@@ -22,7 +22,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public override string PropertyString => $"{IntValue:N0}";
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -31,6 +31,20 @@ namespace UpkManager.Domain.Models.Properties {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int);
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await Task.Run(() => Writer.WriteInt32(IntValue));
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 
