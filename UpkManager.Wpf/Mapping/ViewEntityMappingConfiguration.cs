@@ -60,12 +60,26 @@ namespace UpkManager.Wpf.Mapping {
                                                                             .ForMember(dest => dest.IsSelected,    opt => opt.Ignore())
                                                                             .ForMember(dest => dest.IsErrored,     opt => opt.Ignore());
 
+      config.CreateMap<DomainExportTableEntry, ObjectTreeViewEntity>().ForMember(dest => dest.Name,       opt => opt.MapFrom(src => src.NameTableIndex.Name))
+                                                                      .ForMember(dest => dest.IsExport,   opt => opt.UseValue(true))
+                                                                      .ForMember(dest => dest.IsImport,   opt => opt.UseValue(false))
+                                                                      .ForMember(dest => dest.IsExpanded, opt => opt.Ignore())
+                                                                      .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
+                                                                      .ForMember(dest => dest.Children,   opt => opt.Ignore());
+
       config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>().ForMember(dest => dest.PackageName,        opt => opt.MapFrom(src => src.PackageNameIndex.Name))
                                                                             .ForMember(dest => dest.TypeName,           opt => opt.MapFrom(src => src.TypeNameIndex.Name))
                                                                             .ForMember(dest => dest.Name,               opt => opt.MapFrom(src => src.NameTableIndex.Name))
                                                                             .ForMember(dest => dest.OwnerReferenceName, opt => opt.MapFrom(src => src.OwnerReferenceNameIndex.Name))
                                                                             .ForMember(dest => dest.IsErrored,          opt => opt.Ignore())
                                                                             .ForMember(dest => dest.IsSelected,         opt => opt.Ignore());
+
+      config.CreateMap<DomainImportTableEntry, ObjectTreeViewEntity>().ForMember(dest => dest.Name,       opt => opt.MapFrom(src => src.NameTableIndex.Name))
+                                                                      .ForMember(dest => dest.IsExport,   opt => opt.UseValue(false))
+                                                                      .ForMember(dest => dest.IsImport,   opt => opt.UseValue(true))
+                                                                      .ForMember(dest => dest.IsExpanded, opt => opt.Ignore())
+                                                                      .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
+                                                                      .ForMember(dest => dest.Children,   opt => opt.Ignore());
 
       config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name,       opt => opt.MapFrom(src => src.Name.String))
                                                                         .ForMember(dest => dest.IsErrored,  opt => opt.Ignore())

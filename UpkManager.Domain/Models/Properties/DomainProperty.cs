@@ -56,16 +56,21 @@ namespace UpkManager.Domain.Models.Properties {
     #region DomainUpkBuilderBase Implementation
 
     public override int GetBuilderSize() {
-      BuilderSize = NameIndex.GetBuilderSize()
-                  + TypeNameIndex.GetBuilderSize()
-                  + sizeof(int) * 2
-                  + Value.GetBuilderSize();
+      BuilderSize = NameIndex.GetBuilderSize();
+
+      if (NameIndex.Name == ObjectType.None.ToString()) return BuilderSize;
+
+      BuilderSize += TypeNameIndex.GetBuilderSize()
+                  +  sizeof(int) * 2
+                  +  Value.GetBuilderSize();
 
       return BuilderSize;
     }
 
     public override async Task WriteBuffer(ByteArrayWriter Writer) {
       await NameIndex.WriteBuffer(Writer);
+
+      if (NameIndex.Name == ObjectType.None.ToString()) return;
 
       await TypeNameIndex.WriteBuffer(Writer);
 

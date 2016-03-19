@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using UpkManager.Domain.Constants;
 using UpkManager.Domain.Helpers;
 
 
@@ -27,6 +29,8 @@ namespace UpkManager.Domain.Models.Compression {
     public async Task ReadCompressedChunkHeader(ByteArrayReader reader, uint flags, int uncompressedSize, int compressedSize) {
       if (flags > 0) {
         Signature = reader.ReadUInt32();
+
+        if (Signature != FileHeader.Signature) throw new Exception("Compressed Header Signature not found.");
 
         BlockSize = reader.ReadInt32();
 

@@ -49,8 +49,6 @@ namespace UpkManager.Domain.Models.Objects {
     public virtual async Task ReadDomainObject(ByteArrayReader reader, DomainHeader header, DomainExportTableEntry export, bool skipProperties, bool skipParse) {
       if (!skipProperties) await PropertyHeader.ReadPropertyHeader(reader, header);
 
-      if (reader.Remaining == 0) return;
-
       AdditionalDataOffset = export.SerialDataOffset + reader.CurrentOffset;
 
       AdditionalDataReader = await reader.Splice();

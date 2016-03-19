@@ -7,23 +7,23 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models.Objects {
 
-  public class DomainObjectObjectRedirector : DomainObjectBase {
+  public sealed class DomainObjectObjectRedirector : DomainObjectBase {
 
     #region Properties
 
-    public int ObjectTableReference { get; set; }
+    public int ObjectTableReference { get; private set; }
 
     #endregion Properties
 
     #region Domain Properties
 
+    public override ObjectType ObjectType => ObjectType.ObjectRedirector;
+
     public DomainNameTableIndex ObjectReferenceNameIndex { get; set; }
 
     #endregion Domain Properties
 
-    #region Overrides
-
-    public override ObjectType ObjectType => ObjectType.ObjectRedirector;
+    #region Domain Methods
 
     public override async Task ReadDomainObject(ByteArrayReader reader, DomainHeader header, DomainExportTableEntry export, bool skipProperties, bool skipParse) {
       await base.ReadDomainObject(reader, header, export, skipProperties, skipParse);
@@ -35,7 +35,24 @@ namespace UpkManager.Domain.Models.Objects {
       ObjectReferenceNameIndex = header.GetObjectTableEntry(ObjectTableReference)?.NameTableIndex;
     }
 
-    #endregion Overrides
+    #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = base.GetBuilderSize()
+                  + sizeof(int);
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      await base.WriteBuffer(Writer);
+
+      Writer.WriteInt32(ObjectTableReference);
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

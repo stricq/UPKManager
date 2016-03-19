@@ -4,8 +4,6 @@ using System.ComponentModel.Composition;
 
 using AutoMapper;
 
-using STR.Common.Extensions;
-
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Wpf.Messages.FileListing;
@@ -55,7 +53,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
     }
 
     private void onFileLoaded(FileLoadedMessage message) {
-      viewModel.ImportTableEntries.AddRange(mapper.Map<IEnumerable<ImportTableEntryViewEntity>>(message.File.Header.ImportTable));
+      viewModel.ImportTableEntries = new ObservableCollection<ImportTableEntryViewEntity>(mapper.Map<IEnumerable<ImportTableEntryViewEntity>>(message.File.Header.ImportTable));
     }
 
     #endregion Messages

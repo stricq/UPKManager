@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,11 +8,11 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.Compression {
 
-  public class DomainCompressedChunkBulkData : DomainCompressedChunk {
+  public sealed class DomainCompressedChunkBulkData : DomainCompressedChunk {
 
     #region Properties
 
-    public uint BulkDataFlags { get; set; }
+    public uint BulkDataFlags { get; private set; }
 
     #endregion Properties
 

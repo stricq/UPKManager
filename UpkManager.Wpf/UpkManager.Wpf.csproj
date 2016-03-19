@@ -131,6 +131,7 @@
     <Compile Include="Controllers\Tables\NameTableController.cs" />
     <Compile Include="Controllers\PropertyController.cs" />
     <Compile Include="Controllers\StatusBarController.cs" />
+    <Compile Include="Controllers\Tables\ObjectTreeController.cs" />
     <Compile Include="Controllers\UpkManagerController.cs" />
     <Compile Include="Mapping\ViewEntityMappingConfiguration.cs" />
     <Compile Include="Messages\Application\AboutMessage.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="ViewEntities\Tables\NameTableEntryViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsDialogViewEntity.cs" />
     <Compile Include="ViewEntities\SettingsWindowViewEntity.cs" />
+    <Compile Include="ViewEntities\Tables\ObjectTreeViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
     <Compile Include="ViewModels\Tables\CompressionTablesViewModel.cs" />
@@ -170,6 +172,7 @@
     <Compile Include="ViewModels\Tables\NameTableViewModel.cs" />
     <Compile Include="ViewModels\PropertyViewModel.cs" />
     <Compile Include="ViewModels\StatusBarViewModel.cs" />
+    <Compile Include="ViewModels\Tables\ObjectTreeViewModel.cs" />
     <Compile Include="ViewModels\UpkManagerViewModel.cs" />
     <Compile Include="Views\Dialogs\AboutDialogView.xaml.cs">
       <DependentUpon>AboutDialogView.xaml</DependentUpon>
@@ -218,6 +221,9 @@
     </Compile>
     <Compile Include="Views\StatusBarView.xaml.cs">
       <DependentUpon>StatusBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tables\ObjectTreeView.xaml.cs">
+      <DependentUpon>ObjectTreeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UpkManagerView.xaml.cs">
       <DependentUpon>UpkManagerView.xaml</DependentUpon>
@@ -347,6 +353,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StatusBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Tables\ObjectTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -11,13 +11,17 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Properties
 
-    public override ObjectType ObjectType => ObjectType.ArchetypeObjectReference;
-
-    public int ArchetypeObjectReference { get; set; } // This is still just a guess but it is related to the export object having an ArchetypeReference and it seems to point to a type.
-
-    public DomainNameTableIndex ArchetypeObjectNameIndex { get; set; }
+    public int ArchetypeObjectReference { get; private set; } // This is still just a guess but it is related to the export object having an ArchetypeReference and it seems to point to a type.
 
     #endregion Properties
+
+    #region Domain Properties
+
+    public override ObjectType ObjectType => ObjectType.ArchetypeObjectReference;
+
+    public DomainNameTableIndex ArchetypeObjectNameIndex { get; private set; }
+
+    #endregion domain Properties
 
     #region Domain Methods
 
@@ -30,6 +34,23 @@ namespace UpkManager.Domain.Models.Objects {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = sizeof(int)
+                  + base.GetBuilderSize();
+
+      return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+      Writer.WriteInt32(ArchetypeObjectReference);
+
+      await base.WriteBuffer(Writer);
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
   }
 

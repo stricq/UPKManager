@@ -77,6 +77,22 @@
               <Setter TargetName="Expander" Property="UIElement.Visibility" Value="Hidden" />
             </Trigger>
 
+            <DataTrigger Binding="{Binding Path=IsExport}" Value="True">
+              <Setter Property="Foreground" Value="{StaticResource ExportObjectColor}" />
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding Path=IsImport}" Value="True">
+              <Setter Property="Foreground" Value="{StaticResource ImportObjectColor}" />
+            </DataTrigger>
+
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding Path=IsExport}" Value="False" />
+                <Condition Binding="{Binding Path=IsImport}" Value="False" />
+              </MultiDataTrigger.Conditions>
+              <Setter Property="Foreground" Value="{StaticResource ForegroundColor}" />
+            </MultiDataTrigger>
+
             <Trigger Property="TreeViewItem.IsSelected" Value="True">
               <Setter TargetName="Bd" Property="Panel.Background"       Value="{StaticResource ListItemSelectedColor}" />
               <Setter                 Property="TextElement.Foreground" Value="{StaticResource ListItemSelectedForeColor}" />

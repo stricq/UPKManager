@@ -77,7 +77,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
     private void onFileLoaded(FileLoadedMessage message) {
       header = message.File.Header;
 
-      viewModel.ExportTableEntries.AddRange(mapper.Map<IEnumerable<ExportTableEntryViewEntity>>(message.File.Header.ExportTable));
+      viewModel.ExportTableEntries = new ObservableCollection<ExportTableEntryViewEntity>(mapper.Map<IEnumerable<ExportTableEntryViewEntity>>(message.File.Header.ExportTable));
 
       exportTableEntries.AddRange(message.File.Header.ExportTable);
 

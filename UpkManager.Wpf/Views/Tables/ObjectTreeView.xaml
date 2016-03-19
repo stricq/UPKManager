@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="UpkManager.Wpf.Views.Tables.ObjectTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ve="clr-namespace:UpkManager.Wpf.ViewEntities.Tables"
+             xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
+             mvvm:ViewModelLocator.ComposedViewModel="ObjectTreeViewModel"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="720">
+
+  <TreeView ItemsSource="{Binding Path=ObjectTree}" Margin="0" BorderThickness="0" Background="{StaticResource BackgroundColor}" FontFamily="Tahoma" FontSize="12"
+            VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+    <TreeView.Resources>
+      <HierarchicalDataTemplate DataType="{x:Type ve:ObjectTreeViewEntity}" ItemsSource="{Binding Path=Children}">
+        <Grid>
+
+          <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Left" Margin="0" />
+
+        </Grid>
+      </HierarchicalDataTemplate>
+    </TreeView.Resources>
+
+  </TreeView>
+
+</UserControl>

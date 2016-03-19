@@ -12,9 +12,9 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Properties
 
-    public byte[] Unknown1 { get; set; }
+    public byte[] Unknown1 { get; private set; }
 
-    public int CompressedChunkOffset { get; set; }
+    public int CompressedChunkOffset { get; private set; }
 
     #endregion Properties
 
@@ -31,11 +31,11 @@ namespace UpkManager.Domain.Models.Objects {
     }
 
     public virtual async Task ProcessCompressedBulkData(ByteArrayReader reader, Func<DomainCompressedChunkBulkData, Task> chunkHandler) {
-      DomainCompressedChunkBulkData bulkChunk = new DomainCompressedChunkBulkData();
+      DomainCompressedChunkBulkData compressedChunk = new DomainCompressedChunkBulkData();
 
-      await bulkChunk.ReadCompressedChunk(reader);
+      await compressedChunk.ReadCompressedChunk(reader);
 
-      await chunkHandler(bulkChunk);
+      await chunkHandler(compressedChunk);
     }
 
     #endregion Domain Methods
