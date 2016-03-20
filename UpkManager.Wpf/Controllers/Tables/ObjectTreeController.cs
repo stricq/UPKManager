@@ -120,6 +120,8 @@ namespace UpkManager.Wpf.Controllers.Tables {
         if (token.IsCancellationRequested) return;
 
         buildObjectTypes(childEntity, token);
+
+        if (token.IsCancellationRequested) return;
       }
 
       message.IsComplete = true;
@@ -147,17 +149,31 @@ namespace UpkManager.Wpf.Controllers.Tables {
     private void buildObjectChildren(ObjectTreeViewEntity parentEntity, CancellationToken token) {
       List<ObjectTreeViewEntity> entities = new List<ObjectTreeViewEntity>();
 
+      if (token.IsCancellationRequested) return;
+
       List<DomainImportTableEntry> importChildren = imports.Where(import => import.TypeNameIndex.Name.Equals(parentEntity.Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+      if (token.IsCancellationRequested) return;
 
       entities.AddRange(mapper.Map<IEnumerable<ObjectTreeViewEntity>>(importChildren));
 
+      if (token.IsCancellationRequested) return;
+
       List<DomainExportTableEntry> exportChildren = exports.Where(export => export.TypeReferenceNameIndex.Name.Equals(parentEntity.Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+      if (token.IsCancellationRequested) return;
 
       entities.AddRange(mapper.Map<IEnumerable<ObjectTreeViewEntity>>(exportChildren));
 
+      if (token.IsCancellationRequested) return;
+
       entities.Where(entity => entity.IsExport).ForEach(entity => entity.PropertyChanged += onObjectTreeViewEntityPropertyChanged);
 
+      if (token.IsCancellationRequested) return;
+
       parentEntity.Children = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.IsImport).ThenBy(entity => entity.Name));
+
+      if (token.IsCancellationRequested) return;
 
       foreach(ObjectTreeViewEntity childEntity in parentEntity.Children) {
         if (token.IsCancellationRequested) return;

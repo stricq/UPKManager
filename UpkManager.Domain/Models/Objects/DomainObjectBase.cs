@@ -34,7 +34,7 @@ namespace UpkManager.Domain.Models.Objects {
 
     public virtual bool IsExportable => false;
 
-    public virtual bool IsViewable => false;
+    public virtual ViewableTypes Viewable => ViewableTypes.Unknown;
 
     public virtual ObjectType ObjectType => ObjectType.Unknown;
 

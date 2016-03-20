@@ -250,8 +250,10 @@ namespace UpkManager.Wpf.Controllers {
 
       if (changes.Any()) {
         changes.ForEach(f => {
-          f.GameVersion = version;
-          f.Id          = null;
+          if (f.GameVersion != version) {
+            f.GameVersion = version;
+            f.Id          = null;
+          }
         });
 
         allFiles.AddRange(changes.OrderBy(f => f.Filename));

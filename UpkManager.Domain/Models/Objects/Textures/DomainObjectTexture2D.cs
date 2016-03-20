@@ -33,7 +33,7 @@ namespace UpkManager.Domain.Models.Objects.Textures {
 
     public override bool IsExportable => true;
 
-    public override bool IsViewable => true;
+    public override ViewableTypes Viewable => ViewableTypes.Image;
 
     public override ObjectType ObjectType => ObjectType.Texture2D;
 

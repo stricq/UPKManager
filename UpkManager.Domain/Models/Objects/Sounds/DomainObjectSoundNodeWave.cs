@@ -26,7 +26,7 @@ namespace UpkManager.Domain.Models.Objects.Sounds {
 
     public override bool IsExportable => true;
 
-    public override bool IsViewable => false;
+    public override ViewableTypes Viewable => ViewableTypes.Sound;
 
     public override ObjectType ObjectType => ObjectType.SoundNodeWave;
 

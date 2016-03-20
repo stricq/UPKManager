@@ -1,12 +1,17 @@
 ﻿using System.ComponentModel.Composition;
 using System.IO;
+using System.Threading.Tasks;
 
 using CSharpImageLibrary.General;
 
+using NAudio.Vorbis;
+using NAudio.Wave;
+
+using STR.Common.Extensions;
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Contracts;
-
+using UpkManager.Domain.Constants;
+using UpkManager.Domain.Models.Objects;
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewModels;
@@ -23,17 +28,14 @@ namespace UpkManager.Wpf.Controllers {
 
     private readonly IMessenger messenger;
 
-    private readonly IUpkFileRepository repository;
-
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public ImageController(ImageViewModel ViewModel, IMessenger Messenger, IUpkFileRepository Repository) {
+    public ImageController(ImageViewModel ViewModel, IMessenger Messenger) {
       viewModel = ViewModel;
 
-      repository = Repository;
       messenger  = Messenger;
 
       registerMessages();
@@ -50,21 +52,35 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
-      if (message.ExportTableEntry.DomainObject != null && message.ExportTableEntry.DomainObject.IsViewable) {
-        Stream stream = message.ExportTableEntry.DomainObject.GetObjectStream();
+      if (message.ExportTableEntry.DomainObject == null) return;
 
-        if (stream != null) {
-          ImageEngineImage image = new ImageEngineImage(stream);
+      switch(message.ExportTableEntry.DomainObject.Viewable) {
+        case ViewableTypes.Sound: {
+          Task.Run(() => playSound(message.ExportTableEntry.DomainObject)).FireAndForget();
 
-          viewModel.Texture = image.GetWPFBitmap();
+          break;
+        }
 
-          stream.Close();
+        case ViewableTypes.Image: {
+          Stream stream = message.ExportTableEntry.DomainObject.GetObjectStream();
 
-          return;
+          if (stream != null) {
+            ImageEngineImage image = new ImageEngineImage(stream);
+
+            viewModel.Texture = image.GetWPFBitmap();
+
+            stream.Close();
+          }
+
+          break;
+        }
+
+        default: {
+          viewModel.Texture = null;
+
+          break;
         }
       }
-
-      viewModel.Texture = null;
     }
 
     private void onFileLoading(FileLoadingMessage message) {
@@ -72,6 +88,24 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     #endregion Messages
+
+    #region Private Methods
+
+    private static void playSound(DomainObjectBase soundObject) {
+      Stream stream = soundObject.GetObjectStream();
+
+      using(VorbisWaveReader vorbisStream = new VorbisWaveReader(stream)) {
+        using(WaveOutEvent waveOut = new WaveOutEvent()) {
+            waveOut.Init(vorbisStream);
+
+            waveOut.Play();
+
+            while(waveOut.PlaybackState == PlaybackState.Playing) Task.Delay(250);
+        }
+      }
+    }
+
+    #endregion Private Methods
 
   }
 
