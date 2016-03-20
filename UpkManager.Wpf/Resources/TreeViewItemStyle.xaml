@@ -28,8 +28,8 @@
                   <Setter Property="Template">
                     <Setter.Value>
                       <ControlTemplate TargetType="ToggleButton">
-                        <Border Padding="5,5,5,5" Background="#00FFFFFF" Width="16" Height="16">
-                          <Path Fill="#00FFFFFF" Stroke="#FF989898" Name="ExpandPath">
+                        <Border Name="Inner" Padding="5,5,5,5" Background="#00FFFFFF" Width="16" Height="16" CornerRadius="4">
+                          <Path Name="ExpandPath" Fill="#00FFFFFF" Stroke="{StaticResource ForegroundColor}">
                             <Path.Data>
                               <PathGeometry Figures="M0,0L0,6L6,0z" />
                             </Path.Data>
@@ -40,8 +40,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                           <Trigger Property="UIElement.IsMouseOver" Value="True">
-                            <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="#FF1BBBFA" />
-                            <Setter TargetName="ExpandPath" Property="Shape.Fill"   Value="#00FFFFFF" />
+                            <Setter TargetName="ExpandPath" Property="Shape.Fill" Value="{StaticResource ForegroundColor}" />
+                            <Setter TargetName="Inner" Property="Background" Value="#4087CEFA" />
                           </Trigger>
                           <Trigger Property="ToggleButton.IsChecked" Value="True">
                             <Setter TargetName="ExpandPath" Property="UIElement.RenderTransform">
@@ -49,8 +49,7 @@
                                 <RotateTransform Angle="180" CenterX="3" CenterY="3" />
                               </Setter.Value>
                             </Setter>
-                            <Setter TargetName="ExpandPath" Property="Shape.Fill"   Value="#FF595959" />
-                            <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="#FF262626" />
+                            <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="{StaticResource ForegroundColor}" />
                           </Trigger>
                         </ControlTemplate.Triggers>
                       </ControlTemplate>

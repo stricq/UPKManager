@@ -112,7 +112,9 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       List<string> packages = imports.Select(import => import.PackageNameIndex.Name).Distinct().ToList();
 
-      List<ObjectTreeViewEntity> entities = packages.Select(package => new ObjectTreeViewEntity { Name = package }).ToList();
+      imports.RemoveAll(import => packages.Contains(import.NameTableIndex.Name));
+
+      List<ObjectTreeViewEntity> entities = packages.Select(package => new ObjectTreeViewEntity { Name = package, IsExpanded = package.Equals("Core", StringComparison.CurrentCultureIgnoreCase)}).ToList();
 
       viewModel.ObjectTree = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.Name));
 
@@ -135,7 +137,9 @@ namespace UpkManager.Wpf.Controllers.Tables {
                                   .Distinct()
                                   .ToList();
 
-      List<ObjectTreeViewEntity> entities = types.Select(type => new ObjectTreeViewEntity { Name = type }).ToList();
+      imports.RemoveAll(import => types.Contains(import.NameTableIndex.Name));
+
+      List<ObjectTreeViewEntity> entities = types.Select(type => new ObjectTreeViewEntity { Name = type, IsExpanded = type.Equals("Class", StringComparison.CurrentCultureIgnoreCase) }).ToList();
 
       parentEntity.Children = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.Name));
 

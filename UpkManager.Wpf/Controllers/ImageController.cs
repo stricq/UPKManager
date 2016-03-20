@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 using CSharpImageLibrary.General;
@@ -8,6 +10,8 @@ using NAudio.Vorbis;
 using NAudio.Wave;
 
 using STR.Common.Extensions;
+using STR.Common.Messages;
+
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
@@ -23,6 +27,8 @@ namespace UpkManager.Wpf.Controllers {
   public class ImageController : IController {
 
     #region Private Fields
+
+    private CancellationTokenSource tokenSource;
 
     private readonly ImageViewModel viewModel;
 
@@ -56,7 +62,7 @@ namespace UpkManager.Wpf.Controllers {
 
       switch(message.ExportTableEntry.DomainObject.Viewable) {
         case ViewableTypes.Sound: {
-          Task.Run(() => playSound(message.ExportTableEntry.DomainObject)).FireAndForget();
+          Task.Run(() => playSound(message.ExportTableEntry.DomainObject, resetToken())).FireAndForget();
 
           break;
         }
@@ -91,17 +97,34 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Methods
 
-    private static void playSound(DomainObjectBase soundObject) {
-      Stream stream = soundObject.GetObjectStream();
+    private CancellationToken resetToken() {
+      tokenSource?.Cancel();
 
-      using(VorbisWaveReader vorbisStream = new VorbisWaveReader(stream)) {
-        using(WaveOutEvent waveOut = new WaveOutEvent()) {
+      tokenSource = new CancellationTokenSource();
+
+      return tokenSource.Token;
+    }
+
+    private void playSound(DomainObjectBase soundObject, CancellationToken token) {
+      try {
+        Stream stream = soundObject.GetObjectStream();
+
+        using(VorbisWaveReader vorbisStream = new VorbisWaveReader(stream)) {
+          using(WaveOutEvent waveOut = new WaveOutEvent()) {
             waveOut.Init(vorbisStream);
 
             waveOut.Play();
 
-            while(waveOut.PlaybackState == PlaybackState.Playing) Task.Delay(250);
+            while(waveOut.PlaybackState == PlaybackState.Playing) {
+              if (token.IsCancellationRequested) break;
+
+              Task.Delay(250, token);
+            }
+          }
         }
+      }
+      catch(Exception ex) {
+        messenger.SendUi(new ApplicationErrorMessage { Exception = ex, HeaderText = "Error Playing Audio" });
       }
     }
 
