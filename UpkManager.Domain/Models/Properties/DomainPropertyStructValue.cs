@@ -25,7 +25,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.StructProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.StructProperty;
 
     public override string PropertyString => StructNameIndex.Name;
 
@@ -50,10 +50,10 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await StructNameIndex.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await StructNameIndex.WriteBuffer(Writer, CurrentOffset);
 
-      await base.WriteBuffer(Writer);
+      await base.WriteBuffer(Writer, CurrentOffset);
     }
 
     #endregion DomainUpkBuilderBase Implementation

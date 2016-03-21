@@ -64,14 +64,14 @@ namespace UpkManager.Domain.Models.Tables {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await PackageNameIndex.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await PackageNameIndex.WriteBuffer(Writer, 0);
 
-      await TypeNameIndex.WriteBuffer(Writer);
+      await TypeNameIndex.WriteBuffer(Writer, 0);
 
       Writer.WriteInt32(OwnerReference);
 
-      await NameTableIndex.WriteBuffer(Writer);
+      await NameTableIndex.WriteBuffer(Writer, 0);
     }
 
     #endregion DomainUpkBuilderBase Implementation

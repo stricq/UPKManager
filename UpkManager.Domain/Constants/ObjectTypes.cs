@@ -2,7 +2,7 @@
 
 namespace UpkManager.Domain.Constants {
 
-  public enum ObjectType {
+  public enum ObjectTypes {
 
     Unknown,
 

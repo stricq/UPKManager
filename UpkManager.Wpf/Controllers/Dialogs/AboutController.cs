@@ -12,6 +12,8 @@ using UpkManager.Domain.Constants;
 using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.ViewModels.Dialogs;
 
+using DialogNames = UpkManager.Wpf.Constants.DialogNames;
+
 
 namespace UpkManager.Wpf.Controllers.Dialogs {
 

@@ -55,7 +55,7 @@ namespace UpkManager.Domain.Models {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteInt32(Size);
 
       if (Size < 0) await Writer.WriteBytes(Encoding.Unicode.GetBytes(String));

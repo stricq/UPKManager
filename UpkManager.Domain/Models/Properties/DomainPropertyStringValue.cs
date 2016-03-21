@@ -24,7 +24,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.StrProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.StrProperty;
 
     public override object PropertyValue => stringValue;
 
@@ -48,8 +48,8 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await stringValue.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await stringValue.WriteBuffer(Writer, CurrentOffset);
     }
 
     #endregion DomainUpkBuilderBase Implementation

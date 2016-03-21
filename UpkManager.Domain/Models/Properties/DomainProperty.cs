@@ -39,7 +39,7 @@ namespace UpkManager.Domain.Models.Properties {
     public async Task ReadProperty(ByteArrayReader reader, DomainHeader header) {
       await Task.Run(() => NameIndex.ReadNameTableIndex(reader, header));
 
-      if (NameIndex.Name == ObjectType.None.ToString()) return;
+      if (NameIndex.Name == ObjectTypes.None.ToString()) return;
 
       await Task.Run(() => TypeNameIndex.ReadNameTableIndex(reader, header));
 
@@ -58,7 +58,7 @@ namespace UpkManager.Domain.Models.Properties {
     public override int GetBuilderSize() {
       BuilderSize = NameIndex.GetBuilderSize();
 
-      if (NameIndex.Name == ObjectType.None.ToString()) return BuilderSize;
+      if (NameIndex.Name == ObjectTypes.None.ToString()) return BuilderSize;
 
       BuilderSize += TypeNameIndex.GetBuilderSize()
                   +  sizeof(int) * 2
@@ -67,18 +67,18 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await NameIndex.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await NameIndex.WriteBuffer(Writer, 0);
 
-      if (NameIndex.Name == ObjectType.None.ToString()) return;
+      if (NameIndex.Name == ObjectTypes.None.ToString()) return;
 
-      await TypeNameIndex.WriteBuffer(Writer);
+      await TypeNameIndex.WriteBuffer(Writer, 0);
 
       Writer.WriteInt32(Size);
 
       Writer.WriteInt32(ArrayIndex);
 
-      await Value.WriteBuffer(Writer);
+      await Value.WriteBuffer(Writer, CurrentOffset);
     }
 
     #endregion DomainUpkBuilderBase Implementation
@@ -86,24 +86,24 @@ namespace UpkManager.Domain.Models.Properties {
     #region Private Methods
 
     private DomainPropertyValueBase propertyValueFactory() {
-      PropertyType type;
+      PropertyTypes type;
 
       Enum.TryParse(TypeNameIndex?.Name, true, out type);
 
       switch(type) {
-        case PropertyType.BoolProperty:      return new DomainPropertyBoolValue();
-        case PropertyType.IntProperty:       return new DomainPropertyIntValue();
-        case PropertyType.FloatProperty:     return new DomainPropertyFloatValue();
-        case PropertyType.ObjectProperty:    return new DomainPropertyObjectValue();
-        case PropertyType.InterfaceProperty: return new DomainPropertyInterfaceValue();
-        case PropertyType.ComponentProperty: return new DomainPropertyComponentValue();
-        case PropertyType.ClassProperty:     return new DomainPropertyClassValue();
-        case PropertyType.GuidProperty:      return new DomainPropertyGuidValue();
-        case PropertyType.NameProperty:      return new DomainPropertyNameValue();
-        case PropertyType.ByteProperty:      return new DomainPropertyByteValue();
-        case PropertyType.StrProperty:       return new DomainPropertyStringValue();
-        case PropertyType.StructProperty:    return new DomainPropertyStructValue();
-        case PropertyType.ArrayProperty:     return new DomainPropertyArrayValue();
+        case PropertyTypes.BoolProperty:      return new DomainPropertyBoolValue();
+        case PropertyTypes.IntProperty:       return new DomainPropertyIntValue();
+        case PropertyTypes.FloatProperty:     return new DomainPropertyFloatValue();
+        case PropertyTypes.ObjectProperty:    return new DomainPropertyObjectValue();
+        case PropertyTypes.InterfaceProperty: return new DomainPropertyInterfaceValue();
+        case PropertyTypes.ComponentProperty: return new DomainPropertyComponentValue();
+        case PropertyTypes.ClassProperty:     return new DomainPropertyClassValue();
+        case PropertyTypes.GuidProperty:      return new DomainPropertyGuidValue();
+        case PropertyTypes.NameProperty:      return new DomainPropertyNameValue();
+        case PropertyTypes.ByteProperty:      return new DomainPropertyByteValue();
+        case PropertyTypes.StrProperty:       return new DomainPropertyStringValue();
+        case PropertyTypes.StructProperty:    return new DomainPropertyStructValue();
+        case PropertyTypes.ArrayProperty:     return new DomainPropertyArrayValue();
 
         default: return new DomainPropertyValueBase();
       }

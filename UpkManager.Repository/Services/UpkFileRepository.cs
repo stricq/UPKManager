@@ -35,7 +35,7 @@ namespace UpkManager.Repository.Services {
 
       ByteArrayWriter writer = ByteArrayWriter.CreateNew(headerSize);
 
-      await Header.WriteBuffer(writer);
+      await Header.WriteBuffer(writer, 0);
 
       await Task.Run(() => File.WriteAllBytes(Filename, writer.GetBytes()));
     }

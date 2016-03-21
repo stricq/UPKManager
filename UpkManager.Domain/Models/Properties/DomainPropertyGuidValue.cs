@@ -9,7 +9,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.GuidProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.GuidProperty;
 
     public override string PropertyString => $"{new Guid(DataReader.GetBytes()):B}";
 

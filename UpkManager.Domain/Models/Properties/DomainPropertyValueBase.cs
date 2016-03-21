@@ -16,7 +16,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public virtual PropertyType PropertyType => PropertyType.UnknownProperty;
+    public virtual PropertyTypes PropertyType => PropertyTypes.UnknownProperty;
 
     public virtual object PropertyValue => DataReader.GetBytes();
 
@@ -40,7 +40,7 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       await Writer.WriteBytes(DataReader?.GetBytes());
     }
 

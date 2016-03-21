@@ -1,6 +1,6 @@
 ﻿
 
-namespace UpkManager.Domain.Constants {
+namespace UpkManager.Wpf.Constants {
 
   public static class DialogNames {
 

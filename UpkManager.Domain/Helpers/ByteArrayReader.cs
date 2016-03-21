@@ -25,6 +25,8 @@ namespace UpkManager.Domain.Helpers {
     public static ByteArrayReader CreateNew(byte[] Data, int Index) {
       ByteArrayReader reader = new ByteArrayReader();
 
+      if (Data == null) Data = new byte[0];
+
       if (Index < 0 || Index > Data.Length) throw new ArgumentOutOfRangeException(nameof(Index), "Index value is outside the bounds of the byte array.");
 
       reader.Initialize(Data, Index);

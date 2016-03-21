@@ -16,7 +16,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.BoolProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.BoolProperty;
 
     public override object PropertyValue => boolValue;
 
@@ -40,7 +40,7 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       await Task.Run(() => Writer.WriteUInt32(boolValue));
     }
 

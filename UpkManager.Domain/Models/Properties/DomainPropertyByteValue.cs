@@ -16,7 +16,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.ByteProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.ByteProperty;
 
     public override object PropertyValue => byteValue ?? base.PropertyValue;
 
@@ -41,9 +41,9 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       if (byteValue.HasValue) Writer.WriteByte(byteValue.Value);
-      else await NameIndexValue.WriteBuffer(Writer);
+      else await NameIndexValue.WriteBuffer(Writer, CurrentOffset);
     }
 
     #endregion DomainUpkBuilderBase Implementation

@@ -48,8 +48,8 @@ namespace UpkManager.Domain.Models.Tables {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await Name.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await Name.WriteBuffer(Writer, 0);
 
       Writer.WriteUInt64(Flags);
     }

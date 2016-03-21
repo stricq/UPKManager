@@ -30,7 +30,7 @@ namespace UpkManager.Domain.Models.Compression {
       if (flags > 0) {
         Signature = reader.ReadUInt32();
 
-        if (Signature != FileHeader.Signature) throw new Exception("Compressed Header Signature not found.");
+        if (Signature != Signatures.Signature) throw new Exception("Compressed Header Signature not found.");
 
         BlockSize = reader.ReadInt32();
 

@@ -13,7 +13,7 @@ using UpkManager.Domain.Models.Tables;
 
 namespace UpkManager.Domain.Models.Objects.Textures {
 
-  public class DomainObjectTexture2D : DomainObjectCompressionBase {
+  public sealed class DomainObjectTexture2D : DomainObjectCompressionBase {
 
     #region Constructor
 
@@ -25,23 +25,27 @@ namespace UpkManager.Domain.Models.Objects.Textures {
 
     #region Properties
 
-    public int MipMapsCount { get; set; }
+    public int MipMapsCount { get; private set; }
 
-    public List<DomainMipMap> MipMaps { get; set; }
+    public List<DomainMipMap> MipMaps { get; }
 
-    public byte[] Guid { get; set; }
+    public byte[] Guid { get; private set; }
+
+    #endregion Properties
+
+    #region Domain Properties
 
     public override bool IsExportable => true;
 
     public override ViewableTypes Viewable => ViewableTypes.Image;
 
-    public override ObjectType ObjectType => ObjectType.Texture2D;
+    public override ObjectTypes ObjectType => ObjectTypes.Texture2D;
 
     public override string FileExtension => ".dds";
 
     public override string FileTypeDesc => "Direct Draw Surface";
 
-    #endregion Properties
+    #endregion Domain Properties
 
     #region Domain Methods
 
@@ -97,6 +101,23 @@ namespace UpkManager.Domain.Models.Objects.Textures {
     }
 
     #endregion Domain Methods
+
+    #region DomainUpkBuilderBase Implementation
+
+    public override int GetBuilderSize() {
+      BuilderSize = PropertyHeader.GetBuilderSize()
+                  + base.GetBuilderSize();
+
+      foreach(DomainMipMap mipMap in MipMaps) {
+        BulkDataCompressionTypes flags = mipMap.ImageData == null || mipMap.ImageData.Length == 0 ? BulkDataCompressionTypes.Unused : BulkDataCompressionTypes.LZO_ENC;
+
+        BuilderSize += Task.Run(() => ProcessUncompressedBulkData(ByteArrayReader.CreateNew(mipMap.ImageData, 0), flags)).Result;
+      }
+
+      return BuilderSize;
+    }
+
+    #endregion DomainUpkBuilderBase Implementation
 
     #region Private Methods
 

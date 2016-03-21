@@ -2,7 +2,7 @@
 
 namespace UpkManager.Domain.Constants {
 
-  public enum PropertyType {
+  public enum PropertyTypes {
 
     UnknownProperty,
 
@@ -22,7 +22,7 @@ namespace UpkManager.Domain.Constants {
 
     StructProperty, // variable : depends on structNameIndex
 
-    ArrayProperty // uint elements, elements * element size (lookup in export or import table)
+    ArrayProperty // uint elements, elements * element size
 
   }
 

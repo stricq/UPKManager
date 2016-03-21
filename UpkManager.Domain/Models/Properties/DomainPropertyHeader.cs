@@ -39,7 +39,7 @@ namespace UpkManager.Domain.Models.Properties {
 
         Properties.Add(property);
 
-        if (property.NameIndex.Name == ObjectType.None.ToString()) break;
+        if (property.NameIndex.Name == ObjectTypes.None.ToString()) break;
       }
       while(true);
     }
@@ -59,10 +59,10 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteInt32(TypeIndex);
 
-      foreach(DomainProperty property in Properties) await property.WriteBuffer(Writer);
+      foreach(DomainProperty property in Properties) await property.WriteBuffer(Writer, CurrentOffset);
     }
 
     #endregion DomainUpkBuilderBase Implementation

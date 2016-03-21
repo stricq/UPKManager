@@ -35,6 +35,16 @@ namespace UpkManager.Domain.Models.Compression {
       await Header.ReadCompressedChunkHeader(reader, BulkDataFlags, UncompressedSize, CompressedSize);
     }
 
+    public async Task WriteUncompressedChunk(ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
+      BulkDataFlags = (uint)compressionFlags;
+
+      reader.Seek(0);
+
+      UncompressedSize = reader.Remaining;
+
+      await CompressChunk(reader, BulkDataFlags);
+    }
+
     public async Task<ByteArrayReader> DecompressChunk(uint flags) {
       const BulkDataCompressionTypes nothingTodo = BulkDataCompressionTypes.Unused | BulkDataCompressionTypes.StoreInSeparatefile;
 
@@ -45,11 +55,11 @@ namespace UpkManager.Domain.Models.Compression {
       int uncompressedOffset = 0;
 
       foreach(DomainCompressedChunkBlock block in Header.Blocks) {
-        if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.CompressedLzoEnc) > 0) await block.CompressedData.Decrypt();
+        if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.LZO_ENC) > 0) await block.CompressedData.Decrypt();
 
         byte[] decompressed;
 
-        const BulkDataCompressionTypes validCompression = BulkDataCompressionTypes.CompressedLzo | BulkDataCompressionTypes.CompressedLzoEnc;
+        const BulkDataCompressionTypes validCompression = BulkDataCompressionTypes.LZO | BulkDataCompressionTypes.LZO_ENC;
 
         if (((BulkDataCompressionTypes)BulkDataFlags & validCompression) > 0) decompressed = await block.CompressedData.Decompress(block.UncompressedSize);
         else {
@@ -65,6 +75,10 @@ namespace UpkManager.Domain.Models.Compression {
       }
 
       return ByteArrayReader.CreateNew(chunkData, 0);
+    }
+
+    public async Task<ByteArrayReader> CompressChunk(ByteArrayReader reader, uint flags) {
+      return await Task.FromResult(ByteArrayReader.CreateNew(null, 0));
     }
 
     #endregion Domain Methods

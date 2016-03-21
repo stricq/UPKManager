@@ -16,7 +16,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.IntProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.IntProperty;
 
     public override object PropertyValue => IntValue;
 
@@ -40,7 +40,7 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       await Task.Run(() => Writer.WriteInt32(IntValue));
     }
 

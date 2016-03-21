@@ -63,10 +63,9 @@
   <ItemGroup>
     <Compile Include="Constants\BulkDataCompressionTypes.cs" />
     <Compile Include="Constants\CompressionTypes.cs" />
-    <Compile Include="Constants\DialogNames.cs" />
-    <Compile Include="Constants\FileHeader.cs" />
-    <Compile Include="Constants\ObjectType.cs" />
-    <Compile Include="Constants\PropertyType.cs" />
+    <Compile Include="Constants\Signatures.cs" />
+    <Compile Include="Constants\ObjectTypes.cs" />
+    <Compile Include="Constants\PropertyTypes.cs" />
     <Compile Include="Constants\ViewableTypes.cs" />
     <Compile Include="Contracts\IAutoMapperConfiguration.cs" />
     <Compile Include="Contracts\ISettingsRepository.cs" />

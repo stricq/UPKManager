@@ -17,7 +17,7 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Domain Properties
 
-    public override ObjectType ObjectType => ObjectType.ArchetypeObjectReference;
+    public override ObjectTypes ObjectType => ObjectTypes.ArchetypeObjectReference;
 
     public DomainNameTableIndex ArchetypeObjectNameIndex { get; private set; }
 
@@ -44,10 +44,10 @@ namespace UpkManager.Domain.Models.Objects {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteInt32(ArchetypeObjectReference);
 
-      await base.WriteBuffer(Writer);
+      await base.WriteBuffer(Writer, CurrentOffset);
     }
 
     #endregion DomainUpkBuilderBase Implementation

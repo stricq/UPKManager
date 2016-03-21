@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using UpkManager.Domain.Helpers;
 
 
 namespace UpkManager.Domain.Models.Compression {
 
-  public class DomainCompressedChunk : DomainUpkBuilderBase {
+  public class DomainCompressedChunk {
 
     #region Properties
 
@@ -37,20 +36,6 @@ namespace UpkManager.Domain.Models.Compression {
     }
 
     #endregion Domain Methods
-
-    #region DomainUpkBuilderBase Implementation
-
-    public override int GetBuilderSize() {
-      BuilderSize = sizeof(int) * 4;
-
-      return BuilderSize;
-    }
-
-    public override Task WriteBuffer(ByteArrayWriter Writer) {
-      throw new NotSupportedException("Cannot currently write compressed data.");
-    }
-
-    #endregion DomainUpkBuilderBase Implementation
 
   }
 

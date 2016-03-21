@@ -28,7 +28,7 @@ namespace UpkManager.Domain.Models.Objects.Sounds {
 
     public override ViewableTypes Viewable => ViewableTypes.Sound;
 
-    public override ObjectType ObjectType => ObjectType.SoundNodeWave;
+    public override ObjectTypes ObjectType => ObjectTypes.SoundNodeWave;
 
     public override string FileExtension => ".ogg";
 

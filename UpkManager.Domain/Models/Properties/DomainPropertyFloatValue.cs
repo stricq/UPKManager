@@ -16,7 +16,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.FloatProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.FloatProperty;
 
     public override object PropertyValue => floatValue;
 
@@ -40,7 +40,7 @@ namespace UpkManager.Domain.Models.Properties {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       await Task.Run(() => Writer.WriteSingle(floatValue));
     }
 

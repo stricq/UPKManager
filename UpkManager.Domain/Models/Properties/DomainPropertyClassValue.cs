@@ -7,7 +7,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Overrides
 
-    public override PropertyType PropertyType => PropertyType.ClassProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.ClassProperty;
 
     #endregion Overrides
 

@@ -7,6 +7,8 @@ using STR.MvvmCommon;
 
 using UpkManager.Domain.Constants;
 
+using DialogNames = UpkManager.Wpf.Constants.DialogNames;
+
 
 namespace UpkManager.Wpf.Views.Dialogs {
 

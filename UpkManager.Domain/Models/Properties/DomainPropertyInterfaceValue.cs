@@ -7,7 +7,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Domain Properties
 
-    public override PropertyType PropertyType => PropertyType.InterfaceProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.InterfaceProperty;
 
     #endregion Domain Properties
 

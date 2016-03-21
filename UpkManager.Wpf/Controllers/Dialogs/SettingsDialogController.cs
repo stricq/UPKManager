@@ -13,6 +13,8 @@ using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.Messages.Settings;
 using UpkManager.Wpf.ViewModels.Dialogs;
 
+using DialogNames = UpkManager.Wpf.Constants.DialogNames;
+
 
 namespace UpkManager.Wpf.Controllers.Dialogs {
 

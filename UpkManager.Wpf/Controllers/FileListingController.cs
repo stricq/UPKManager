@@ -95,7 +95,7 @@ namespace UpkManager.Wpf.Controllers {
 
       oldPathToGame = settings.PathToGame;
 
-      viewModel.SelectedType        = ObjectType.Texture2D.ToString();
+      viewModel.SelectedType        = ObjectTypes.Texture2D.ToString();
       viewModel.IsShowFilesWithType = true;
 
       await loadAllFiles();

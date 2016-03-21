@@ -13,7 +13,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     public DomainNameTableIndex ObjectIndexName { get; private set; }
 
-    public override PropertyType PropertyType => PropertyType.ObjectProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.ObjectProperty;
 
     public override string PropertyString => ObjectIndexName.Name;
 

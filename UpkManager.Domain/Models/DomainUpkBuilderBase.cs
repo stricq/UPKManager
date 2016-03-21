@@ -13,7 +13,7 @@ namespace UpkManager.Domain.Models {
 
     public abstract int GetBuilderSize();
 
-    public abstract Task WriteBuffer(ByteArrayWriter Writer);
+    public abstract Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset);
 
   }
 

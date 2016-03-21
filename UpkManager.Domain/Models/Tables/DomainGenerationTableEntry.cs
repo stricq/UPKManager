@@ -35,7 +35,7 @@ namespace UpkManager.Domain.Models.Tables {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       await Task.Run(() => {
         Writer.WriteInt32(ExportTableCount);
 

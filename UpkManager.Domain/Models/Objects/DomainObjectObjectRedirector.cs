@@ -17,7 +17,7 @@ namespace UpkManager.Domain.Models.Objects {
 
     #region Domain Properties
 
-    public override ObjectType ObjectType => ObjectType.ObjectRedirector;
+    public override ObjectTypes ObjectType => ObjectTypes.ObjectRedirector;
 
     public DomainNameTableIndex ObjectReferenceNameIndex { get; set; }
 
@@ -46,8 +46,8 @@ namespace UpkManager.Domain.Models.Objects {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await base.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await base.WriteBuffer(Writer, CurrentOffset);
 
       Writer.WriteInt32(ObjectTableReference);
     }

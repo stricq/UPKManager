@@ -179,15 +179,14 @@ namespace UpkManager.Domain.Models {
     public override int GetBuilderSize() {
       if (CompressedChunks.Any()) throw new NotSupportedException("Cannot rebuild compressed files. Yet.");
 
-      if (Signature == FileHeader.EncryptedSignature) throw new NotSupportedException("Cannot rebuild fully encrypted files. Yet.");
+      if (Signature == Signatures.EncryptedSignature) throw new NotSupportedException("Cannot rebuild fully encrypted files. Yet.");
 
       BuilderSize = sizeof(uint)   * 7
                   + sizeof(ushort) * 2
                   + sizeof(int)    * 10
                   + Group.GetBuilderSize()
                   + Guid.Length
-                  + GenerationTable.Sum(gen => gen.GetBuilderSize())
-                  + CompressedChunks.Sum(chunk => chunk.GetBuilderSize());
+                  + GenerationTable.Sum(gen => gen.GetBuilderSize());
 
       BuilderNameTableOffset = BuilderSize;
 
@@ -214,7 +213,7 @@ namespace UpkManager.Domain.Models {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       writer = Writer;
 
       await writeUpkHeader();
@@ -239,8 +238,8 @@ namespace UpkManager.Domain.Models {
 
       Signature = reader.ReadUInt32();
 
-      if (Signature == FileHeader.EncryptedSignature) await reader.Decrypt();
-      else if (Signature != FileHeader.Signature) throw new Exception("File is not a properly formatted UPK file.");
+      if (Signature == Signatures.EncryptedSignature) await reader.Decrypt();
+      else if (Signature != Signatures.Signature) throw new Exception("File is not a properly formatted UPK file.");
 
       Version  = reader.ReadUInt16();
       Licensee = reader.ReadUInt16();
@@ -291,7 +290,7 @@ namespace UpkManager.Domain.Models {
 
       writer.WriteInt32(BuilderSize);
 
-      await Group.WriteBuffer(writer);
+      await Group.WriteBuffer(writer, 0);
 
       writer.WriteUInt32(Flags);
 
@@ -319,8 +318,6 @@ namespace UpkManager.Domain.Models {
 
       writer.WriteInt32(CompressedChunks.Count);
 
-      await writeCompressedChunks();
-
       writer.WriteUInt32(Unknown1);
       writer.WriteUInt32(Unknown2);
     }
@@ -341,7 +338,7 @@ namespace UpkManager.Domain.Models {
 
     private async Task writeGenerationTable() {
       foreach(DomainGenerationTableEntry entry in GenerationTable) {
-        await entry.WriteBuffer(writer);
+        await entry.WriteBuffer(writer, 0);
       }
     }
 
@@ -357,12 +354,6 @@ namespace UpkManager.Domain.Models {
       }
 
       return chunks;
-    }
-
-    private async Task writeCompressedChunks() {
-      foreach(DomainCompressedChunk chunk in CompressedChunks) {
-        await chunk.WriteBuffer(writer);
-      }
     }
 
     private async Task<ByteArrayReader> decompressChunks() {
@@ -415,7 +406,7 @@ namespace UpkManager.Domain.Models {
 
     private async Task writeNameTable() {
       foreach(DomainNameTableEntry entry in NameTable) {
-        await entry.WriteBuffer(writer);
+        await entry.WriteBuffer(writer, 0);
       }
     }
 
@@ -447,7 +438,7 @@ namespace UpkManager.Domain.Models {
 
     private async Task writeImportTable() {
       foreach(DomainImportTableEntry entry in ImportTable) {
-        await entry.WriteBuffer(writer);
+        await entry.WriteBuffer(writer, 0);
       }
     }
 
@@ -479,7 +470,7 @@ namespace UpkManager.Domain.Models {
 
     private async Task writeExportTable() {
       foreach(DomainExportTableEntry entry in ExportTable) {
-        await entry.WriteBuffer(writer);
+        await entry.WriteBuffer(writer, 0);
       }
     }
 

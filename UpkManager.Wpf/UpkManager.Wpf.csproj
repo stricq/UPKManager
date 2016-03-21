@@ -129,6 +129,7 @@
     </Compile>
     <Compile Include="Behaviors\GridViewBehaviors.cs" />
     <Compile Include="Behaviors\HyperlinkBehaviors.cs" />
+    <Compile Include="Constants\DialogNames.cs" />
     <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
     <Compile Include="Controllers\Tables\CompressionTablesController.cs" />

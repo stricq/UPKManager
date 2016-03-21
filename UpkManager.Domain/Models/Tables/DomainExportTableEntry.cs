@@ -149,12 +149,12 @@ namespace UpkManager.Domain.Models.Tables {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteInt32(TypeReference);
       Writer.WriteInt32(ParentReference);
       Writer.WriteInt32(OwnerReference);
 
-      await NameTableIndex.WriteBuffer(Writer);
+      await NameTableIndex.WriteBuffer(Writer, 0);
 
       Writer.WriteInt32(ArchetypeReference);
 
@@ -180,22 +180,22 @@ namespace UpkManager.Domain.Models.Tables {
     #region Private Methods
 
     private DomainObjectBase objectTypeFactory() {
-      ObjectType type;
+      ObjectTypes type;
 
       Enum.TryParse(TypeReferenceNameIndex?.Name, true, out type);
 
-      if (type == ObjectType.Unknown && TypeReferenceNameIndex != null) {
+      if (type == ObjectTypes.Unknown && TypeReferenceNameIndex != null) {
         if (TypeReferenceNameIndex.Name.StartsWith("CustomUIComp", StringComparison.CurrentCultureIgnoreCase) ||
             TypeReferenceNameIndex.Name.StartsWith("Distribution", StringComparison.CurrentCultureIgnoreCase) ||
             TypeReferenceNameIndex.Name.StartsWith("UIComp",       StringComparison.CurrentCultureIgnoreCase) ||
-            TypeReferenceNameIndex.Name.EndsWith("Component",      StringComparison.CurrentCultureIgnoreCase)) type = ObjectType.ArchetypeObjectReference;
+            TypeReferenceNameIndex.Name.EndsWith("Component",      StringComparison.CurrentCultureIgnoreCase)) type = ObjectTypes.ArchetypeObjectReference;
       }
 
       switch(type) {
-        case ObjectType.ArchetypeObjectReference: return new DomainObjectArchetypeBase();
-        case ObjectType.ObjectRedirector:         return new DomainObjectObjectRedirector();
-        case ObjectType.SoundNodeWave:            return new DomainObjectSoundNodeWave();
-        case ObjectType.Texture2D:                return new DomainObjectTexture2D();
+        case ObjectTypes.ArchetypeObjectReference: return new DomainObjectArchetypeBase();
+        case ObjectTypes.ObjectRedirector:         return new DomainObjectObjectRedirector();
+        case ObjectTypes.SoundNodeWave:            return new DomainObjectSoundNodeWave();
+        case ObjectTypes.Texture2D:                return new DomainObjectTexture2D();
 
         default: return new DomainObjectBase();
       }

@@ -36,7 +36,7 @@ namespace UpkManager.Domain.Models.Objects {
 
     public virtual ViewableTypes Viewable => ViewableTypes.Unknown;
 
-    public virtual ObjectType ObjectType => ObjectType.Unknown;
+    public virtual ObjectTypes ObjectType => ObjectTypes.Unknown;
 
     public virtual string FileExtension => String.Empty;
 
@@ -73,8 +73,8 @@ namespace UpkManager.Domain.Models.Objects {
       return BuilderSize;
     }
 
-    public override async Task WriteBuffer(ByteArrayWriter Writer) {
-      await PropertyHeader.WriteBuffer(Writer);
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await PropertyHeader.WriteBuffer(Writer, CurrentOffset);
 
       await Writer.WriteBytes(AdditionalDataReader?.GetBytes());
     }

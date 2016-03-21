@@ -7,7 +7,7 @@ namespace UpkManager.Domain.Models.Properties {
 
     #region Properties
 
-    public override PropertyType PropertyType => PropertyType.ArrayProperty;
+    public override PropertyTypes PropertyType => PropertyTypes.ArrayProperty;
 
     #endregion Properties
 
