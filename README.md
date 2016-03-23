@@ -17,7 +17,7 @@ Name: STR Programming Services
 Source: http://nuget.stricq.com/nuget
 
 # Download
-[UPK Manager v1.1.1](https://bns.stricq.com/Files/UpkManager.Installer.msi)
+[UPK Manager v1.2](https://bns.stricq.com/Files/UpkManager.Installer.msi)
 
 # Instructions for Viewing and Saving Textures
 ### Settings
@@ -48,3 +48,10 @@ To export all objects in a file (to your chosen Export Path) on the File Listing
 To export the objects from your checked files, on the menu choose File -> Export Selected Files.
 
 All the texture objects in all the files that are checked will be saved as individual DDS files to the Export Path you choose in the settings.
+
+# Changes for Release 1.2
+
+* Audio objects (SoundNodeWave) can now be exported (as .ogg) and will play when clicked on in the export object listing.
+* Any fatal exceptions will be stored on the remote database to help improve the program.
+* Background tasks are now handled in a much better manner.
+* New object Viewer: Object Tree.  Export objects show in green and import objects show in blue.  Export objects can be clicked on for viewing as in the Export Table list.
