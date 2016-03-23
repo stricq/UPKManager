@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mapping\AutoMapperConfiguration.cs" />
+    <Compile Include="Services\ExceptionRepository.cs" />
     <Compile Include="Services\SettingsRepository.cs" />
     <Compile Include="Services\UpkFileRemoteRepository.cs" />
     <Compile Include="Services\UpkFileRepository.cs" />

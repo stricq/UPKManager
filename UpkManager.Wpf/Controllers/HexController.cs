@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using STR.Common.Contracts;
 using STR.Common.Extensions;
 using STR.Common.Messages;
 
@@ -34,18 +35,22 @@ namespace UpkManager.Wpf.Controllers {
 
     private readonly IMessenger messenger;
 
+    private readonly IAsyncService asyncService;
+
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public HexController(HexViewModel ViewModel, IMessenger Messenger) {
+    public HexController(HexViewModel ViewModel, IMessenger Messenger, IAsyncService AsyncService) {
       viewModel = ViewModel;
 
       viewModel.Title   = "No Display";
       viewModel.HexData = new ObservableCollection<DomainHexData>();
 
       messenger = Messenger;
+
+      asyncService = AsyncService;
 
       registerMessages();
       registerCommands();
@@ -60,9 +65,9 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Register<FileLoadedMessage>(this, onFileLoaded);
 
-      messenger.RegisterAsync<ExportTableEntrySelectedMessage>(this, onExportTableEntrySelected);
+      messenger.Register<ExportTableEntrySelectedMessage>(this, onExportTableEntrySelected);
 
-      messenger.RegisterAsync<PropertySelectedMessage>(this, onPropertySelected);
+      messenger.Register<PropertySelectedMessage>(this, onPropertySelected);
 
       messenger.Register<ApplicationClosingMessage>(this, onApplicationClosing);
     }
@@ -75,28 +80,28 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Title = "No Display";
     }
 
-    private async void onFileLoaded(FileLoadedMessage message) {
+    private void onFileLoaded(FileLoadedMessage message) {
       viewModel.Title = "Depends Table";
 
       title = viewModel.Title;
 
-      await buildHexDataAsync(message.File.Header.DependsTable, message.File.Header.DependsTableOffset, resetToken());
+      Task.Run(() => buildHexDataAsync(message.File.Header.DependsTable, message.File.Header.DependsTableOffset, resetToken())).FireAndForget();
     }
 
-    private async Task onExportTableEntrySelected(ExportTableEntrySelectedMessage message) {
+    private void onExportTableEntrySelected(ExportTableEntrySelectedMessage message) {
       viewModel.Title = message.ExportTableEntry.NameTableIndex.Name;
 
       title = viewModel.Title;
 
       if (message.ExportTableEntry.DomainObject?.AdditionalDataReader != null) {
-        await buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetBytes(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, resetToken());
+        Task.Run(() => buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetBytes(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, resetToken())).FireAndForget();
       }
       else {
-        await buildHexDataAsync(message.ExportTableEntry.DomainObjectReader.GetBytes(), message.ExportTableEntry.SerialDataOffset, resetToken());
+        Task.Run(() => buildHexDataAsync(message.ExportTableEntry.DomainObjectReader.GetBytes(), message.ExportTableEntry.SerialDataOffset, resetToken())).FireAndForget();
       }
     }
 
-    private async Task onPropertySelected(PropertySelectedMessage message) {
+    private void onPropertySelected(PropertySelectedMessage message) {
       byte[] data = message.Property.Value?.PropertyValue as byte[];
 
       if (data == null) return;
@@ -105,7 +110,7 @@ namespace UpkManager.Wpf.Controllers {
 
       title = viewModel.Title;
 
-      await buildHexDataAsync(data, 0, resetToken());
+      Task.Run(() => buildHexDataAsync(data, 0, resetToken())).FireAndForget();
     }
 
     private void onApplicationClosing(ApplicationClosingMessage message) {
@@ -157,54 +162,62 @@ namespace UpkManager.Wpf.Controllers {
       return tokenSource.Token;
     }
 
-    private async Task buildHexDataAsync(byte[] data, int fileOffset, CancellationToken token) {
-      viewModel.HexData.Clear();
+    private void buildHexDataAsync(byte[] data, int fileOffset, CancellationToken token) {
+      try {
+        asyncService.RunUiContext(token, () => viewModel.HexData.Clear()).Wait(token);
 
-      List<DomainHexData> cache = new List<DomainHexData>();
+        List<DomainHexData> cache = new List<DomainHexData>();
 
-      for(int i = 0; i < data.Length; i += 16) {
-        if (token.IsCancellationRequested) return;
+        for(int i = 0; i < data.Length; i += 16) {
+          if (token.IsCancellationRequested) return;
 
-        StringBuilder hexStr = new StringBuilder();
-        StringBuilder ascStr = new StringBuilder();
+          StringBuilder hexStr = new StringBuilder();
+          StringBuilder ascStr = new StringBuilder();
 
-        int innerI = i;
-
-        await Task.Run(() => {
           for(int j = 0; j < 16; ++j) {
-            if (innerI + j >= data.Length || token.IsCancellationRequested) break;
+            if (i + j >= data.Length || token.IsCancellationRequested) break;
 
-            byte c = data[innerI + j];
+            byte c = data[i + j];
 
             hexStr.AppendFormat("{0:X2} ", c);
             ascStr.Append(isDisplayable(c) ? (char)c : '.');
           }
-        }, token);
 
-        if (token.IsCancellationRequested) return;
+          if (token.IsCancellationRequested) return;
 
-        DomainHexData hexData = new DomainHexData {
-          FileIndex   = fileOffset + i,
-          Index       = i,
-          HexValues   = hexStr.ToString().Trim(),
-          AsciiValues = ascStr.ToString()
-        };
+          DomainHexData hexData = new DomainHexData {
+            FileIndex   = fileOffset + i,
+            Index       = i,
+            HexValues   = hexStr.ToString().Trim(),
+            AsciiValues = ascStr.ToString()
+          };
 
-        cache.Add(hexData);
+          cache.Add(hexData);
 
-        if (cache.Count > 48) {
-          viewModel.HexData.AddRange(cache);
+          if (cache.Count > 512) {
+            int i1 = i;
 
-          viewModel.Title = $"{title} {String.Join("", Enumerable.Repeat(".", DateTime.Now.Second % 4))}";
+            asyncService.RunUiContext(token, () => {
+              viewModel.HexData.AddRange(cache);
 
-          cache.Clear();
+              viewModel.Title = $"{title} {i1 / (double)data.Length:P1}";
+            }).Wait(token);
+
+            cache.Clear();
+          }
+
         }
 
+        asyncService.RunUiContext(token, () => {
+          if (cache.Any()) viewModel.HexData.AddRange(cache);
+
+          viewModel.Title = $"{title} \u2713";
+        }).Wait(token);
       }
-
-      if (cache.Any()) viewModel.HexData.AddRange(cache);
-
-      viewModel.Title = $"{title} \u2713";
+      catch(TaskCanceledException) { }
+      catch(Exception ex) {
+        messenger.SendUi(new ApplicationErrorMessage { HeaderText = "Error Building Hex Display", Exception = ex });
+      }
     }
 
     private static bool isDisplayable(byte c) {

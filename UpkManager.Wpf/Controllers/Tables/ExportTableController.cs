@@ -102,7 +102,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
             if (export.DomainObject == null) await export.ParseDomainObject(header, menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing);
 
-            await messenger.SendAsync(new ExportTableEntrySelectedMessage { ExportTableEntry = export });
+            messenger.Send(new ExportTableEntrySelectedMessage { ExportTableEntry = export });
           }
 
           break;

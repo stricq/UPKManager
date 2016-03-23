@@ -14,7 +14,7 @@
       <HierarchicalDataTemplate DataType="{x:Type ve:ObjectTreeViewEntity}" ItemsSource="{Binding Path=Children}">
         <Grid>
 
-          <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Left" Margin="0" />
+          <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Left" Margin="0" Padding="6,0,0,0" />
 
         </Grid>
       </HierarchicalDataTemplate>

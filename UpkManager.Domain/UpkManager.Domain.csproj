@@ -40,8 +40,8 @@
       <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CSharpImageLibrary, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CSharpImageLibrary.3.1.1.0\lib\net45\CSharpImageLibrary.exe</HintPath>
+    <Reference Include="CSharpImageLibrary, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSharpImageLibrary.3.1.2.0\lib\net45\CSharpImageLibrary.exe</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -68,6 +68,7 @@
     <Compile Include="Constants\PropertyTypes.cs" />
     <Compile Include="Constants\ViewableTypes.cs" />
     <Compile Include="Contracts\IAutoMapperConfiguration.cs" />
+    <Compile Include="Contracts\IExceptionRepository.cs" />
     <Compile Include="Contracts\ISettingsRepository.cs" />
     <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Models\DomainHeader.cs" />
     <Compile Include="Models\DomainSettings.cs" />
     <Compile Include="Models\DomainUpkBuilderBase.cs" />
+    <Compile Include="Models\DomainUpkManagerException.cs" />
     <Compile Include="Models\Objects\DomainObjectArchetypeBase.cs" />
     <Compile Include="Models\Objects\DomainObjectBase.cs" />
     <Compile Include="Models\Objects\DomainObjectCompressionBase.cs" />

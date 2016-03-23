@@ -115,7 +115,7 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Methods
 
-    private async void onPropertyChanged(object sender, PropertyChangedEventArgs args) {
+    private void onPropertyChanged(object sender, PropertyChangedEventArgs args) {
       PropertyViewEntity propertyViewEntity = sender as PropertyViewEntity;
 
       if (propertyViewEntity == null) return;
@@ -128,7 +128,7 @@ namespace UpkManager.Wpf.Controllers {
 
             if (property == null) return;
 
-            await messenger.SendAsync(new PropertySelectedMessage { Property = property });
+            messenger.Send(new PropertySelectedMessage { Property = property });
           }
 
           break;

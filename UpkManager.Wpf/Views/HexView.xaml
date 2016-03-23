@@ -26,7 +26,8 @@
     </Grid>
 
     <HeaderedContentControl Grid.Row="1" Header="{Binding Path=Title}" Margin="0,6,0,0" Style="{StaticResource TallHeaderedContentStyle}">
-      <ListView ItemsSource="{Binding Path=HexData}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}">
+      <ListView ItemsSource="{Binding Path=HexData}" BorderThickness="0" SelectionMode="Single" b:GridViewBehaviors.AutoResizeColumns="True" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}"
+                VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
         <ListView.View>
           <GridView>
             <GridViewColumn Header="File Offset">

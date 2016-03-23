@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 
 using STR.Common.Extensions;
+using STR.Common.Messages;
 
 using STR.MvvmCommon.Contracts;
 
@@ -110,20 +111,25 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       messenger.SendUi(message);
 
-      List<string> packages = imports.Select(import => import.PackageNameIndex.Name).Distinct().ToList();
+      try {
+        List<string> packages = imports.Select(import => import.PackageNameIndex.Name).Distinct().ToList();
 
-      imports.RemoveAll(import => packages.Contains(import.NameTableIndex.Name));
+        imports.RemoveAll(import => packages.Contains(import.NameTableIndex.Name));
 
-      List<ObjectTreeViewEntity> entities = packages.Select(package => new ObjectTreeViewEntity { Name = package, IsExpanded = package.Equals("Core", StringComparison.CurrentCultureIgnoreCase)}).ToList();
+        List<ObjectTreeViewEntity> entities = packages.Select(package => new ObjectTreeViewEntity { Name = package, IsExpanded = package.Equals("Core", StringComparison.CurrentCultureIgnoreCase)}).ToList();
 
-      viewModel.ObjectTree = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.Name));
+        viewModel.ObjectTree = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.Name));
 
-      foreach(ObjectTreeViewEntity childEntity in viewModel.ObjectTree) {
-        if (token.IsCancellationRequested) return;
+        foreach(ObjectTreeViewEntity childEntity in viewModel.ObjectTree) {
+          if (token.IsCancellationRequested) return;
 
-        buildObjectTypes(childEntity, token);
+          buildObjectTypes(childEntity, token);
 
-        if (token.IsCancellationRequested) return;
+          if (token.IsCancellationRequested) return;
+        }
+      }
+      catch(Exception ex) {
+        messenger.SendUi(new ApplicationErrorMessage { HeaderText = "Error Building Object Tree", Exception = ex });
       }
 
       message.IsComplete = true;
@@ -143,21 +149,17 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       parentEntity.Children = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.Name));
 
-      foreach(ObjectTreeViewEntity childEntity in parentEntity.Children) {
+      Parallel.ForEach(parentEntity.Children, childEntity => {
         if (token.IsCancellationRequested) return;
 
         buildObjectChildren(childEntity, token);
-      }
+      });
     }
 
     private void buildObjectChildren(ObjectTreeViewEntity parentEntity, CancellationToken token) {
       List<ObjectTreeViewEntity> entities = new List<ObjectTreeViewEntity>();
 
-      if (token.IsCancellationRequested) return;
-
       List<DomainImportTableEntry> importChildren = imports.Where(import => import.TypeNameIndex.Name.Equals(parentEntity.Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
-
-      if (token.IsCancellationRequested) return;
 
       entities.AddRange(mapper.Map<IEnumerable<ObjectTreeViewEntity>>(importChildren));
 
@@ -165,25 +167,21 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       List<DomainExportTableEntry> exportChildren = exports.Where(export => export.TypeReferenceNameIndex.Name.Equals(parentEntity.Name, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
-      if (token.IsCancellationRequested) return;
-
       entities.AddRange(mapper.Map<IEnumerable<ObjectTreeViewEntity>>(exportChildren));
 
       if (token.IsCancellationRequested) return;
 
       entities.Where(entity => entity.IsExport).ForEach(entity => entity.PropertyChanged += onObjectTreeViewEntityPropertyChanged);
 
-      if (token.IsCancellationRequested) return;
-
       parentEntity.Children = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.IsImport).ThenBy(entity => entity.Name));
 
       if (token.IsCancellationRequested) return;
 
-      foreach(ObjectTreeViewEntity childEntity in parentEntity.Children) {
+      Parallel.ForEach(parentEntity.Children, childEntity => {
         if (token.IsCancellationRequested) return;
 
         buildObjectChildren(childEntity, token);
-      }
+      });
     }
 
     private async void onObjectTreeViewEntityPropertyChanged(object sender, PropertyChangedEventArgs args) {
@@ -198,7 +196,7 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
             if (export.DomainObject == null) await export.ParseDomainObject(header, menuViewModel.IsSkipProperties, menuViewModel.IsSkipParsing);
 
-            await messenger.SendAsync(new ExportTableEntrySelectedMessage { ExportTableEntry = export });
+            messenger.Send(new ExportTableEntrySelectedMessage { ExportTableEntry = export });
           }
 
           break;

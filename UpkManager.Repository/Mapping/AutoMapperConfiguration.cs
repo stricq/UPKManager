@@ -27,6 +27,10 @@ namespace UpkManager.Repository.Mapping {
                                                 .ForMember(dest => dest.LastAccess,           opt => opt.Ignore())
                                                 .ReverseMap();
 
+      config.CreateMap<DomainUpkManagerException, UpkManagerException>().ForMember(dest => dest.Message,    opt => opt.MapFrom(src => src.Exception.Message))
+                                                                        .ForMember(dest => dest.StackTrace, opt => opt.MapFrom(src => src.Exception.StackTrace))
+                                                                        .ForMember(dest => dest.Id,         opt => opt.Ignore());
+
       #endregion DTOs
 
     }

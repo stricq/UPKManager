@@ -41,7 +41,8 @@ namespace UpkManager.Wpf.Controllers {
 
     private readonly IMessenger messenger;
 
-    private readonly ISettingsRepository settingsRepository;
+    private readonly ISettingsRepository  settingsRepository;
+    private readonly IExceptionRepository exceptionRepository;
 
     private readonly IMapper mapper;
 
@@ -50,7 +51,7 @@ namespace UpkManager.Wpf.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public UpkManagerController(UpkManagerViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, ISettingsRepository SettingsRepository, IMapper Mapper) {
+    public UpkManagerController(UpkManagerViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, ISettingsRepository SettingsRepository, IExceptionRepository ExceptionRepository, IMapper Mapper) {
       if (Application.Current != null) Application.Current.DispatcherUnhandledException += onCurrentDispatcherUnhandledException;
 
       AppDomain.CurrentDomain.UnhandledException += onDomainUnhandledException;
@@ -66,7 +67,8 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger = Messenger;
 
-      settingsRepository = SettingsRepository;
+      settingsRepository  = SettingsRepository;
+      exceptionRepository = ExceptionRepository;
 
       mapper = Mapper;
 
@@ -166,12 +168,16 @@ namespace UpkManager.Wpf.Controllers {
       Exception ex = e.ExceptionObject as Exception;
 
       if (ex != null) {
+        storeException(ex);
+
         if (e.IsTerminating) MessageBox.Show(ex.Message, "Fatal Domain Unhandled Exception");
         else messenger.SendUi(new ApplicationErrorMessage { ErrorMessage = "Domain Unhandled Exception", Exception = ex });
       }
     }
 
     private void onCurrentDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
+      storeException(e.Exception);
+
       if (e.Exception != null) {
         if (isStartupComplete) {
           messenger.SendUi(new ApplicationErrorMessage { ErrorMessage = "Dispatcher Unhandled Exception", Exception = e.Exception });
@@ -181,7 +187,7 @@ namespace UpkManager.Wpf.Controllers {
         else {
           e.Handled = true;
 
-          MessageBox.Show(e.Exception.Message, "Fatal Startup Exception");
+          MessageBox.Show(e.Exception.Message, "Fatal Dispatcher Exception");
 
           Application.Current.Shutdown();
         }
@@ -192,11 +198,13 @@ namespace UpkManager.Wpf.Controllers {
       if (e.Exception == null || e.Exception.InnerExceptions.Count == 0) return;
 
       foreach(Exception ex in e.Exception.InnerExceptions) {
+        storeException(ex);
+
         if (isStartupComplete) {
           messenger.SendUi(new ApplicationErrorMessage { ErrorMessage = "Unobserved Task Exception", Exception = ex });
         }
         else {
-          MessageBox.Show(ex.Message, "Fatal Startup Exception");
+          MessageBox.Show(ex.Message, "Fatal Unobserved Task Exception");
         }
       }
 
@@ -208,7 +216,21 @@ namespace UpkManager.Wpf.Controllers {
     private void onThreadException(object sender, ThreadExceptionEventArgs e) {
       if (e.Exception == null) return;
 
+      storeException(e.Exception);
+
       messenger.SendUi(new ApplicationErrorMessage { ErrorMessage = "Thread Exception", Exception = e.Exception });
+    }
+
+    private void storeException(Exception ex) {
+      while(ex.InnerException != null) ex = ex.InnerException;
+
+      DomainUpkManagerException exception = new DomainUpkManagerException {
+        Exception   = ex,
+        MachineName = Environment.MachineName,
+        HappenedAt  = DateTime.Now
+      };
+
+      Task.Run(() => exceptionRepository.SaveExceptionAsync(exception)).Wait();
     }
 
     #endregion Private Methods

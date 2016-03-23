@@ -16,6 +16,7 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Models.Objects;
+
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewModels;
@@ -118,11 +119,12 @@ namespace UpkManager.Wpf.Controllers {
             while(waveOut.PlaybackState == PlaybackState.Playing) {
               if (token.IsCancellationRequested) break;
 
-              Task.Delay(250, token);
+              Task.Delay(100, token);
             }
           }
         }
       }
+      catch(TaskCanceledException) { }
       catch(Exception ex) {
         messenger.SendUi(new ApplicationErrorMessage { Exception = ex, HeaderText = "Error Playing Audio" });
       }
