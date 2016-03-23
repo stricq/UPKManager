@@ -210,7 +210,20 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      int version = await repository.GetGameVersion(settings.PathToGame);
+      int version;
+
+      try {
+        version = await repository.GetGameVersion(settings.PathToGame);
+      }
+      catch(FileNotFoundException) {
+        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The VersionInfo_BnS.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
+
+        progress.IsComplete = true;
+
+        messenger.Send(progress);
+
+        return;
+      }
 
       List<DomainUpkFile> localFiles = await loadGameFiles(version);
 

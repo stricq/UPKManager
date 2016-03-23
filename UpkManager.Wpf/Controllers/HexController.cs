@@ -215,6 +215,7 @@ namespace UpkManager.Wpf.Controllers {
         }).Wait(token);
       }
       catch(TaskCanceledException) { }
+      catch(OperationCanceledException) { }
       catch(Exception ex) {
         messenger.SendUi(new ApplicationErrorMessage { HeaderText = "Error Building Hex Display", Exception = ex });
       }

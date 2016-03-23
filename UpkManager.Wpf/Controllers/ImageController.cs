@@ -125,6 +125,7 @@ namespace UpkManager.Wpf.Controllers {
         }
       }
       catch(TaskCanceledException) { }
+      catch(OperationCanceledException) { }
       catch(Exception ex) {
         messenger.SendUi(new ApplicationErrorMessage { Exception = ex, HeaderText = "Error Playing Audio" });
       }
