@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using UpkManager.Domain.Contracts;
@@ -41,7 +42,13 @@ namespace UpkManager.Repository.Services {
     }
 
     public async Task<int> GetGameVersion(string GamePath) {
-      StreamReader stream = new StreamReader(File.OpenRead(Path.Combine(GamePath, @"..\VersionInfo_BnS.ini")));
+      DirectoryInfo dirInfo = new DirectoryInfo(Path.Combine(GamePath, @"..\"));
+
+      FileInfo[] files = dirInfo.GetFiles("VersionInfo_BNS*.ini");
+
+      if (files.Length == 0) throw new FileNotFoundException("Could not find a matching VersionInfo_BNS*.ini file.");
+
+      StreamReader stream = new StreamReader(File.OpenRead(files.First().FullName));
 
       int version = 0;
 
