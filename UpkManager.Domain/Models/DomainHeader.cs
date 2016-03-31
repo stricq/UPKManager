@@ -204,11 +204,7 @@ namespace UpkManager.Domain.Models {
 
       BuilderSize += DependsTable.Length;
 
-      ExportTable.ForEach(export => {
-        Task.Run(() => export.ParseDomainObject(this, false, false)).Wait();
-
-        export.DomainObject?.GetBuilderSize();
-      });
+      ExportTable.Aggregate(BuilderSize, (current, export) => current + export.GetObjectSize(current));
 
       return BuilderSize;
     }

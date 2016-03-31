@@ -59,9 +59,9 @@ namespace UpkManager.Domain.Models.Objects {
 
       CompressedChunks.Add(compressedChunk);
 
-      await compressedChunk.WriteUncompressedChunk(reader, compressionFlags);
+      int builderSize = await compressedChunk.BuildCompressedChunk(reader, compressionFlags);
 
-      return compressedChunk.CompressedSize;
+      return builderSize;
     }
 
     #endregion Domain Methods
@@ -71,6 +71,12 @@ namespace UpkManager.Domain.Models.Objects {
     public override int GetBuilderSize() {
       return sizeof(uint) * 3
            + sizeof(int);
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await Writer.WriteBytes(Unknown1);
+
+      Writer.WriteInt32(CurrentOffset + Writer.Index + sizeof(int));
     }
 
     #endregion DomainUpkBuilderBase Implementation

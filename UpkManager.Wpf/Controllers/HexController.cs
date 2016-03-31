@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Ookii.Dialogs.Wpf;
 
 using STR.Common.Contracts;
 using STR.Common.Extensions;
@@ -27,11 +30,14 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
+    private bool isBuilding;
+
     private string title;
 
     private CancellationTokenSource tokenSource;
 
-    private readonly HexViewModel viewModel;
+    private readonly HexViewModel          viewModel;
+    private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
 
@@ -42,8 +48,9 @@ namespace UpkManager.Wpf.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public HexController(HexViewModel ViewModel, IMessenger Messenger, IAsyncService AsyncService) {
-      viewModel = ViewModel;
+    public HexController(HexViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IAsyncService AsyncService) {
+          viewModel =     ViewModel;
+      menuViewModel = MenuViewModel;
 
       viewModel.Title   = "No Display";
       viewModel.HexData = new ObservableCollection<DomainHexData>();
@@ -93,7 +100,7 @@ namespace UpkManager.Wpf.Controllers {
 
       title = viewModel.Title;
 
-      if (message.ExportTableEntry.DomainObject?.AdditionalDataReader != null) {
+      if (!menuViewModel.IsHexViewObject && message.ExportTableEntry.DomainObject?.AdditionalDataReader != null) {
         Task.Run(() => buildHexDataAsync(message.ExportTableEntry.DomainObject.AdditionalDataReader.GetBytes(), message.ExportTableEntry.DomainObject.AdditionalDataOffset, resetToken())).FireAndForget();
       }
       else {
@@ -124,6 +131,8 @@ namespace UpkManager.Wpf.Controllers {
     private void registerCommands() {
       viewModel.SearchBackward = new RelayCommand(onSearchBackwardExecute, canSearchBackwardExecute);
       viewModel.SearchForward  = new RelayCommand(onSearchForwardExecute, canSearchForwardExecute);
+
+      menuViewModel.ExportHexView = new RelayCommandAsync(onExportHexViewExecute, canExportHexView);
     }
 
     #region SearchBackward Command
@@ -150,6 +159,39 @@ namespace UpkManager.Wpf.Controllers {
 
     #endregion SearchForward Command
 
+    #region ExportHexView Command
+
+    private bool canExportHexView() {
+      return !isBuilding && viewModel.HexData.Any();
+    }
+
+    private async Task onExportHexViewExecute() {
+      VistaSaveFileDialog sfd = new VistaSaveFileDialog {
+        FileName   = title,
+        DefaultExt = ".txt",
+        Filter     = "Text Files|*.txt",
+        Title      = "Save Hex View As..."
+      };
+
+      bool? result = sfd.ShowDialog();
+
+      if (!result.HasValue || !result.Value) return;
+
+      StreamWriter stream = new StreamWriter(File.OpenWrite(sfd.FileName));
+
+      foreach(DomainHexData hexData in viewModel.HexData) {
+        string line = $"0x{hexData.Index:X8} 0x{hexData.FileIndex:X8} {hexData.HexValues} {hexData.AsciiValues}";
+
+        await stream.WriteLineAsync(line);
+      }
+
+      await stream.FlushAsync();
+
+      stream.Close();
+    }
+
+    #endregion ExportHexView Command
+
     #endregion Commands
 
     #region Private Methods
@@ -163,6 +205,8 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void buildHexDataAsync(byte[] data, int fileOffset, CancellationToken token) {
+      isBuilding = true;
+
       try {
         asyncService.RunUiContext(token, () => viewModel.HexData.Clear()).Wait(token);
 
@@ -219,6 +263,8 @@ namespace UpkManager.Wpf.Controllers {
       catch(Exception ex) {
         messenger.SendUi(new ApplicationErrorMessage { HeaderText = "Error Building Hex Display", Exception = ex });
       }
+
+      isBuilding = false;
     }
 
     private static bool isDisplayable(byte c) {

@@ -98,6 +98,14 @@ namespace UpkManager.Domain.Helpers {
       await Task.Run(() => { for(int i = 0; i < data.Length; ++i) data[i] ^= key[i % 32]; });
     }
 
+    public async Task<byte[]> Compress() {
+      byte[] compressed = null;
+
+      await Task.Run(() => MiniLZO.Compress(data, out compressed));
+
+      return compressed;
+    }
+
     public async Task<byte[]> Decompress(int UncompressedSize) {
       byte[] decompressed = new byte[UncompressedSize];
 

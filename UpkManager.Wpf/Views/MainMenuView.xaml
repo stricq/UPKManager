@@ -34,6 +34,14 @@
         <MenuItem Header="_Scan UPK Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ScanUpkFiles}" />
       </MenuItem>
 
+      <MenuItem Header="He_x View" Foreground="{StaticResource BackgroundColor}">
+        <MenuItem Header="View Whole Object" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsHexViewObject}" />
+
+        <Separator />
+
+        <MenuItem Header="Export as Text..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ExportHexView}" />
+      </MenuItem>
+
       <Separator />
 
       <MenuItem Header="S_ettings..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=Settings}" />

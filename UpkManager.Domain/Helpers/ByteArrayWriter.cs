@@ -20,6 +20,8 @@ namespace UpkManager.Domain.Helpers {
       return data;
     }
 
+    public int Index => index;
+
     public static ByteArrayWriter CreateNew(int Length) {
       ByteArrayWriter writer = new ByteArrayWriter();
 

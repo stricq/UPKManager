@@ -10,6 +10,14 @@ namespace UpkManager.Domain.Models.Compression {
 
   public class DomainCompressedChunkHeader {
 
+    #region Constructor
+
+    public DomainCompressedChunkHeader() {
+      Blocks = new List<DomainCompressedChunkBlock>();
+    }
+
+    #endregion Constructor
+
     #region Properties
 
     public uint Signature { get; set; }
@@ -37,7 +45,7 @@ namespace UpkManager.Domain.Models.Compression {
         CompressedSize   = reader.ReadInt32();
         UncompressedSize = reader.ReadInt32();
 
-        Blocks = new List<DomainCompressedChunkBlock>();
+        Blocks.Clear();
 
         int blockCount = (UncompressedSize + BlockSize - 1) / BlockSize;
 
@@ -59,6 +67,50 @@ namespace UpkManager.Domain.Models.Compression {
       }
 
       foreach(DomainCompressedChunkBlock block in Blocks) await block.ReadCompressedChunkBlockData(reader);
+    }
+
+    public async Task<int> BuildCompressedChunkHeader(ByteArrayReader reader, uint flags) {
+      Signature = Signatures.Signature;
+      BlockSize = 0x00020000;
+
+      CompressedSize   = 0;
+      UncompressedSize = reader.Remaining;
+
+      int blockCount = (reader.Remaining + BlockSize - 1) / BlockSize;
+
+      int builderSize = 0;
+
+      Blocks.Clear();
+
+      for(int i = 0; i < blockCount; ++i) {
+        DomainCompressedChunkBlock block = new DomainCompressedChunkBlock();
+
+        ByteArrayReader uncompressed = await reader.ReadByteArray(Math.Min(BlockSize, reader.Remaining));
+
+        builderSize += await block.BuildCompressedChunkBlockData(uncompressed);
+
+        CompressedSize += block.CompressedSize;
+
+        Blocks.Add(block);
+      }
+
+      builderSize += sizeof(uint)
+                  +  sizeof(int) * 3;
+
+      return builderSize;
+    }
+
+    public async Task WriteCompressedChunkHeader(ByteArrayWriter Writer, int CurrentOffset) {
+      Writer.WriteUInt32(Signature);
+
+      Writer.WriteInt32(BlockSize);
+
+      Writer.WriteInt32(CompressedSize);
+      Writer.WriteInt32(UncompressedSize);
+
+      foreach(DomainCompressedChunkBlock block in Blocks) await block.WriteCompressedChunkBlock(Writer);
+
+      foreach(DomainCompressedChunkBlock block in Blocks) await block.WriteCompressedChunkBlockData(Writer);
     }
 
     #endregion Domain Methods

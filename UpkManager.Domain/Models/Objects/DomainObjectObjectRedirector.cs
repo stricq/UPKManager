@@ -40,14 +40,14 @@ namespace UpkManager.Domain.Models.Objects {
     #region DomainUpkBuilderBase Implementation
 
     public override int GetBuilderSize() {
-      BuilderSize = base.GetBuilderSize()
+      BuilderSize = PropertyHeader.GetBuilderSize()
                   + sizeof(int);
 
       return BuilderSize;
     }
 
     public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
-      await base.WriteBuffer(Writer, CurrentOffset);
+      await PropertyHeader.WriteBuffer(Writer, CurrentOffset);
 
       Writer.WriteInt32(ObjectTableReference);
     }

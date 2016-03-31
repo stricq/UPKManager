@@ -35,16 +35,6 @@ namespace UpkManager.Domain.Models.Compression {
       await Header.ReadCompressedChunkHeader(reader, BulkDataFlags, UncompressedSize, CompressedSize);
     }
 
-    public async Task WriteUncompressedChunk(ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
-      BulkDataFlags = (uint)compressionFlags;
-
-      reader.Seek(0);
-
-      UncompressedSize = reader.Remaining;
-
-      await CompressChunk(reader, BulkDataFlags);
-    }
-
     public async Task<ByteArrayReader> DecompressChunk(uint flags) {
       const BulkDataCompressionTypes nothingTodo = BulkDataCompressionTypes.Unused | BulkDataCompressionTypes.StoreInSeparatefile;
 
@@ -77,8 +67,38 @@ namespace UpkManager.Domain.Models.Compression {
       return ByteArrayReader.CreateNew(chunkData, 0);
     }
 
-    public async Task<ByteArrayReader> CompressChunk(ByteArrayReader reader, uint flags) {
-      return await Task.FromResult(ByteArrayReader.CreateNew(null, 0));
+    public async Task<int> BuildCompressedChunk(ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
+      BulkDataFlags = (uint)compressionFlags;
+
+      reader.Seek(0);
+
+      UncompressedSize = reader.Remaining;
+
+      Header = new DomainCompressedChunkHeader();
+
+      int builderSize = await Header.BuildCompressedChunkHeader(reader, BulkDataFlags);
+
+      CompressedSize = builderSize;
+
+      builderSize += sizeof(uint)
+                  +  sizeof(int) * 3;
+
+      return builderSize;
+    }
+
+    public async Task WriteCompressedChunk(ByteArrayWriter Writer, int CurrentOffset) {
+      Writer.WriteUInt32(BulkDataFlags);
+
+      Writer.WriteInt32(UncompressedSize);
+      Writer.WriteInt32(CompressedSize);
+
+      Writer.WriteInt32(CurrentOffset + Writer.Index + sizeof(int));
+
+      if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.Unused) > 0) return;
+
+      if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.StoreInSeparatefile) > 0) return;
+
+      await Header.WriteCompressedChunkHeader(Writer, CurrentOffset);
     }
 
     #endregion Domain Methods

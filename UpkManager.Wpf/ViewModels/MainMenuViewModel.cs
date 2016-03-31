@@ -15,7 +15,11 @@ namespace UpkManager.Wpf.ViewModels {
     private bool isSkipProperties;
     private bool isSkipParsing;
 
+    private bool isHexViewObject;
+
     private RelayCommand scanUpkFiles;
+
+    private RelayCommandAsync exportHexView;
 
     private RelayCommandAsync exportFiles;
     private RelayCommandAsync saveObjectAs;
@@ -47,9 +51,19 @@ namespace UpkManager.Wpf.ViewModels {
       set { SetField(ref isSkipParsing, value, () => IsSkipParsing); }
     }
 
+    public bool IsHexViewObject {
+      get { return isHexViewObject; }
+      set { SetField(ref isHexViewObject, value, () => IsHexViewObject); }
+    }
+
     public RelayCommand ScanUpkFiles {
       get { return scanUpkFiles; }
       set { SetField(ref scanUpkFiles, value, () => ScanUpkFiles); }
+    }
+
+    public RelayCommandAsync ExportHexView {
+      get { return exportHexView; }
+      set { SetField(ref exportHexView, value, () => ExportHexView); }
     }
 
     public RelayCommandAsync ExportFiles {

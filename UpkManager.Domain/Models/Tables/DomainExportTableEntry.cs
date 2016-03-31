@@ -149,6 +149,16 @@ namespace UpkManager.Domain.Models.Tables {
       return BuilderSize;
     }
 
+    public override int GetObjectSize(int CurrentOffset) {
+      if (DomainObject == null) throw new Exception("All objects in file must be fully parsed before writing back to disk.");
+
+      SerialDataOffset = BuilderSerialDataOffset = CurrentOffset;
+
+      SerialDataSize = BuilderSerialDataSize = DomainObject.GetBuilderSize();
+
+      return BuilderSerialDataSize;
+    }
+
     public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteInt32(TypeReference);
       Writer.WriteInt32(ParentReference);
@@ -173,6 +183,14 @@ namespace UpkManager.Domain.Models.Tables {
       Writer.WriteUInt32(Unknown1);
 
       await Writer.WriteBytes(Unknown2);
+    }
+
+    public override async Task<ByteArrayWriter> WriteObjectBuffer() {
+      ByteArrayWriter writer = ByteArrayWriter.CreateNew(SerialDataSize);
+
+      await DomainObject.WriteBuffer(writer, SerialDataOffset);
+
+      return writer;
     }
 
     #endregion DomainUpkBuilderBase Implementation

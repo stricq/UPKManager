@@ -30,18 +30,18 @@
                 VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
         <ListView.View>
           <GridView>
-            <GridViewColumn Header="File Offset">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBlock Text="{Binding Path=FileIndex, StringFormat=0x{0:X8}}" TextAlignment="Right" FontFamily="Consolas" />
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-
             <GridViewColumn Header="Offset">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
                   <TextBlock Text="{Binding Path=Index, StringFormat=0x{0:X8}}" TextAlignment="Right" FontFamily="Consolas" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <GridViewColumn Header="File Offset">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=FileIndex, StringFormat=0x{0:X8}}" TextAlignment="Right" FontFamily="Consolas" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>

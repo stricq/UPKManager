@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models;
+using UpkManager.Domain.Models.Tables;
 
 
 namespace UpkManager.Repository.Services {
@@ -32,13 +33,29 @@ namespace UpkManager.Repository.Services {
     public async Task SaveUpkFile(DomainHeader Header, string Filename) {
       if (Header == null) return;
 
+      FileStream stream = new FileStream(Filename, FileMode.Create);
+
+      foreach(DomainExportTableEntry export in Header.ExportTable.Where(export => export.DomainObject == null)) await export.ParseDomainObject(Header, false, false);
+
       int headerSize = Header.GetBuilderSize();
 
       ByteArrayWriter writer = ByteArrayWriter.CreateNew(headerSize);
 
       await Header.WriteBuffer(writer, 0);
 
-      await Task.Run(() => File.WriteAllBytes(Filename, writer.GetBytes()));
+      await stream.WriteAsync(writer.GetBytes(), 0, headerSize);
+
+      foreach(DomainExportTableEntry export in Header.ExportTable) {
+        if (export.DomainObject == null) await export.ParseDomainObject(Header, false, false);
+
+        ByteArrayWriter objectWriter = await export.WriteObjectBuffer();
+
+        await stream.WriteAsync(objectWriter.GetBytes(), 0, objectWriter.Index);
+      }
+
+      await stream.FlushAsync();
+
+      stream.Close();
     }
 
     public async Task<int> GetGameVersion(string GamePath) {

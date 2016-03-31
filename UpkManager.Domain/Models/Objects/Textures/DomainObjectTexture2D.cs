@@ -106,15 +106,36 @@ namespace UpkManager.Domain.Models.Objects.Textures {
 
     public override int GetBuilderSize() {
       BuilderSize = PropertyHeader.GetBuilderSize()
-                  + base.GetBuilderSize();
+                  + base.GetBuilderSize()
+                  + sizeof(int);
 
       foreach(DomainMipMap mipMap in MipMaps) {
         BulkDataCompressionTypes flags = mipMap.ImageData == null || mipMap.ImageData.Length == 0 ? BulkDataCompressionTypes.Unused : BulkDataCompressionTypes.LZO_ENC;
 
-        BuilderSize += Task.Run(() => ProcessUncompressedBulkData(ByteArrayReader.CreateNew(mipMap.ImageData, 0), flags)).Result;
+        BuilderSize += Task.Run(() => ProcessUncompressedBulkData(ByteArrayReader.CreateNew(mipMap.ImageData, 0), flags)).Result
+                    +  sizeof(int) * 2;
       }
 
+      BuilderSize += Guid.Length;
+
       return BuilderSize;
+    }
+
+    public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
+      await PropertyHeader.WriteBuffer(Writer, CurrentOffset);
+
+      await base.WriteBuffer(Writer, CurrentOffset);
+
+      Writer.WriteInt32(MipMaps.Count);
+
+      for(int i = 0; i < MipMaps.Count; ++i) {
+        await CompressedChunks[i].WriteCompressedChunk(Writer, CurrentOffset);
+
+        Writer.WriteInt32(MipMaps[i].Width);
+        Writer.WriteInt32(MipMaps[i].Height);
+      }
+
+      await Writer.WriteBytes(Guid);
     }
 
     #endregion DomainUpkBuilderBase Implementation
