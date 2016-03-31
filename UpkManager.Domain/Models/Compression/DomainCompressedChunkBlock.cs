@@ -35,7 +35,7 @@ namespace UpkManager.Domain.Models.Compression {
 
       CompressedData = ByteArrayReader.CreateNew(compressed, 0);
 
-      await CompressedData.Decrypt();
+      await CompressedData.Encrypt(); // TODO: Fix this to use the flag
 
       CompressedSize = CompressedData.Remaining;
 

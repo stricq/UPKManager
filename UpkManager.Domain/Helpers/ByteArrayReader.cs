@@ -88,6 +88,10 @@ namespace UpkManager.Domain.Helpers {
       return reader;
     }
 
+    public async Task Encrypt() {
+      await Decrypt();
+    }
+
     public async Task Decrypt() {
       if (data.Length < 32) return;
 
