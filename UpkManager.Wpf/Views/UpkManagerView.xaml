@@ -44,6 +44,14 @@
             <v:FileListingView />
           </TabItem>
 
+          <TabItem Header="Rebuild">
+            <v:RebuildView />
+          </TabItem>
+
+          <TabItem Header="Mods">
+            <v:ModsView />
+          </TabItem>
+
           <TabItem Header="File Tables">
             <v:HeaderTablesView />
           </TabItem>

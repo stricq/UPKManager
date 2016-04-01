@@ -75,6 +75,7 @@
     <Compile Include="Helpers\ByteArrayWriter.cs" />
     <Compile Include="Helpers\MiniLZO.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunkBulkData.cs" />
+    <Compile Include="Models\DomainExportedObject.cs" />
     <Compile Include="Models\DomainHeaderBuilderBase.cs" />
     <Compile Include="Models\DomainLoadProgress.cs" />
     <Compile Include="Models\Compression\DomainCompressedChunk.cs" />

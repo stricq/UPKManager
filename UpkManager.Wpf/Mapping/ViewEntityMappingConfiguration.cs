@@ -114,6 +114,9 @@ namespace UpkManager.Wpf.Mapping {
                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
                                                        .ForMember(dest => dest.IsErrored,  opt => opt.Ignore());
 
+      config.CreateMap<DomainExportedObject, ExportedObjectViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
+                                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
+
       #endregion DTOs
 
     }

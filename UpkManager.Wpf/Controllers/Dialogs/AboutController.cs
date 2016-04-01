@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Windows.Navigation;
 
@@ -6,8 +7,6 @@ using STR.DialogView.Domain.Messages;
 
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
-
-using UpkManager.Domain.Constants;
 
 using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.ViewModels.Dialogs;
@@ -63,7 +62,12 @@ namespace UpkManager.Wpf.Controllers.Dialogs {
     }
 
     private static void onNavigateExecute(RequestNavigateEventArgs args) {
-      Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri));
+      try {
+        Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri));
+      }
+      catch(Exception) {
+        // ignored
+      }
     }
 
     private void onOkExecute() {

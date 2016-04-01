@@ -132,6 +132,7 @@
     <Compile Include="Constants\DialogNames.cs" />
     <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
+    <Compile Include="Controllers\RebuildController.cs" />
     <Compile Include="Controllers\Tables\CompressionTablesController.cs" />
     <Compile Include="Controllers\Tables\ExportTableController.cs" />
     <Compile Include="Controllers\HeaderController.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Messages\Application\AboutMessage.cs" />
     <Compile Include="Messages\Application\AppLoadedMessage.cs" />
     <Compile Include="Messages\FileListing\FileLoadingMessage.cs" />
+    <Compile Include="Messages\Rebuild\ExportedObjectSelectedMessage.cs" />
     <Compile Include="Messages\Settings\SettingsChangedMessage.cs" />
     <Compile Include="Messages\Settings\SettingsEditMessage.cs" />
     <Compile Include="Messages\FileListing\FileLoadedMessage.cs" />
@@ -157,6 +159,7 @@
     <Compile Include="Messages\Status\StatusTickMessage.cs" />
     <Compile Include="Messages\Tables\ExportTableEntrySelectedMessage.cs" />
     <Compile Include="Messages\Tables\PropertySelectedMessage.cs" />
+    <Compile Include="ViewEntities\ExportedObjectViewEntity.cs" />
     <Compile Include="ViewEntities\FileViewEntity.cs" />
     <Compile Include="ViewEntities\PropertyViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\CompressionBlockViewEntity.cs" />
@@ -171,6 +174,7 @@
     <Compile Include="ViewEntities\Tables\ObjectTreeViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
+    <Compile Include="ViewModels\RebuildViewModel.cs" />
     <Compile Include="ViewModels\Tables\CompressionTablesViewModel.cs" />
     <Compile Include="ViewModels\Tables\ExportTableViewModel.cs" />
     <Compile Include="ViewModels\HeaderViewModel.cs" />
@@ -192,6 +196,12 @@
     </Compile>
     <Compile Include="Views\Dialogs\SettingsDialogView.xaml.cs">
       <DependentUpon>SettingsDialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModsView.xaml.cs">
+      <DependentUpon>ModsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RebuildView.xaml.cs">
+      <DependentUpon>RebuildView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tables\CompressionTablesView.xaml.cs">
       <DependentUpon>CompressionTablesView.xaml</DependentUpon>
@@ -310,6 +320,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\SettingsDialogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ModsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RebuildView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

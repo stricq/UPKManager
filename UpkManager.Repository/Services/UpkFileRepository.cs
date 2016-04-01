@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,51 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRepository Implementation
 
+    public async Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFiles, int Version, string ParentPath, string Path, string Filter) {
+      DirectoryInfo   dirInfo  = new DirectoryInfo(Path);
+      DirectoryInfo[] dirInfos = await Task.Run(() => dirInfo.GetDirectories());
+
+      if (dirInfos.Length > 0) {
+        List<DomainUpkFile> dirs = dirInfos.Select(dir => new DomainUpkFile { GameFilename = dir.FullName.Replace(ParentPath, null) }).ToList();
+
+        foreach(DomainUpkFile upkFile in dirs.ToList()) {
+          List<DomainUpkFile> children = new List<DomainUpkFile>();
+
+          await LoadDirectoryRecursiveFlat(children, Version, ParentPath, System.IO.Path.Combine(ParentPath, upkFile.GameFilename), Filter);
+
+          if (children.Count == 0) dirs.Remove(upkFile);
+          else ParentFiles.AddRange(children);
+        }
+      }
+
+      FileInfo[] files = await Task.Run(() => dirInfo.GetFiles(Filter));
+
+      if (files.Length > 0) {
+        List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(ParentPath, null), FileSize = f.Length, GameVersion = Version }).ToList();
+
+        ParentFiles.AddRange(upkFiles);
+      }
+    }
+
+    public async Task LoadDirectoryRecursive(DomainExportedObject Parent, string Path) {
+      DirectoryInfo   dirInfo  = new DirectoryInfo(Path);
+      DirectoryInfo[] dirInfos = await Task.Run(() => dirInfo.GetDirectories());
+
+      if (dirInfos.Length > 0) {
+        Parent.Children = dirInfos.Select(dir => new DomainExportedObject { Filename = dir.FullName, Parent = Parent, Children = new List<DomainExportedObject>() }).ToList();
+
+        foreach(DomainExportedObject exportedDir in Parent.Children) {
+          await LoadDirectoryRecursive(exportedDir, exportedDir.Filename);
+        }
+      }
+
+      FileInfo[] files = await Task.Run(() => dirInfo.GetFiles());
+
+      if (files.Length > 0) {
+        Parent.Children.AddRange(files.Select(f => new DomainExportedObject { Filename = f.FullName, Parent = Parent }).ToList());
+      }
+    }
+
     public async Task<DomainHeader> LoadUpkFile(string Filename) {
       byte[] data = await Task.Run(() => File.ReadAllBytes(Filename));
 
@@ -34,8 +80,6 @@ namespace UpkManager.Repository.Services {
       if (Header == null) return;
 
       FileStream stream = new FileStream(Filename, FileMode.Create);
-
-      foreach(DomainExportTableEntry export in Header.ExportTable.Where(export => export.DomainObject == null)) await export.ParseDomainObject(Header, false, false);
 
       int headerSize = Header.GetBuilderSize();
 

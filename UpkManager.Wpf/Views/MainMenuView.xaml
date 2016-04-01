@@ -23,6 +23,10 @@
       <MenuItem Header="_Deselect All Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=DeselectAllFiles}" />
     </MenuItem>
 
+    <MenuItem Header="_Rebuild" Foreground="White">
+      <MenuItem Header="Re_build Selected Exports" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=RebuildExported}" />
+    </MenuItem>
+
     <MenuItem Header="_Settings" Foreground="White">
       <MenuItem Header="_Debug" Foreground="{StaticResource BackgroundColor}">
         <MenuItem Header="Skip _Properties"            Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsSkipProperties}" />

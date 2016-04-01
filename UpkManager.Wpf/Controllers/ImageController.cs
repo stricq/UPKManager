@@ -15,9 +15,9 @@ using STR.Common.Messages;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
-using UpkManager.Domain.Models.Objects;
 
 using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewModels;
 
@@ -55,6 +55,8 @@ namespace UpkManager.Wpf.Controllers {
     private void registerMessages() {
       messenger.Register<ExportTableEntrySelectedMessage>(this, onExportObjectSelected);
 
+      messenger.Register<ExportedObjectSelectedMessage>(this, onExportedObjectSelected);
+
       messenger.Register<FileLoadingMessage>(this, onFileLoading);
     }
 
@@ -63,7 +65,7 @@ namespace UpkManager.Wpf.Controllers {
 
       switch(message.ExportTableEntry.DomainObject.Viewable) {
         case ViewableTypes.Sound: {
-          Task.Run(() => playSound(message.ExportTableEntry.DomainObject, resetToken())).FireAndForget();
+          Task.Run(() => playSound(message.ExportTableEntry.DomainObject.GetObjectStream(), resetToken())).FireAndForget();
 
           break;
         }
@@ -90,6 +92,28 @@ namespace UpkManager.Wpf.Controllers {
       }
     }
 
+    private void onExportedObjectSelected(ExportedObjectSelectedMessage message) {
+      string extension = Path.GetExtension(message.Filename)?.ToLowerInvariant();
+
+      switch(extension) {
+        case ".ogg": {
+          Task.Run(() => playSound(new FileStream(message.Filename, FileMode.Open), resetToken())).FireAndForget();
+
+          break;
+        }
+        case ".dds": {
+          ImageEngineImage image = new ImageEngineImage(message.Filename);
+
+          viewModel.Texture = image.GetWPFBitmap();
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+
     private void onFileLoading(FileLoadingMessage message) {
       viewModel.Texture = null;
     }
@@ -106,13 +130,15 @@ namespace UpkManager.Wpf.Controllers {
       return tokenSource.Token;
     }
 
-    private void playSound(DomainObjectBase soundObject, CancellationToken token) {
+    private void playSound(Stream stream, CancellationToken token) {
       try {
-        Stream stream = soundObject.GetObjectStream();
-
         using(VorbisWaveReader vorbisStream = new VorbisWaveReader(stream)) {
           using(WaveOutEvent waveOut = new WaveOutEvent()) {
             waveOut.Init(vorbisStream);
+
+#pragma warning disable 612
+            waveOut.Volume = 0.7f; // If only there were an example of setting volume the correct way....
+#pragma warning restore 612
 
             waveOut.Play();
 
@@ -128,6 +154,9 @@ namespace UpkManager.Wpf.Controllers {
       catch(OperationCanceledException) { }
       catch(Exception ex) {
         messenger.SendUi(new ApplicationErrorMessage { Exception = ex, HeaderText = "Error Playing Audio" });
+      }
+      finally {
+        stream.Close();
       }
     }
 

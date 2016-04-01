@@ -17,6 +17,8 @@ namespace UpkManager.Wpf.ViewModels {
 
     private bool isHexViewObject;
 
+    private RelayCommandAsync rebuildExported;
+
     private RelayCommand scanUpkFiles;
 
     private RelayCommandAsync exportHexView;
@@ -54,6 +56,11 @@ namespace UpkManager.Wpf.ViewModels {
     public bool IsHexViewObject {
       get { return isHexViewObject; }
       set { SetField(ref isHexViewObject, value, () => IsHexViewObject); }
+    }
+
+    public RelayCommandAsync RebuildExported {
+      get { return rebuildExported; }
+      set { SetField(ref rebuildExported, value, () => RebuildExported); }
     }
 
     public RelayCommand ScanUpkFiles {

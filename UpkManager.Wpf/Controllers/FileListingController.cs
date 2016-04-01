@@ -310,50 +310,14 @@ namespace UpkManager.Wpf.Controllers {
 
       if (String.IsNullOrEmpty(settings.PathToGame)) return files;
 
-      await loadDirectoryAsync(files, version, settings.PathToGame);
+      try {
+        await repository.LoadDirectoryRecursiveFlat(files, version, settings.PathToGame, settings.PathToGame, "*.upk");
+      }
+      catch(Exception ex) {
+        messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
+      }
 
       return files;
-    }
-
-    private async Task loadDirectoryAsync(List<DomainUpkFile> parent, int version, string path) {
-      DirectoryInfo   dirInfo;
-      DirectoryInfo[] dirInfos;
-
-      try {
-        dirInfo  = new DirectoryInfo(path);
-        dirInfos = await Task.Run(() => dirInfo.GetDirectories());
-      }
-      catch(Exception ex) {
-        messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
-
-        return;
-      }
-
-      if (dirInfos.Length > 0) {
-        List<DomainUpkFile> dirs = dirInfos.Select(dir => new DomainUpkFile { GameFilename = dir.FullName.Replace(settings.PathToGame, null) }).ToList();
-
-        foreach(DomainUpkFile upkFile in dirs.ToList()) {
-          List<DomainUpkFile> children = new List<DomainUpkFile>();
-
-          await loadDirectoryAsync(children, version, Path.Combine(settings.PathToGame, upkFile.GameFilename));
-
-          if (children.Count == 0) dirs.Remove(upkFile);
-          else parent.AddRange(children);
-        }
-      }
-
-      try {
-        FileInfo[] files = await Task.Run(() => dirInfo.GetFiles("*.upk"));
-
-        if (files.Length > 0) {
-          List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(settings.PathToGame, null), FileSize = f.Length, GameVersion = version }).ToList();
-
-          parent.AddRange(upkFiles);
-        }
-      }
-      catch(Exception ex) {
-        messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
-      }
     }
 
     private async void onFileEntityViewModelChanged(object sender, PropertyChangedEventArgs e) {
