@@ -7,10 +7,37 @@
              mvvm:ViewModelLocator.ComposedViewModel="ImageViewModel"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
-  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
 
-    <Image Source="{Binding Path=Texture}" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+    <ItemsControl Grid.Row="0" ItemsSource="{Binding Path=MipMaps}" Margin="3" BorderThickness="0" Background="Transparent" Visibility="{Binding Path=IsLineVisible, Converter={StaticResource VisibilityConverter}}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel Orientation="Horizontal" IsItemsHost="True" HorizontalAlignment="Left" MaxWidth="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
 
-  </ScrollViewer>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <ToggleButton Content="{Binding Path=LevelSize}" IsChecked="{Binding Path=IsChecked}" IsEnabled="{Binding Path=IsEnabled}" Width="Auto" Padding="6,0" Margin="3" Style="{StaticResource ToggleButtonStyle}" />
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+
+    </ItemsControl>
+
+    <Border Grid.Row="1" BorderThickness="0,1,0,0" BorderBrush="{StaticResource ContentControlBorderColor}" Visibility="{Binding Path=IsLineVisible, Converter={StaticResource VisibilityConverter}}" />
+
+    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+
+      <Image Source="{Binding Path=Texture}" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+
+    </ScrollViewer>
+
+  </Grid>
 
 </UserControl>

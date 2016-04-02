@@ -1,8 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using AutoMapper;
 
 using CSharpImageLibrary.General;
 
@@ -15,10 +21,12 @@ using STR.Common.Messages;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
+using UpkManager.Domain.Models.Objects.Textures;
 
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Tables;
+using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
 
@@ -29,21 +37,29 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
+    private bool isSelf;
+
     private CancellationTokenSource tokenSource;
+
+    private DomainObjectTexture2D texture;
 
     private readonly ImageViewModel viewModel;
 
     private readonly IMessenger messenger;
+
+    private readonly IMapper mapper;
 
     #endregion Private Fields
 
     #region Constructor
 
     [ImportingConstructor]
-    public ImageController(ImageViewModel ViewModel, IMessenger Messenger) {
+    public ImageController(ImageViewModel ViewModel, IMessenger Messenger, IMapper Mapper) {
       viewModel = ViewModel;
 
-      messenger  = Messenger;
+      messenger = Messenger;
+
+      mapper = Mapper;
 
       registerMessages();
     }
@@ -58,6 +74,8 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Register<ExportedObjectSelectedMessage>(this, onExportedObjectSelected);
 
       messenger.Register<FileLoadingMessage>(this, onFileLoading);
+
+      messenger.Register<ApplicationClosingMessage>(this, onApplicationClosing);
     }
 
     private void onExportObjectSelected(ExportTableEntrySelectedMessage message) {
@@ -71,9 +89,29 @@ namespace UpkManager.Wpf.Controllers {
         }
 
         case ViewableTypes.Image: {
-          Stream stream = message.ExportTableEntry.DomainObject.GetObjectStream();
+          texture = message.ExportTableEntry.DomainObject as DomainObjectTexture2D;
 
-          if (stream != null) {
+          if (texture != null) {
+            clearViewModel();
+
+            viewModel.MipMaps = new ObservableCollection<MipMapViewEntity>(mapper.Map<IEnumerable<MipMapViewEntity>>(texture.MipMaps));
+
+            Stream stream = null;
+
+            for(int i = 0; i < viewModel.MipMaps.Count; ++i) {
+              viewModel.MipMaps[i].Level = i + 1;
+
+              viewModel.MipMaps[i].PropertyChanged += onMipMapViewEntityChanged;
+
+              if (stream == null && texture.MipMaps[i].ImageData != null) {
+                stream = texture.GetObjectStream(i);
+
+                viewModel.MipMaps[i].IsChecked = true;
+              }
+            }
+
+            if (stream == null) return;
+
             ImageEngineImage image = new ImageEngineImage(stream);
 
             viewModel.Texture = image.GetWPFBitmap();
@@ -85,7 +123,7 @@ namespace UpkManager.Wpf.Controllers {
         }
 
         default: {
-          viewModel.Texture = null;
+          clearViewModel();
 
           break;
         }
@@ -104,6 +142,8 @@ namespace UpkManager.Wpf.Controllers {
         case ".dds": {
           ImageEngineImage image = new ImageEngineImage(message.Filename);
 
+          viewModel.MipMaps = null;
+
           viewModel.Texture = image.GetWPFBitmap();
 
           break;
@@ -115,12 +155,65 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void onFileLoading(FileLoadingMessage message) {
-      viewModel.Texture = null;
+      clearViewModel();
+    }
+
+    private void onApplicationClosing(ApplicationClosingMessage message) {
+      tokenSource?.Cancel();
     }
 
     #endregion Messages
 
     #region Private Methods
+
+    private void clearViewModel() {
+      viewModel.MipMaps?.ForEach(mip => mip.PropertyChanged -= onMipMapViewEntityChanged);
+
+      viewModel.MipMaps = null;
+      viewModel.Texture = null;
+    }
+
+    private void onMipMapViewEntityChanged(object sender, PropertyChangedEventArgs args) {
+      if (isSelf) return;
+
+      MipMapViewEntity entity = sender as MipMapViewEntity;
+
+      if (entity == null) return;
+
+      switch(args.PropertyName) {
+        case "IsChecked": {
+          if (entity.IsChecked) {
+            isSelf = true;
+
+            viewModel.MipMaps.Where(mip => mip != entity).ToList().ForEach(mip => mip.IsChecked = false);
+
+            isSelf = false;
+
+            Stream stream = texture.GetObjectStream(entity.Level - 1);
+
+            if (stream != null) {
+              ImageEngineImage image = new ImageEngineImage(stream);
+
+              viewModel.Texture = image.GetWPFBitmap();
+
+              stream.Close();
+            }
+          }
+          else {
+            isSelf = true;
+
+            entity.IsChecked = true;
+
+            isSelf = false;
+          }
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
 
     private CancellationToken resetToken() {
       tokenSource?.Cancel();

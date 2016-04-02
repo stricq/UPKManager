@@ -161,6 +161,7 @@
     <Compile Include="Messages\Tables\PropertySelectedMessage.cs" />
     <Compile Include="ViewEntities\ExportedObjectViewEntity.cs" />
     <Compile Include="ViewEntities\FileViewEntity.cs" />
+    <Compile Include="ViewEntities\MipMapViewEntity.cs" />
     <Compile Include="ViewEntities\PropertyViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\CompressionBlockViewEntity.cs" />
     <Compile Include="ViewEntities\Tables\CompressionTableEntryViewEntity.cs" />
@@ -304,6 +305,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\TabItemStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\ToggleButtonStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Windows.Media.Imaging;
 
 using STR.MvvmCommon;
+
+using UpkManager.Wpf.ViewEntities;
 
 
 namespace UpkManager.Wpf.ViewModels {
@@ -15,6 +18,8 @@ namespace UpkManager.Wpf.ViewModels {
 
     private BitmapSource texture = new BitmapImage(new Uri("pack://application:,,,/UpkManager.Wpf;component/Images/UpkManagerShield.png"));
 
+    private ObservableCollection<MipMapViewEntity> mipMaps;
+
     #endregion Private Fields
 
     #region Properties
@@ -23,6 +28,13 @@ namespace UpkManager.Wpf.ViewModels {
       get { return texture; }
       set { SetField(ref texture, value, () => Texture); }
     }
+
+    public ObservableCollection<MipMapViewEntity> MipMaps {
+      get { return mipMaps; }
+      set { SetField(ref mipMaps, value, () => MipMaps, () => IsLineVisible); }
+    }
+
+    public bool IsLineVisible => MipMaps != null;
 
     #endregion Properties
 

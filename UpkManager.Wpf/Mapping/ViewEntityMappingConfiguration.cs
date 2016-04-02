@@ -8,6 +8,7 @@ using AutoMapper;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.Compression;
+using UpkManager.Domain.Models.Objects.Textures;
 using UpkManager.Domain.Models.Properties;
 using UpkManager.Domain.Models.Tables;
 
@@ -108,14 +109,22 @@ namespace UpkManager.Wpf.Mapping {
 
       #endregion Properties
 
+      #region Objects
+
+      config.CreateMap<DomainMipMap, MipMapViewEntity>().ForMember(dest => dest.IsEnabled, opt => opt.ResolveUsing(src => src.ImageData != null))
+                                                        .ForMember(dest => dest.IsChecked, opt => opt.Ignore())
+                                                        .ForMember(dest => dest.Level,     opt => opt.Ignore());
+
+      config.CreateMap<DomainExportedObject, ExportedObjectViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
+                                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
+
+      #endregion Objects
+
       #region DTOs
 
       config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
                                                        .ForMember(dest => dest.IsErrored,  opt => opt.Ignore());
-
-      config.CreateMap<DomainExportedObject, ExportedObjectViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
-                                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
 
       #endregion DTOs
 

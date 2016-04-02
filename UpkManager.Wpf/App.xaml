@@ -11,6 +11,7 @@
         <ResourceDictionary Source="Resources/TabItemStyle.xaml" />
         <ResourceDictionary Source="Resources/HeaderedContentStyle.xaml" />
         <ResourceDictionary Source="Resources/ListViewStyle.xaml" />
+        <ResourceDictionary Source="Resources/ToggleButtonStyle.xaml" />
         <ResourceDictionary Source="Resources/TreeListViewItemStyle.xaml" />
         <ResourceDictionary Source="Resources/TreeViewItemStyle.xaml" />
       </ResourceDictionary.MergedDictionaries>

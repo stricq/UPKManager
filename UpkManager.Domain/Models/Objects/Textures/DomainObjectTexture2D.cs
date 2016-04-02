@@ -77,7 +77,11 @@ namespace UpkManager.Domain.Models.Objects.Textures {
 
       ImageEngineFormat format;
 
-      MemoryStream memory = buildDdsImage(out format);
+      DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
+
+      if (mipMap == null) return;
+
+      MemoryStream memory = buildDdsImage(MipMaps.IndexOf(mipMap), out format);
 
       if (memory == null) return;
 
@@ -97,7 +101,15 @@ namespace UpkManager.Domain.Models.Objects.Textures {
 
       ImageEngineFormat format;
 
-      return buildDdsImage(out format);
+      DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
+
+      return mipMap == null ? null : buildDdsImage(MipMaps.IndexOf(mipMap), out format);
+    }
+
+    public Stream GetObjectStream(int mipMapIndex) {
+      ImageEngineFormat format;
+
+      return buildDdsImage(mipMapIndex, out format);
     }
 
     #endregion Domain Methods
@@ -142,7 +154,7 @@ namespace UpkManager.Domain.Models.Objects.Textures {
 
     #region Private Methods
 
-    private MemoryStream buildDdsImage(out ImageEngineFormat imageFormat) {
+    private MemoryStream buildDdsImage(int mipMapIndex, out ImageEngineFormat imageFormat) {
       DomainPropertyByteValue formatProp = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
       imageFormat = ImageEngineFormat.Unknown;
@@ -177,9 +189,7 @@ namespace UpkManager.Domain.Models.Objects.Textures {
         }
       }
 
-      DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
-
-      if (mipMap == null) return null;
+      DomainMipMap mipMap = MipMaps[mipMapIndex];
 
       DDSGeneral.DDS_HEADER header = DDSGeneral.Build_DDS_Header(0, mipMap.Height, mipMap.Width, imageFormat);
 
