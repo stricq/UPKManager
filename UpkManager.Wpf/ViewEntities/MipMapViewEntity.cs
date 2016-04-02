@@ -30,7 +30,7 @@ namespace UpkManager.Wpf.ViewEntities {
 
     public int Level {
       get { return level; }
-      set { SetField(ref level, value, () => Level); }
+      set { SetField(ref level, value, () => Level, () => LevelSize); }
     }
 
     public int Width {

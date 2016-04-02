@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models;
-using UpkManager.Domain.Models.Tables;
+using UpkManager.Domain.Models.UpkFile;
+using UpkManager.Domain.Models.UpkFile.Tables;
 
 
 namespace UpkManager.Repository.Services {

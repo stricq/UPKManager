@@ -40,8 +40,8 @@
       <HintPath>..\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CSharpImageLibrary, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CSharpImageLibrary.3.1.2.0\lib\net45\CSharpImageLibrary.exe</HintPath>
+    <Reference Include="CSharpImageLibrary, Version=3.1.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSharpImageLibrary.3.1.4.0\lib\net45\CSharpImageLibrary.exe</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -74,49 +74,49 @@
     <Compile Include="Contracts\IUpkFileRepository.cs" />
     <Compile Include="Helpers\ByteArrayWriter.cs" />
     <Compile Include="Helpers\MiniLZO.cs" />
-    <Compile Include="Models\Compression\DomainCompressedChunkBulkData.cs" />
+    <Compile Include="Models\UpkFile\Compression\DomainCompressedChunkBulkData.cs" />
     <Compile Include="Models\DomainExportedObject.cs" />
-    <Compile Include="Models\DomainHeaderBuilderBase.cs" />
+    <Compile Include="Models\UpkFile\DomainHeaderBuilderBase.cs" />
     <Compile Include="Models\DomainLoadProgress.cs" />
-    <Compile Include="Models\Compression\DomainCompressedChunk.cs" />
-    <Compile Include="Models\Compression\DomainCompressedChunkBlock.cs" />
-    <Compile Include="Models\Compression\DomainCompressedChunkHeader.cs" />
-    <Compile Include="Models\DomainHeader.cs" />
+    <Compile Include="Models\UpkFile\Compression\DomainCompressedChunk.cs" />
+    <Compile Include="Models\UpkFile\Compression\DomainCompressedChunkBlock.cs" />
+    <Compile Include="Models\UpkFile\Compression\DomainCompressedChunkHeader.cs" />
+    <Compile Include="Models\UpkFile\DomainHeader.cs" />
     <Compile Include="Models\DomainSettings.cs" />
-    <Compile Include="Models\DomainUpkBuilderBase.cs" />
+    <Compile Include="Models\UpkFile\DomainUpkBuilderBase.cs" />
     <Compile Include="Models\DomainUpkManagerException.cs" />
-    <Compile Include="Models\Objects\DomainObjectArchetypeBase.cs" />
-    <Compile Include="Models\Objects\DomainObjectBase.cs" />
-    <Compile Include="Models\Objects\DomainObjectCompressionBase.cs" />
-    <Compile Include="Models\Objects\DomainObjectObjectRedirector.cs" />
-    <Compile Include="Models\Objects\Sounds\DomainObjectSoundNodeWave.cs" />
-    <Compile Include="Models\Objects\Textures\DomainObjectTexture2D.cs" />
-    <Compile Include="Models\Objects\Textures\DomainMipMap.cs" />
-    <Compile Include="Models\Objects\Textures\DomainObjectTextureMovie.cs" />
-    <Compile Include="Models\Properties\DomainPropertyArrayValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyClassValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyComponentValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyGuidValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyInterfaceValue.cs" />
-    <Compile Include="Models\Tables\DomainExportTableEntryBuilderBase.cs" />
-    <Compile Include="Models\Tables\DomainGenerationTableEntry.cs" />
-    <Compile Include="Models\DomainString.cs" />
-    <Compile Include="Models\Tables\DomainObjectTableEntryBase.cs" />
-    <Compile Include="Models\Tables\DomainNameTableIndex.cs" />
-    <Compile Include="Models\Tables\DomainExportTableEntry.cs" />
-    <Compile Include="Models\Tables\DomainImportTableEntry.cs" />
-    <Compile Include="Models\Tables\DomainNameTableEntry.cs" />
-    <Compile Include="Models\Properties\DomainProperty.cs" />
-    <Compile Include="Models\Properties\DomainPropertyBoolValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyByteValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyFloatValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyHeader.cs" />
-    <Compile Include="Models\Properties\DomainPropertyIntValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyNameValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyObjectValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyStructValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyStringValue.cs" />
-    <Compile Include="Models\Properties\DomainPropertyValueBase.cs" />
+    <Compile Include="Models\UpkFile\Objects\DomainObjectArchetypeBase.cs" />
+    <Compile Include="Models\UpkFile\Objects\DomainObjectBase.cs" />
+    <Compile Include="Models\UpkFile\Objects\DomainObjectCompressionBase.cs" />
+    <Compile Include="Models\UpkFile\Objects\DomainObjectObjectRedirector.cs" />
+    <Compile Include="Models\UpkFile\Objects\Sounds\DomainObjectSoundNodeWave.cs" />
+    <Compile Include="Models\UpkFile\Objects\Textures\DomainObjectTexture2D.cs" />
+    <Compile Include="Models\UpkFile\Objects\Textures\DomainMipMap.cs" />
+    <Compile Include="Models\UpkFile\Objects\Textures\DomainObjectTextureMovie.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyArrayValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyClassValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyComponentValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyGuidValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyInterfaceValue.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainExportTableEntryBuilderBase.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainGenerationTableEntry.cs" />
+    <Compile Include="Models\UpkFile\DomainString.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainObjectTableEntryBase.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainNameTableIndex.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainExportTableEntry.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainImportTableEntry.cs" />
+    <Compile Include="Models\UpkFile\Tables\DomainNameTableEntry.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainProperty.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyBoolValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyByteValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyFloatValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyHeader.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyIntValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyNameValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyObjectValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyStructValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyStringValue.cs" />
+    <Compile Include="Models\UpkFile\Properties\DomainPropertyValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\DomainUpkFile.cs" />
     <Compile Include="Helpers\ByteArrayReader.cs" />

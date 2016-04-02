@@ -20,7 +20,8 @@ using STR.MvvmCommon.Contracts;
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
-using UpkManager.Domain.Models.Tables;
+using UpkManager.Domain.Models.UpkFile;
+using UpkManager.Domain.Models.UpkFile.Tables;
 
 using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.Messages.FileListing;
@@ -407,9 +408,9 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private async Task loadUpkFile(FileViewEntity file, DomainUpkFile upkFile) {
-      upkFile.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, upkFile.GameFilename));
-
       try {
+        upkFile.Header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, upkFile.GameFilename));
+
         await Task.Run(() => upkFile.Header.ReadHeaderAsync(onLoadProgress));
 
         file.IsErrored = false;
@@ -417,7 +418,7 @@ namespace UpkManager.Wpf.Controllers {
       catch(Exception ex) {
         file.IsErrored = true;
 
-        messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", Exception = ex });
+        messenger.Send(new ApplicationErrorMessage { HeaderText = $"Error Loading UPK File: {upkFile.GameFilename}", Exception = ex });
       }
     }
 
@@ -479,7 +480,7 @@ namespace UpkManager.Wpf.Controllers {
       catch(Exception ex) {
         file.IsErrored = true;
 
-        messenger.Send(new ApplicationErrorMessage { ErrorMessage = "Error Scanning UPK File.", Exception = ex, HeaderText = "Scan Error" });
+        messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Scanning UPK File.", ErrorMessage = $"Scanning {upkFile.GameFilename}", Exception = ex });
       }
     }
 

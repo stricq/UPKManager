@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using UpkManager.Domain.Models.UpkFile;
+
 
 namespace UpkManager.Domain.Models {
 

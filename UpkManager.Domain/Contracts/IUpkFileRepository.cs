@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 
 using UpkManager.Domain.Models;
+using UpkManager.Domain.Models.UpkFile;
 
 
 namespace UpkManager.Domain.Contracts {

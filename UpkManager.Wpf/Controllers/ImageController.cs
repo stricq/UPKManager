@@ -21,8 +21,7 @@ using STR.Common.Messages;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Constants;
-using UpkManager.Domain.Models.Objects.Textures;
-
+using UpkManager.Domain.Models.UpkFile.Objects.Textures;
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Tables;
@@ -228,10 +227,6 @@ namespace UpkManager.Wpf.Controllers {
         using(VorbisWaveReader vorbisStream = new VorbisWaveReader(stream)) {
           using(WaveOutEvent waveOut = new WaveOutEvent()) {
             waveOut.Init(vorbisStream);
-
-#pragma warning disable 612
-            waveOut.Volume = 0.7f; // If only there were an example of setting volume the correct way....
-#pragma warning restore 612
 
             waveOut.Play();
 

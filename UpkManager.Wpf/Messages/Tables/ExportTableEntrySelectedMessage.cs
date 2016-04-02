@@ -1,6 +1,6 @@
 ﻿using STR.Common.Messages;
 
-using UpkManager.Domain.Models.Tables;
+using UpkManager.Domain.Models.UpkFile.Tables;
 
 
 namespace UpkManager.Wpf.Messages.Tables {

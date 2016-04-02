@@ -14,9 +14,8 @@ using STR.Common.Extensions;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Models.Properties;
-using UpkManager.Domain.Models.Tables;
-
+using UpkManager.Domain.Models.UpkFile.Properties;
+using UpkManager.Domain.Models.UpkFile.Tables;
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewEntities;

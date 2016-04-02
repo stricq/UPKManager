@@ -7,11 +7,11 @@ using AutoMapper;
 
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
-using UpkManager.Domain.Models.Compression;
-using UpkManager.Domain.Models.Objects.Textures;
-using UpkManager.Domain.Models.Properties;
-using UpkManager.Domain.Models.Tables;
-
+using UpkManager.Domain.Models.UpkFile;
+using UpkManager.Domain.Models.UpkFile.Compression;
+using UpkManager.Domain.Models.UpkFile.Objects.Textures;
+using UpkManager.Domain.Models.UpkFile.Properties;
+using UpkManager.Domain.Models.UpkFile.Tables;
 using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewEntities.Tables;
