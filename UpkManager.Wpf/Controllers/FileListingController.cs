@@ -293,13 +293,17 @@ namespace UpkManager.Wpf.Controllers {
 
       viewModel.AllTypes = new ObservableCollection<string>(allFiles.SelectMany(f => f.ExportTypes).Distinct().OrderBy(s => s));
 
-      allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename))); });
+      // ReSharper disable once PossibleNullReferenceException
+      allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
+                                                                   && Path.GetDirectoryName(mf.GameFilename).StartsWith(Path.GetDirectoryName(f.GameFilename)))); });
 
       filterFiles();
 
       progress.IsComplete = true;
 
       messenger.Send(progress);
+
+      messenger.Send(new FileListingLoadedMessage { Allfiles = allFiles });
     }
 
     private static int domainUpkfileComparison(DomainUpkFile left, DomainUpkFile right) {
@@ -336,9 +340,12 @@ namespace UpkManager.Wpf.Controllers {
             DomainUpkFile upkFile = allFiles.Single(f => f.Id == file.Id);
 
             if (upkFile.Header == null) {
-              await loadUpkFile(file, upkFile);
-
-//            await repository.SaveUpkFile(upkFile.Header, Path.Combine(@"V:\", Path.GetFileName(upkFile.Filename)));
+              try {
+                await loadUpkFile(file, upkFile);
+              }
+              catch(Exception ex) {
+                messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", ErrorMessage = $"{upkFile.GameFilename}", Exception = ex });
+              }
             }
 
             upkFile.LastAccess = DateTime.Now;

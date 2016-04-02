@@ -132,6 +132,7 @@
     <Compile Include="Constants\DialogNames.cs" />
     <Compile Include="Controllers\Dialogs\AboutController.cs" />
     <Compile Include="Controllers\Dialogs\SettingsDialogController.cs" />
+    <Compile Include="Controllers\ModsController.cs" />
     <Compile Include="Controllers\RebuildController.cs" />
     <Compile Include="Controllers\Tables\CompressionTablesController.cs" />
     <Compile Include="Controllers\Tables\ExportTableController.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Mapping\ViewEntityMappingConfiguration.cs" />
     <Compile Include="Messages\Application\AboutMessage.cs" />
     <Compile Include="Messages\Application\AppLoadedMessage.cs" />
+    <Compile Include="Messages\FileListing\FileListingLoadedMessage.cs" />
     <Compile Include="Messages\FileListing\FileLoadingMessage.cs" />
     <Compile Include="Messages\Rebuild\ExportedObjectSelectedMessage.cs" />
     <Compile Include="Messages\Settings\SettingsChangedMessage.cs" />
@@ -175,6 +177,7 @@
     <Compile Include="ViewEntities\Tables\ObjectTreeViewEntity.cs" />
     <Compile Include="ViewModels\Dialogs\AboutDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SettingsDialogViewModel.cs" />
+    <Compile Include="ViewModels\ModsViewModel.cs" />
     <Compile Include="ViewModels\RebuildViewModel.cs" />
     <Compile Include="ViewModels\Tables\CompressionTablesViewModel.cs" />
     <Compile Include="ViewModels\Tables\ExportTableViewModel.cs" />

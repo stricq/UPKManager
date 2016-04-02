@@ -40,7 +40,7 @@
             <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
           </TabControl.Resources>
 
-          <TabItem Header="File Listing">
+          <TabItem Header="Game Files">
             <v:FileListingView />
           </TabItem>
 
@@ -48,7 +48,7 @@
             <v:RebuildView />
           </TabItem>
 
-          <TabItem Header="Mods">
+          <TabItem Header="Mod Files">
             <v:ModsView />
           </TabItem>
 
