@@ -8,6 +8,8 @@ namespace UpkManager.Domain.Constants {
 
     Image,
 
+    Movie,
+
     Sound
 
   }

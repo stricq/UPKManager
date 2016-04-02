@@ -14,7 +14,9 @@ namespace UpkManager.Domain.Constants {
 
     SoundNodeWave,
 
-    Texture2D
+    Texture2D,
+
+    TextureMovie
 
   }
 

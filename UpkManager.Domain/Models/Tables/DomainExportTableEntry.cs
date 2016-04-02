@@ -214,6 +214,7 @@ namespace UpkManager.Domain.Models.Tables {
         case ObjectTypes.ObjectRedirector:         return new DomainObjectObjectRedirector();
         case ObjectTypes.SoundNodeWave:            return new DomainObjectSoundNodeWave();
         case ObjectTypes.Texture2D:                return new DomainObjectTexture2D();
+        case ObjectTypes.TextureMovie:             return new DomainObjectTextureMovie();
 
         default: return new DomainObjectBase();
       }

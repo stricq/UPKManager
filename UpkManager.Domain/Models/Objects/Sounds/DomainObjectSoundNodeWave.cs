@@ -22,7 +22,7 @@ namespace UpkManager.Domain.Models.Objects.Sounds {
 
     #region Properties
 
-    public List<byte[]> Sounds { get; set; }
+    public List<byte[]> Sounds { get; }
 
     public override bool IsExportable => true;
 

@@ -92,6 +92,7 @@
     <Compile Include="Models\Objects\Sounds\DomainObjectSoundNodeWave.cs" />
     <Compile Include="Models\Objects\Textures\DomainObjectTexture2D.cs" />
     <Compile Include="Models\Objects\Textures\DomainMipMap.cs" />
+    <Compile Include="Models\Objects\Textures\DomainObjectTextureMovie.cs" />
     <Compile Include="Models\Properties\DomainPropertyArrayValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyClassValue.cs" />
     <Compile Include="Models\Properties\DomainPropertyComponentValue.cs" />
