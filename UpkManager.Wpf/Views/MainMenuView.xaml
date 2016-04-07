@@ -10,8 +10,12 @@
   <Menu Height="24" Padding="3,3,0,0" VerticalContentAlignment="Center" BorderThickness="0,0,0,1" BorderBrush="{StaticResource StatusBarBorderColor}" Background="{StaticResource MenuGradient}">
 
     <MenuItem Header="_File" Foreground="White">
-      <MenuItem Header="Export Selected Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ExportFiles}" />
-      <MenuItem Header="Save Object _As..."    Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=SaveObjectAs}" />
+      <MenuItem Header="_Reload Game Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ReloadFiles}" />
+
+      <Separator />
+
+      <MenuItem Header="_Export Selected Files" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ExportFiles}" />
+      <MenuItem Header="Save Object _As..."     Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=SaveObjectAs}" />
 
       <Separator />
 
@@ -25,6 +29,10 @@
 
     <MenuItem Header="_Rebuild" Foreground="White">
       <MenuItem Header="Re_build Selected Exports" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=RebuildExported}" />
+
+      <Separator />
+
+      <MenuItem Header="_Delete Selected Exports" Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=DeleteExported}" />
     </MenuItem>
 
     <MenuItem Header="_Settings" Foreground="White">

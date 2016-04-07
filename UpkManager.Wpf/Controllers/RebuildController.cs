@@ -12,13 +12,17 @@ using AutoMapper;
 using STR.Common.Extensions;
 using STR.Common.Messages;
 
+using STR.DialogView.Domain.Messages;
+
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
-
+using UpkManager.Domain.Models.UpkFile;
+using UpkManager.Domain.Models.UpkFile.Tables;
 using UpkManager.Wpf.Messages.Application;
+using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Settings;
 using UpkManager.Wpf.ViewEntities;
@@ -37,6 +41,8 @@ namespace UpkManager.Wpf.Controllers {
     private FileSystemWatcher fileWatcher;
 
     private DomainSettings settings;
+
+    private List<DomainUpkFile> allFiles;
 
     private readonly IMessenger messenger;
 
@@ -74,6 +80,8 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Register<AppLoadedMessage>(this, onApplicationLoaded);
 
       messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
+
+      messenger.Register<FileListingLoadedMessage>(this, onFileListingLoaded);
     }
 
     private void onApplicationLoaded(AppLoadedMessage message) {
@@ -90,12 +98,18 @@ namespace UpkManager.Wpf.Controllers {
       setupWatchers();
     }
 
+    private void onFileListingLoaded(FileListingLoadedMessage message) {
+      allFiles = message.Allfiles;
+    }
+
     #endregion Messages
 
     #region Commands
 
     private void registerCommands() {
       menuViewModel.RebuildExported = new RelayCommandAsync(onRebuildExportedExecute, canRebuildExportedExecute);
+
+      menuViewModel.DeleteExported = new RelayCommand(onDeleteExportedExecute, canDeleteExportedExecute);
     }
 
     #region RebuildExported Command
@@ -105,10 +119,50 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private async Task onRebuildExportedExecute() {
-      await Task.FromResult(1);
+      await rebuildExports();
     }
 
     #endregion RebuildExported Command
+
+    #region DeleteExported Command
+
+    private bool canDeleteExportedExecute() {
+      return viewModel.ExportsTree?.Traverse(e => e.IsChecked).Any() ?? false;
+    }
+
+    private void onDeleteExportedExecute() {
+      messenger.Send(new MessageBoxDialogMessage { Header = "Delete Exported Files", Message = "This will remove the files from disk.\n\nAre you sure?", Callback = onDeleteExportedResponse });
+    }
+
+    private void onDeleteExportedResponse(MessageBoxDialogMessage message) {
+      if (message.IsCancel) return;
+
+      fileWatcher.EnableRaisingEvents = false;
+
+      List<ExportedObjectViewEntity> allFiles = viewModel.ExportsTree?.Traverse(e => e.IsChecked && Path.HasExtension(e.Filename)).ToList();
+
+      allFiles?.ForEach(file => {
+        if (File.Exists(file.Filename)) File.Delete(file.Filename);
+
+        if (file.Parent != null) file.Parent.Children.Remove(file);
+        else viewModel.ExportsTree.Remove(file);
+      });
+
+      Task.Delay(500).Wait();
+
+      List<ExportedObjectViewEntity> allDirs = viewModel.ExportsTree?.Traverse(e => e.IsChecked && !Path.HasExtension(e.Filename)).ToList();
+
+      allDirs?.ForEach(dir => {
+        if (Directory.Exists(dir.Filename)) Directory.Delete(dir.Filename);
+
+        if (dir.Parent != null) dir.Parent.Children.Remove(dir);
+        else viewModel.ExportsTree.Remove(dir);
+      });
+
+      fileWatcher.EnableRaisingEvents = true;
+    }
+
+    #endregion DeleteExported Command
 
     #endregion Commands
 
@@ -143,22 +197,24 @@ namespace UpkManager.Wpf.Controllers {
     private async void loadExportFiles() {
       if (String.IsNullOrEmpty(settings.ExportPath)) return;
 
-      DomainExportedObject root = new DomainExportedObject();
-
       try {
+        DomainExportedObject root = new DomainExportedObject();
+
         await repository.LoadDirectoryRecursive(root, settings.ExportPath);
+
+        if (root.Children == null || !root.Children.Any()) return;
+
+        viewModel.ExportsTree?.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged -= onExportedObjectViewEntityChanged);
+
+        viewModel.ExportsTree = new ObservableCollection<ExportedObjectViewEntity>(mapper.Map<IEnumerable<ExportedObjectViewEntity>>(root.Children));
+
+        viewModel.ExportsTree.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged += onExportedObjectViewEntityChanged);
       }
+      catch(FileNotFoundException) { }
+      catch(DirectoryNotFoundException) { }
       catch(Exception ex) {
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
       }
-
-      if (root.Children == null || !root.Children.Any()) return;
-
-      viewModel.ExportsTree?.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged -= onExportedObjectViewEntityChanged);
-
-      viewModel.ExportsTree = new ObservableCollection<ExportedObjectViewEntity>(mapper.Map<IEnumerable<ExportedObjectViewEntity>>(root.Children));
-
-      viewModel.ExportsTree.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged += onExportedObjectViewEntityChanged);
     }
 
     private void onExportedObjectViewEntityChanged(object sender, PropertyChangedEventArgs args) {
@@ -170,18 +226,13 @@ namespace UpkManager.Wpf.Controllers {
 
       switch(args.PropertyName) {
         case "IsChecked": {
-          entity.Children?.ForEach(e => e.IsChecked = entity.IsChecked);
+          isSelf = true;
 
-          if (Path.HasExtension(entity.Name)) {
-            isSelf = true;
+          checkAllChildren(entity);
 
-            if (entity.IsChecked) entity.Parent.IsChecked = true;
-            else {
-              if (!entity.Parent.Children.Any(e => e.IsChecked)) entity.Parent.IsChecked = false;
-            }
+          checkParents(entity.Parent);
 
-            isSelf = false;
-          }
+          isSelf = false;
 
           break;
         }
@@ -193,6 +244,62 @@ namespace UpkManager.Wpf.Controllers {
         default: {
           break;
         }
+      }
+    }
+
+    private static void checkAllChildren(ExportedObjectViewEntity parent) {
+      parent.Children.ForEach(e => {
+        e.IsChecked = parent.IsChecked;
+
+        if (e.Children.Any()) checkAllChildren(e);
+      });
+    }
+
+    private static void checkParents(ExportedObjectViewEntity parent) {
+      while(true) {
+        parent.IsChecked = parent.Children.All(e => e.IsChecked);
+
+        if (parent.Parent != null) {
+          parent = parent.Parent;
+
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    private async Task rebuildExports() {
+      Dictionary<ExportedObjectViewEntity, List<ExportedObjectViewEntity>> filesToMod = viewModel.ExportsTree?.Traverse(e => Path.HasExtension(e.Filename) && e.IsChecked)
+                                                                                                              .GroupBy(e => e.Parent)
+                                                                                                              .ToDictionary(g => g.Key, g => g.ToList());
+
+      if (filesToMod == null || !filesToMod.Any()) return;
+
+      foreach(KeyValuePair<ExportedObjectViewEntity, List<ExportedObjectViewEntity>> pair in filesToMod) {
+        string gameFilename = $"{pair.Key.Filename.Replace(settings.ExportPath, null)}.upk";
+
+        DomainUpkFile file = allFiles.SingleOrDefault(f => f.GameFilename.Equals(gameFilename));
+
+        if (file == null) continue;
+
+        DomainHeader header = await repository.LoadUpkFile(Path.Combine(settings.PathToGame, file.GameFilename));
+
+        await header.ReadHeaderAsync(null);
+
+        foreach(ExportedObjectViewEntity entity in pair.Value) {
+          DomainExportTableEntry export = header.ExportTable.SingleOrDefault(ex => ex.NameTableIndex.Name.Equals(Path.GetFileNameWithoutExtension(entity.Filename), StringComparison.CurrentCultureIgnoreCase));
+
+          if (export == null) continue;
+
+          await export.ParseDomainObject(header, false, false);
+
+          await export.DomainObject.SetObject(entity.Filename);
+        }
+
+        string filename = Path.Combine(settings.PathToGame, Path.GetDirectoryName(file.GameFilename), "mod", Path.GetFileName(file.GameFilename));
+
+        await repository.SaveUpkFile(header, Path.Combine(filename));
       }
     }
 

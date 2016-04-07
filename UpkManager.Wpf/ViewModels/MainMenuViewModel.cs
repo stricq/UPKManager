@@ -17,7 +17,10 @@ namespace UpkManager.Wpf.ViewModels {
 
     private bool isHexViewObject;
 
+    private RelayCommandAsync reloadFiles;
+
     private RelayCommandAsync rebuildExported;
+    private RelayCommand       deleteExported;
 
     private RelayCommand scanUpkFiles;
 
@@ -58,9 +61,19 @@ namespace UpkManager.Wpf.ViewModels {
       set { SetField(ref isHexViewObject, value, () => IsHexViewObject); }
     }
 
+    public RelayCommandAsync ReloadFiles {
+      get { return reloadFiles; }
+      set { SetField(ref reloadFiles, value, () => ReloadFiles); }
+    }
+
     public RelayCommandAsync RebuildExported {
       get { return rebuildExported; }
       set { SetField(ref rebuildExported, value, () => RebuildExported); }
+    }
+
+    public RelayCommand DeleteExported {
+      get { return deleteExported; }
+      set { SetField(ref deleteExported, value, () => DeleteExported); }
     }
 
     public RelayCommand ScanUpkFiles {

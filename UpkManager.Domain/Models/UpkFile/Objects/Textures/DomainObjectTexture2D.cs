@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -96,6 +97,58 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       memory.Close();
     }
 
+    public override async Task SetObject(string filename) {
+      ImageEngineImage image = await Task.Run(() => new ImageEngineImage(filename));
+
+      int width  = image.Width;
+      int height = image.Height;
+
+      DomainPropertyIntValue sizeX = PropertyHeader.GetProperty("SizeX").First()?.Value as DomainPropertyIntValue;
+      DomainPropertyIntValue sizeY = PropertyHeader.GetProperty("SizeY").First()?.Value as DomainPropertyIntValue;
+
+      sizeX?.SetPropertyValue(width);
+      sizeY?.SetPropertyValue(height);
+
+      DomainPropertyIntValue mipTailBaseIdx = PropertyHeader.GetProperty("MipTailBaseIdx").First()?.Value as DomainPropertyIntValue;
+
+      mipTailBaseIdx?.SetPropertyValue((int)Math.Log(width > height ? width : height, 2));
+
+//    DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").First()?.Value as DomainPropertyStringValue;
+//    DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").First()?.Value as DomainPropertyStringValue;
+
+//    filePath?.SetPropertyValue(filename);
+//    fileTime?.SetPropertyValue(File.GetLastWriteTime(filename).ToString("yyyy-MM-dd hh:mm:ss"));
+
+      DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").First()?.Value as DomainPropertyByteValue;
+
+      string format = pfFormat?.PropertyString ?? "PF_DXT5";
+
+      ImageEngineFormat imageFormat = ImageEngine.ParseFromString(format);
+
+      MipMaps.Clear();
+
+      while(true) {
+        MemoryStream stream = new MemoryStream();
+
+        image.Save(stream, imageFormat, MipHandling.KeepTopOnly);
+
+        await stream.FlushAsync();
+
+        MipMaps.Add(new DomainMipMap {
+          ImageData = (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(),
+          Width     = image.Width,
+          Height    = image.Height
+        });
+
+        if (width == 1 && height == 1) break;
+
+        if (width  > 1) width  /= 2;
+        if (height > 1) height /= 2;
+
+        if (image.Width > 4 && image.Height > 4) image.Resize(0.5);
+      }
+    }
+
     public override Stream GetObjectStream() {
       if (MipMaps == null || !MipMaps.Any()) return null;
 
@@ -122,7 +175,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
                   + sizeof(int);
 
       foreach(DomainMipMap mipMap in MipMaps) {
-        BulkDataCompressionTypes flags = mipMap.ImageData == null || mipMap.ImageData.Length == 0 ? BulkDataCompressionTypes.Unused : BulkDataCompressionTypes.LZO_ENC;
+        BulkDataCompressionTypes flags = mipMap.ImageData == null || mipMap.ImageData.Length == 0 ? BulkDataCompressionTypes.Unused | BulkDataCompressionTypes.StoreInSeparatefile : BulkDataCompressionTypes.LZO_ENC;
 
         BuilderSize += Task.Run(() => ProcessUncompressedBulkData(ByteArrayReader.CreateNew(mipMap.ImageData, 0), flags)).Result
                     +  sizeof(int) * 2;

@@ -80,6 +80,8 @@ namespace UpkManager.Repository.Services {
     public async Task SaveUpkFile(DomainHeader Header, string Filename) {
       if (Header == null) return;
 
+      foreach(DomainExportTableEntry export in Header.ExportTable.Where(export => export.DomainObject == null)) await export.ParseDomainObject(Header, false, false);
+
       FileStream stream = new FileStream(Filename, FileMode.Create);
 
       int headerSize = Header.GetBuilderSize();
@@ -91,8 +93,6 @@ namespace UpkManager.Repository.Services {
       await stream.WriteAsync(writer.GetBytes(), 0, headerSize);
 
       foreach(DomainExportTableEntry export in Header.ExportTable) {
-        if (export.DomainObject == null) await export.ParseDomainObject(Header, false, false);
-
         ByteArrayWriter objectWriter = await export.WriteObjectBuffer();
 
         await stream.WriteAsync(objectWriter.GetBytes(), 0, objectWriter.Index);

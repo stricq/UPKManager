@@ -130,6 +130,8 @@ namespace UpkManager.Wpf.Controllers {
     #region Commands
 
     private void registerCommands() {
+      menuViewModel.ReloadFiles = new RelayCommandAsync(onReloadFilesExecute, canReloadFilesExecute);
+
       menuViewModel.ExportFiles = new RelayCommandAsync(onExportFilesExecute, canExportFilesExecute);
 
       menuViewModel.SelectAllFiles   = new RelayCommand(onSelectAllFilesExecute,   canSelectAllFilesExecute);
@@ -137,6 +139,18 @@ namespace UpkManager.Wpf.Controllers {
 
       menuViewModel.ScanUpkFiles = new RelayCommand(onScanUpkFilesExecute, canScanUpkFilesExecute);
     }
+
+    #region ReloadFiles Command
+
+    private static bool canReloadFilesExecute() {
+      return true;
+    }
+
+    private async Task onReloadFilesExecute() {
+      await loadAllFiles();
+    }
+
+    #endregion ReloadFiles Command
 
     #region ExportFiles Command
 
@@ -201,6 +215,8 @@ namespace UpkManager.Wpf.Controllers {
     #region Private Methods
 
     private async Task loadAllFiles() {
+      messenger.Send(new FileLoadingMessage());
+
       allFiles.Clear();
 
       viewModel.Files.Clear();
@@ -248,7 +264,20 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      List<DomainUpkFile> remoteFiles = await remoteRepository.LoadUpkFiles(version);
+      List<DomainUpkFile> remoteFiles;
+
+      try {
+        remoteFiles = await remoteRepository.LoadUpkFiles(version);
+      }
+      catch(Exception ex) {
+        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{ex.Message}", HasCancel = false });
+
+        progress.IsComplete = true;
+
+        messenger.Send(progress);
+
+        return;
+      }
 
       List<DomainUpkFile> matches = (from row1 in localFiles
                                      join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
@@ -342,6 +371,8 @@ namespace UpkManager.Wpf.Controllers {
             if (upkFile.Header == null) {
               try {
                 await loadUpkFile(file, upkFile);
+
+                await repository.SaveUpkFile(upkFile.Header, $@"V:\{upkFile.Filename}");
               }
               catch(Exception ex) {
                 messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", ErrorMessage = $"{upkFile.GameFilename}", Exception = ex });

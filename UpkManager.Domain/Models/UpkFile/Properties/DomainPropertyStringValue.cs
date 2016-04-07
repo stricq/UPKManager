@@ -38,6 +38,14 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
       await stringValue.ReadString(reader);
     }
 
+    public override void SetPropertyValue(object value) {
+      string str = value as string;
+
+      if (str == null) return;
+
+      stringValue.SetString(str);
+    }
+
     #endregion Domain Methods
 
     #region DomainUpkBuilderBase Implementation

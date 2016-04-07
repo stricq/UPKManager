@@ -30,6 +30,14 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
       DataReader = await reader.ReadByteArray(size);
     }
 
+    public virtual void SetPropertyValue(object value) {
+      ByteArrayReader reader = value as ByteArrayReader;
+
+      if (reader == null) return;
+
+      DataReader = reader;
+    }
+
     #endregion Domain Methods
 
     #region DomainUpkBuilderBase Implementation

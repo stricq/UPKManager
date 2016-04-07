@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,9 +30,9 @@ namespace UpkManager.Domain.Models.UpkFile {
       }
 
       if (Size < 0) {
-        Size = -Size * 2;
+        int size = -Size * 2;
 
-        byte[] str = await reader.ReadBytes(Size);
+        byte[] str = await reader.ReadBytes(size);
 
         String = Encoding.Unicode.GetString(str);
       }
@@ -42,6 +43,12 @@ namespace UpkManager.Domain.Models.UpkFile {
 
         String = Encoding.ASCII.GetString(str);
       }
+    }
+
+    public void SetString(string value) {
+      String = value;
+
+      Size = isUnicode() ? -value.Length : value.Length + 1;
     }
 
     #endregion Domain Methods
@@ -58,7 +65,9 @@ namespace UpkManager.Domain.Models.UpkFile {
     public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteInt32(Size);
 
-      if (Size < 0) await Writer.WriteBytes(Encoding.Unicode.GetBytes(String));
+      if (Size < 0) {
+        await Writer.WriteBytes(Encoding.Unicode.GetBytes(String));
+      }
       else {
         await Writer.WriteBytes(Encoding.ASCII.GetBytes(String));
 
@@ -70,11 +79,11 @@ namespace UpkManager.Domain.Models.UpkFile {
 
     #region Private Methods
 
-    //private bool isUnicode() {
-    //  const int maxAnsiCode = 255;
+    private bool isUnicode() {
+      const int maxAnsiCode = 255;
 
-    //  return String.Any(c => c > maxAnsiCode);
-    //}
+      return String.Any(c => c > maxAnsiCode);
+    }
 
     #endregion Private Methods
 

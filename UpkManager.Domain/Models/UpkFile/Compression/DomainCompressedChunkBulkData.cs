@@ -10,6 +10,12 @@ namespace UpkManager.Domain.Models.UpkFile.Compression {
 
   public sealed class DomainCompressedChunkBulkData : DomainCompressedChunk {
 
+    #region Private Fields
+
+    private const BulkDataCompressionTypes NothingToDo = BulkDataCompressionTypes.Unused | BulkDataCompressionTypes.StoreInSeparatefile;
+
+    #endregion Private Fields
+
     #region Properties
 
     public uint BulkDataFlags { get; private set; }
@@ -26,9 +32,7 @@ namespace UpkManager.Domain.Models.UpkFile.Compression {
       CompressedSize   = reader.ReadInt32();
       CompressedOffset = reader.ReadInt32();
 
-      if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.Unused) > 0) return;
-
-      if (((BulkDataCompressionTypes)BulkDataFlags & BulkDataCompressionTypes.StoreInSeparatefile) > 0) return;
+      if (((BulkDataCompressionTypes)BulkDataFlags & NothingToDo) > 0) return;
 
       Header = new DomainCompressedChunkHeader();
 
@@ -70,24 +74,35 @@ namespace UpkManager.Domain.Models.UpkFile.Compression {
     public async Task<int> BuildCompressedChunk(ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
       BulkDataFlags = (uint)compressionFlags;
 
+      int builderSize = sizeof(uint)
+                      + sizeof(int) * 3;
+
+      if ((compressionFlags & NothingToDo) > 0) return builderSize;
+
       reader.Seek(0);
 
       UncompressedSize = reader.Remaining;
 
       Header = new DomainCompressedChunkHeader();
 
-      int builderSize = await Header.BuildCompressedChunkHeader(reader, BulkDataFlags);
+      builderSize += await Header.BuildCompressedChunkHeader(reader, BulkDataFlags);
 
       CompressedSize = builderSize;
-
-      builderSize += sizeof(uint)
-                  +  sizeof(int) * 3;
 
       return builderSize;
     }
 
     public async Task WriteCompressedChunk(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteUInt32(BulkDataFlags);
+
+      if (((BulkDataCompressionTypes)BulkDataFlags & NothingToDo) > 0) {
+        Writer.WriteInt32(0);
+        Writer.WriteInt32(-1);
+
+        Writer.WriteInt32(-1);
+
+        return;
+      }
 
       Writer.WriteInt32(UncompressedSize);
       Writer.WriteInt32(CompressedSize);

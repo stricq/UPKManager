@@ -30,6 +30,12 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
       IntValue = await Task.Run(() => reader.ReadInt32());
     }
 
+    public override void SetPropertyValue(object value) {
+      if (!(value is int)) return;
+
+      IntValue = (int)value;
+    }
+
     #endregion Domain Methods
 
     #region DomainUpkBuilderBase Implementation

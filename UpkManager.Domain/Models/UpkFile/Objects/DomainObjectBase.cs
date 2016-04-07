@@ -55,7 +55,11 @@ namespace UpkManager.Domain.Models.UpkFile.Objects {
     }
 
     public virtual async Task SaveObject(string filename) {
-      await Task.FromResult(1);
+      await Task.CompletedTask;
+    }
+
+    public virtual async Task SetObject(string filename) {
+      await Task.CompletedTask;
     }
 
     public virtual Stream GetObjectStream() {
