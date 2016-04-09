@@ -369,14 +369,11 @@ namespace UpkManager.Wpf.Controllers {
             DomainUpkFile upkFile = allFiles.Single(f => f.Id == file.Id);
 
             if (upkFile.Header == null) {
-              try {
-                await loadUpkFile(file, upkFile);
+              await loadUpkFile(file, upkFile);
 
-                await repository.SaveUpkFile(upkFile.Header, $@"V:\{upkFile.Filename}");
-              }
-              catch(Exception ex) {
-                messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", ErrorMessage = $"{upkFile.GameFilename}", Exception = ex });
-              }
+              if (upkFile.Header == null) return;
+
+//            await repository.SaveUpkFile(upkFile.Header, $@"V:\{upkFile.Filename}");
             }
 
             upkFile.LastAccess = DateTime.Now;

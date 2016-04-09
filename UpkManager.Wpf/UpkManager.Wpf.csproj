@@ -409,6 +409,10 @@
       <Project>{04c2cfaf-8f1e-4631-88a6-0b9dc017452e}</Project>
       <Name>UpkManager.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UpkManager.Lzo\UpkManager.Lzo.csproj">
+      <Project>{576be056-1485-4702-8569-a50169087df2}</Project>
+      <Name>UpkManager.Lzo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UpkManager.Repository\UpkManager.Repository.csproj">
       <Project>{422ff85b-4ce4-40de-be3e-d0db8b1158cd}</Project>
       <Name>UpkManager.Repository</Name>

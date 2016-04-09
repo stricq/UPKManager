@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 
 using ManagedLZO;
 
+using UpkManager.Lzo;
+
 
 namespace UpkManager.Domain.Helpers {
 
@@ -14,7 +16,17 @@ namespace UpkManager.Domain.Helpers {
 
     private int index;
 
+    private ILzoCompression compression;
+
     #endregion Private Fields
+
+    #region Constructor
+
+    private ByteArrayReader() {
+      compression = new LzoCompression();
+    }
+
+    #endregion Constructor
 
     #region Public Methods
 
@@ -103,9 +115,9 @@ namespace UpkManager.Domain.Helpers {
     }
 
     public async Task<byte[]> Compress() {
-      byte[] compressed = null;
+//    await Task.Run(() => MiniLZO.Compress(data, out compressed));
 
-      await Task.Run(() => MiniLZO.Compress(data, out compressed));
+      byte[] compressed = await compression.Compress(data);
 
       return compressed;
     }
@@ -113,7 +125,9 @@ namespace UpkManager.Domain.Helpers {
     public async Task<byte[]> Decompress(int UncompressedSize) {
       byte[] decompressed = new byte[UncompressedSize];
 
-      await Task.Run(() => MiniLZO.Decompress(data, decompressed));
+//    await Task.Run(() => MiniLZO.Decompress(data, decompressed));
+
+      await compression.Decompress(data, decompressed);
 
       return decompressed;
     }
