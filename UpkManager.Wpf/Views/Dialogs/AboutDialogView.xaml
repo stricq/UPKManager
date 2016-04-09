@@ -37,7 +37,7 @@
       <TextBlock Grid.Row="1">STR Programming Services</TextBlock>
       <TextBlock Grid.Row="3">Extract and re-integrate Texture2D and other object types.</TextBlock>
       <TextBlock Grid.Row="5">Icon image provided by <Hyperlink NavigateUri="https://www.undertow.club/members/princessnicky.1428/" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">PrincessNicky</Hyperlink>.</TextBlock>
-      <TextBlock Grid.Row="7">Bitcoin Donations: <Hyperlink NavigateUri="bitcoin:1J8ktbRzv9Hmma8UiJbZbu9pqgzQk3Vkut?amount=0.05&amp;label=UPK%20Manager" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">1J8ktbRzv9Hmma8UiJbZbu9pqgzQk3Vkut</Hyperlink></TextBlock>
+      <TextBlock Grid.Row="7">Bitcoin Donations: <Hyperlink NavigateUri="bitcoin:1DUgsDPv5vuqNnF74GJi3L5NJxPbMBVJFn?amount=0.05&amp;label=UPK%20Manager" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">1DUgsDPv5vuqNnF74GJi3L5NJxPbMBVJFn</Hyperlink></TextBlock>
       <TextBlock Grid.Row="8">Suggested Amount: 0.05 btc (approximately $20 USD)</TextBlock>
     </Grid>
 
