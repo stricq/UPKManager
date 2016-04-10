@@ -22,15 +22,15 @@ namespace UpkManager.Domain.Models.UpkFile.Objects {
 
     #region Properties
 
-    public byte[] Unknown1 { get; private set; }
+    protected byte[] Unknown1 { get; private set; }
 
-    public int CompressedChunkOffset { get; private set; }
+    protected int CompressedChunkOffset { get; private set; }
 
     #endregion Properties
 
     #region Domain Properties
 
-    public List<DomainCompressedChunkBulkData> CompressedChunks { get; }
+    protected List<DomainCompressedChunkBulkData> CompressedChunks { get; }
 
     #endregion Domain Properties
 
@@ -46,20 +46,28 @@ namespace UpkManager.Domain.Models.UpkFile.Objects {
       CompressedChunkOffset = reader.ReadInt32();
     }
 
-    public async Task ProcessCompressedBulkData(ByteArrayReader reader, Func<DomainCompressedChunkBulkData, Task> chunkHandler) {
+    protected async Task ProcessCompressedBulkData(ByteArrayReader reader, Func<DomainCompressedChunkBulkData, Task> chunkHandler) {
       DomainCompressedChunkBulkData compressedChunk = new DomainCompressedChunkBulkData();
+
+//    CompressedChunks.Add(compressedChunk);
 
       await compressedChunk.ReadCompressedChunk(reader);
 
       await chunkHandler(compressedChunk);
     }
 
-    public async Task<int> ProcessUncompressedBulkData(ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
+    protected async Task<int> ProcessUncompressedBulkData(ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
       DomainCompressedChunkBulkData compressedChunk = new DomainCompressedChunkBulkData();
 
       CompressedChunks.Add(compressedChunk);
 
       int builderSize = await compressedChunk.BuildCompressedChunk(reader, compressionFlags);
+
+      return builderSize;
+    }
+
+    protected async Task<int> ProcessExistingBulkData(int index, ByteArrayReader reader, BulkDataCompressionTypes compressionFlags) {
+      int builderSize = await CompressedChunks[index].BuildExistingCompressedChunk(reader, compressionFlags);
 
       return builderSize;
     }

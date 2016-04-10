@@ -11,6 +11,7 @@ namespace UpkManager.Wpf.ViewEntities {
 
     #region Private Fields
 
+    private bool isErrored;
     private bool isSelected;
 
     private int fileIndex;
@@ -48,6 +49,11 @@ namespace UpkManager.Wpf.ViewEntities {
     #endregion Properties
 
     #region Domain Properties
+
+    public bool IsErrored {
+      get { return isErrored; }
+      set { SetField(ref isErrored, value, () => IsErrored); }
+    }
 
     public bool IsSelected {
       get { return isSelected; }

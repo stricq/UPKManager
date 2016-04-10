@@ -42,6 +42,12 @@ namespace UpkManager.Domain.Models.UpkFile.Compression {
       return CompressedSize + sizeof(int) * 2;
     }
 
+    public async Task<int> BuildExistingCompressedChunkBlockData() {
+      await CompressedData.Encrypt();
+
+      return CompressedSize + sizeof(int) * 2;
+    }
+
     public async Task WriteCompressedChunkBlock(ByteArrayWriter Writer) {
       await Task.Run(() => {
         Writer.WriteInt32(CompressedSize);

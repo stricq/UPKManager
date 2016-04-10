@@ -100,6 +100,29 @@ namespace UpkManager.Domain.Models.UpkFile.Compression {
       return builderSize;
     }
 
+    public async Task<int> BuildExistingCompressedChunkHeader(ByteArrayReader reader, uint flags) {
+      Signature = Signatures.Signature;
+      BlockSize = 0x00020000;
+
+      CompressedSize   = 0;
+      UncompressedSize = reader.Remaining;
+
+      int blockCount = (reader.Remaining + BlockSize - 1) / BlockSize;
+
+      int builderSize = 0;
+
+      for(int i = 0; i < blockCount; ++i) {
+        builderSize += await Blocks[i].BuildExistingCompressedChunkBlockData();
+
+        CompressedSize += Blocks[i].CompressedSize;
+      }
+
+      builderSize += sizeof(uint)
+                  +  sizeof(int) * 3;
+
+      return builderSize;
+    }
+
     public async Task WriteCompressedChunkHeader(ByteArrayWriter Writer, int CurrentOffset) {
       Writer.WriteUInt32(Signature);
 
