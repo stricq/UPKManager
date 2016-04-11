@@ -49,6 +49,25 @@ To export the objects from your checked files, on the menu choose File -> Export
 
 All the texture objects in all the files that are checked will be saved as individual DDS files to the Export Path you choose in the settings.
 
+### Repackaging Modded Textures
+After exporting texture files to the chose Export Path, any of the exported textures can be modified or replaced.  Always ensure that you keep the same filename.  The program uses the filename to determine which textures to replace while rebuilding a package file.
+
+All textures must be saved in the DDS file format.  (JPG and PNG should work, too.  Just as long as the original image dimensions are the same.)
+
+Once you have finished modifying the textures in the Export Path switch to the Rebuild tab.  Any textures listed in the tree that are checked will be rebuilt into a new modified UPK file after selecting Rebuild Selected Exports under the Rebuild menu.  The modified UPK file will automatically be placed in a mod folder with the game files ready to be used by the game.
+
+Any textures not checked will be pulled from the source game file and copied unmodified into the repackaged UPK file.
+
+Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
+
+# Changes for Release 1.3
+
+* Exported textures can be edited and re-imported back into the game.
+* Added Rebuild tab.  This tab allows you to view exported textures (and sounds) and view them in the Texture Viewer.
+* Added Modded Files tab.  This tab allows you to view modded files in the same way was as viewing game files.
+* Can now view all the MIPs of loaded textures.
+* TextureMovie objects can now be exported as bink files.
+
 # Changes for Release 1.2
 
 * Audio objects (SoundNodeWave) can now be exported (as .ogg) and will play when clicked on in the export object listing.

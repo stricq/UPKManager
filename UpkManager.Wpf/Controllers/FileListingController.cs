@@ -371,7 +371,7 @@ namespace UpkManager.Wpf.Controllers {
             if (upkFile.Header == null) {
               await loadUpkFile(file, upkFile);
 
-              if (upkFile.Header == null) return;
+              if (file.IsErrored) return;
 
 //            await repository.SaveUpkFile(upkFile.Header, $@"V:\{upkFile.Filename}");
             }
@@ -546,7 +546,7 @@ namespace UpkManager.Wpf.Controllers {
           }
         }
 
-        message.Current += 1;
+        message.Current++;
 
         foreach(DomainExportTableEntry export in header.ExportTable) {
           if (export.DomainObject == null) {

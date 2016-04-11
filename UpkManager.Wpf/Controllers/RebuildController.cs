@@ -21,10 +21,12 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.UpkFile;
 using UpkManager.Domain.Models.UpkFile.Tables;
+
 using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Settings;
+using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
@@ -115,7 +117,7 @@ namespace UpkManager.Wpf.Controllers {
     #region RebuildExported Command
 
     private bool canRebuildExportedExecute() {
-      return viewModel.ExportsTree?.Traverse(e => e.IsChecked).Any() ?? false;
+      return allFiles != null && allFiles.Any() && (viewModel.ExportsTree?.Traverse(e => e.IsChecked).Any() ?? false);
     }
 
     private async Task onRebuildExportedExecute() {
@@ -127,7 +129,7 @@ namespace UpkManager.Wpf.Controllers {
     #region DeleteExported Command
 
     private bool canDeleteExportedExecute() {
-      return viewModel.ExportsTree?.Traverse(e => e.IsChecked).Any() ?? false;
+      return allFiles != null && allFiles.Any() && (viewModel.ExportsTree?.Traverse(e => e.IsChecked).Any() ?? false);
     }
 
     private void onDeleteExportedExecute() {
@@ -139,9 +141,9 @@ namespace UpkManager.Wpf.Controllers {
 
       fileWatcher.EnableRaisingEvents = false;
 
-      List<ExportedObjectViewEntity> allFiles = viewModel.ExportsTree?.Traverse(e => e.IsChecked && Path.HasExtension(e.Filename)).ToList();
+      List<ExportedObjectViewEntity> allExports = viewModel.ExportsTree?.Traverse(e => e.IsChecked && Path.HasExtension(e.Filename)).ToList();
 
-      allFiles?.ForEach(file => {
+      allExports?.ForEach(file => {
         if (File.Exists(file.Filename)) File.Delete(file.Filename);
 
         if (file.Parent != null) file.Parent.Children.Remove(file);
@@ -276,6 +278,8 @@ namespace UpkManager.Wpf.Controllers {
 
       if (filesToMod == null || !filesToMod.Any()) return;
 
+      LoadProgressMessage message = new LoadProgressMessage { Text = "Rebuilding...", Total = filesToMod.Count };
+
       foreach(KeyValuePair<ExportedObjectViewEntity, List<ExportedObjectViewEntity>> pair in filesToMod) {
         string gameFilename = $"{pair.Key.Filename.Replace(settings.ExportPath, null)}.upk";
 
@@ -287,6 +291,8 @@ namespace UpkManager.Wpf.Controllers {
 
         await header.ReadHeaderAsync(null);
 
+        message.Current++;
+
         foreach(ExportedObjectViewEntity entity in pair.Value) {
           DomainExportTableEntry export = header.ExportTable.SingleOrDefault(ex => ex.NameTableIndex.Name.Equals(Path.GetFileNameWithoutExtension(entity.Filename), StringComparison.CurrentCultureIgnoreCase));
 
@@ -295,12 +301,25 @@ namespace UpkManager.Wpf.Controllers {
           await export.ParseDomainObject(header, false, false);
 
           await export.DomainObject.SetObject(entity.Filename);
+
+          message.StatusText = entity.Filename;
+
+          messenger.Send(message);
         }
 
         string filename = Path.Combine(settings.PathToGame, Path.GetDirectoryName(file.GameFilename), "mod", Path.GetFileName(file.GameFilename));
 
-        await repository.SaveUpkFile(header, Path.Combine(filename));
+        await repository.SaveUpkFile(header, filename);
+
+        DomainUpkFile upkFile = new DomainUpkFile { GameFilename = filename.Replace(settings.PathToGame, null), FileSize = new FileInfo(filename).Length };
+
+        messenger.Send(new ModFileBuiltMessage { UpkFile = upkFile });
       }
+
+      message.IsComplete = true;
+      message.StatusText = null;
+
+      messenger.Send(message);
     }
 
     #endregion Private Methods

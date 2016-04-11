@@ -113,11 +113,11 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       mipTailBaseIdx?.SetPropertyValue((int)Math.Log(width > height ? width : height, 2));
 
-//    DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").First()?.Value as DomainPropertyStringValue;
-//    DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").First()?.Value as DomainPropertyStringValue;
+      DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").First()?.Value as DomainPropertyStringValue;
+      DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").First()?.Value as DomainPropertyStringValue;
 
-//    filePath?.SetPropertyValue(filename);
-//    fileTime?.SetPropertyValue(File.GetLastWriteTime(filename).ToString("yyyy-MM-dd hh:mm:ss"));
+      filePath?.SetPropertyValue(filename);
+      fileTime?.SetPropertyValue(File.GetLastWriteTime(filename).ToString("yyyy-MM-dd hh:mm:ss"));
 
       DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").First()?.Value as DomainPropertyByteValue;
 
@@ -135,7 +135,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         await stream.FlushAsync();
 
         MipMaps.Add(new DomainMipMap {
-          ImageData = (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(),
+          ImageData = (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(), // Strip off 128 bytes for the DDS header
           Width     = image.Width,
           Height    = image.Height
         });

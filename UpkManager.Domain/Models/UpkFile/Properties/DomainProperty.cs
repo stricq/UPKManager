@@ -61,10 +61,11 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
       if (NameIndex.Name == ObjectTypes.None.ToString()) return BuilderSize;
 
       BuilderSize += TypeNameIndex.GetBuilderSize()
-                  +  sizeof(int) * 2
-                  +  Value.GetBuilderSize();
+                  +  sizeof(int) * 2;
 
-      return BuilderSize;
+      Size = Value.GetBuilderSize();
+
+      return BuilderSize + Size;
     }
 
     public override async Task WriteBuffer(ByteArrayWriter Writer, int CurrentOffset) {

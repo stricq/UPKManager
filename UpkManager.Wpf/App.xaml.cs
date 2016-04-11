@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Windows;
@@ -39,15 +40,20 @@ namespace UpkManager.Wpf {
     protected override void OnStartup(StartupEventArgs e) {
       base.OnStartup(e);
 
-      IEnumerable<IAutoMapperConfiguration> configurations = container.GetAll<IAutoMapperConfiguration>();
+      try {
+        IEnumerable<IAutoMapperConfiguration> configurations = container.GetAll<IAutoMapperConfiguration>();
 
-      MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg => configurations.ForEach(configuration => configuration.RegisterMappings(cfg)));
+        MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg => configurations.ForEach(configuration => configuration.RegisterMappings(cfg)));
 
-      mapperConfiguration.AssertConfigurationIsValid();
+        mapperConfiguration.AssertConfigurationIsValid();
 
-      container.RegisterInstance(mapperConfiguration.CreateMapper());
+        container.RegisterInstance(mapperConfiguration.CreateMapper());
 
-      container.GetAll<IController>();
+        container.GetAll<IController>();
+      }
+      catch(Exception ex) {
+        MessageBox.Show(ex.Message, "MEF or Mapping Error");
+      }
     }
 
     #endregion Overrides

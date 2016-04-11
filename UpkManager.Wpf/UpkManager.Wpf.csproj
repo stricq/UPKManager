@@ -154,6 +154,7 @@
     <Compile Include="Messages\FileListing\FileListingLoadedMessage.cs" />
     <Compile Include="Messages\FileListing\FileLoadingMessage.cs" />
     <Compile Include="Messages\Rebuild\ExportedObjectSelectedMessage.cs" />
+    <Compile Include="Messages\Rebuild\ModFileBuiltMessage.cs" />
     <Compile Include="Messages\Settings\SettingsChangedMessage.cs" />
     <Compile Include="Messages\Settings\SettingsEditMessage.cs" />
     <Compile Include="Messages\FileListing\FileLoadedMessage.cs" />

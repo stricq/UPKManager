@@ -19,6 +19,7 @@ using UpkManager.Domain.Models;
 
 using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Settings;
 using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
@@ -75,6 +76,8 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
 
       messenger.Register<FileListingLoadedMessage>(this, onFileListingLoaded);
+
+      messenger.Register<ModFileBuiltMessage>(this, onModFileBuilt);
     }
 
     private void onApplicationLoaded(AppLoadedMessage message) {
@@ -99,9 +102,23 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.Mods.ForEach(mf => mf.PropertyChanged += onFileViewEntityChanged);
     }
 
+    private void onModFileBuilt(ModFileBuiltMessage message) {
+      allMods.Where(m => m.GameFilename == message.UpkFile.GameFilename).ToList().ForEach(m => allMods.Remove(m));
+
+      allMods.Add(message.UpkFile);
+
+      allMods.Sort(domainUpkfileComparison);
+
+      viewModel.Mods = new ObservableCollection<FileViewEntity>(mapper.Map<IEnumerable<FileViewEntity>>(allMods));
+    }
+
     #endregion Messenger
 
     #region Private Methods
+
+    private static int domainUpkfileComparison(DomainUpkFile left, DomainUpkFile right) {
+      return String.Compare(left.Filename, right.Filename, StringComparison.CurrentCultureIgnoreCase);
+    }
 
     private async void onFileViewEntityChanged(object sender, PropertyChangedEventArgs args) {
       FileViewEntity file = sender as FileViewEntity;
@@ -118,12 +135,9 @@ namespace UpkManager.Wpf.Controllers {
             DomainUpkFile upkFile = allMods.Single(f => f.GameFilename == file.GameFilename);
 
             if (upkFile.Header == null) {
-              try {
-                await loadUpkFile(file, upkFile);
-              }
-              catch(Exception ex) {
-                messenger.Send(new ApplicationErrorMessage { HeaderText = "Error Loading UPK File", ErrorMessage = $"{upkFile.GameFilename}", Exception = ex });
-              }
+              await loadUpkFile(file, upkFile);
+
+              if (file.IsErrored) return;
             }
 
             upkFile.LastAccess = DateTime.Now;
