@@ -103,23 +103,23 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       int width  = image.Width;
       int height = image.Height;
 
-      DomainPropertyIntValue sizeX = PropertyHeader.GetProperty("SizeX").First()?.Value as DomainPropertyIntValue;
-      DomainPropertyIntValue sizeY = PropertyHeader.GetProperty("SizeY").First()?.Value as DomainPropertyIntValue;
+      DomainPropertyIntValue sizeX = PropertyHeader.GetProperty("SizeX").FirstOrDefault()?.Value as DomainPropertyIntValue;
+      DomainPropertyIntValue sizeY = PropertyHeader.GetProperty("SizeY").FirstOrDefault()?.Value as DomainPropertyIntValue;
 
       sizeX?.SetPropertyValue(width);
       sizeY?.SetPropertyValue(height);
 
-      DomainPropertyIntValue mipTailBaseIdx = PropertyHeader.GetProperty("MipTailBaseIdx").First()?.Value as DomainPropertyIntValue;
+      DomainPropertyIntValue mipTailBaseIdx = PropertyHeader.GetProperty("MipTailBaseIdx").FirstOrDefault()?.Value as DomainPropertyIntValue;
 
       mipTailBaseIdx?.SetPropertyValue((int)Math.Log(width > height ? width : height, 2));
 
-      DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").First()?.Value as DomainPropertyStringValue;
-      DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").First()?.Value as DomainPropertyStringValue;
+      DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").FirstOrDefault()?.Value as DomainPropertyStringValue;
+      DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").FirstOrDefault()?.Value as DomainPropertyStringValue;
 
       filePath?.SetPropertyValue(filename);
       fileTime?.SetPropertyValue(File.GetLastWriteTime(filename).ToString("yyyy-MM-dd hh:mm:ss"));
 
-      DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").First()?.Value as DomainPropertyByteValue;
+      DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
       string format = pfFormat?.PropertyString ?? "PF_DXT5";
 

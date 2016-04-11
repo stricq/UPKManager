@@ -109,7 +109,13 @@ namespace UpkManager.Wpf.Controllers {
 
       allMods.Sort(domainUpkfileComparison);
 
-      viewModel.Mods = new ObservableCollection<FileViewEntity>(mapper.Map<IEnumerable<FileViewEntity>>(allMods));
+      viewModel.Mods.ForEach(mf => mf.PropertyChanged -= onFileViewEntityChanged);
+
+      viewModel.Mods.Clear();
+
+      viewModel.Mods.AddRange(mapper.Map<IEnumerable<FileViewEntity>>(allMods));
+
+      viewModel.Mods.ForEach(mf => mf.PropertyChanged += onFileViewEntityChanged);
     }
 
     #endregion Messenger
