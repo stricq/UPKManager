@@ -307,7 +307,11 @@ namespace UpkManager.Wpf.Controllers {
           messenger.Send(message);
         }
 
-        string filename = Path.Combine(settings.PathToGame, Path.GetDirectoryName(file.GameFilename), "mod", Path.GetFileName(file.GameFilename));
+        string directory = Path.Combine(settings.PathToGame, Path.GetDirectoryName(file.GameFilename), "mod");
+
+        string filename = Path.Combine(directory, Path.GetFileName(file.GameFilename));
+
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
         await repository.SaveUpkFile(header, filename);
 
