@@ -572,6 +572,8 @@ namespace UpkManager.Wpf.Controllers {
 
           await export.DomainObject.SaveObject(filename);
         }
+
+        file.Header = null;
       }
 
       message.IsComplete = true;
