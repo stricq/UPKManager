@@ -17,7 +17,7 @@ namespace UpkManager.Domain.Models.UpkFile.Tables {
 
     #region Properties
 
-    public DomainString Name { get; }
+    public DomainString Name { get; private set;}
 
     public ulong Flags { get; private set; }
 
@@ -35,6 +35,14 @@ namespace UpkManager.Domain.Models.UpkFile.Tables {
       await Name.ReadString(reader);
 
       Flags = reader.ReadUInt64();
+    }
+
+    public void SetNameTableEntry(DomainString name, ulong flags, int index) {
+      Name = name;
+
+      Flags = flags;
+
+      TableIndex = index;
     }
 
     #endregion Domain Methods

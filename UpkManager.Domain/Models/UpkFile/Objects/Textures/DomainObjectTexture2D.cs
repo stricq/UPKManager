@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpImageLibrary.General;
 
 using UpkManager.Domain.Constants;
+using UpkManager.Domain.Extensions;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
@@ -97,7 +98,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       memory.Close();
     }
 
-    public override async Task SetObject(string filename) {
+    public override async Task SetObject(string filename, List<DomainNameTableEntry> nameTable) {
       ImageEngineImage image = await Task.Run(() => new ImageEngineImage(filename));
 
       int width  = image.Width;
@@ -121,9 +122,17 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
-      string format = pfFormat?.PropertyString ?? "PF_DXT5";
+      ImageEngineFormat imageFormat = image.Format.InternalFormat;
 
-      ImageEngineFormat imageFormat = ImageEngine.ParseFromString(format);
+      if (!imageFormat.ToString().Contains("DDS")) throw new Exception($"Image is not in a DDS format.  It is actually {imageFormat}.");
+
+      if (pfFormat != null) {
+        string formatStr =  imageFormat.ToString().Replace("DDS", "PF");
+
+        DomainNameTableEntry formatTableEntry = nameTable.SingleOrDefault(nt => nt.Name.String == formatStr) ?? nameTable.AddDomainNameTableEntry(formatStr);
+
+        pfFormat.SetPropertyValue(formatTableEntry);
+      }
 
       MipMaps.Clear();
 
@@ -145,7 +154,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         if (width  > 1) width  /= 2;
         if (height > 1) height /= 2;
 
-        if (image.Width > 4 && image.Height > 4) image.Resize(0.5);
+        if (image.Width > 4 && image.Height > 4) image.Resize(0.5, false);
       }
     }
 

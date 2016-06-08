@@ -300,7 +300,7 @@ namespace UpkManager.Wpf.Controllers {
 
           await export.ParseDomainObject(header, false, false);
 
-          await export.DomainObject.SetObject(entity.Filename);
+          await export.DomainObject.SetObject(entity.Filename, header.NameTable);
 
           message.StatusText = entity.Filename;
 

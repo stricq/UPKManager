@@ -116,6 +116,7 @@
     <Compile Include="Contracts\ISettingsRepository.cs" />
     <Compile Include="Contracts\IUpkFileRemoteRepository.cs" />
     <Compile Include="Contracts\IUpkFileRepository.cs" />
+    <Compile Include="Extensions\List.AddDomainNameTableEntry.cs" />
     <Compile Include="Helpers\ByteArrayWriter.cs" />
     <Compile Include="Helpers\MiniLZO.cs" />
     <Compile Include="Models\UpkFile\Compression\DomainCompressedChunkBulkData.cs" />

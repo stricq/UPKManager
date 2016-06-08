@@ -24,6 +24,14 @@ namespace UpkManager.Domain.Models.UpkFile.Tables {
 
     #region Public Methods
 
+    public void SetNameTableIndex(DomainNameTableEntry nameTableEntry, int numeric = 0) {
+      Index = nameTableEntry.TableIndex;
+
+      Numeric = numeric;
+
+      Name = nameTableEntry.Name.String;
+    }
+
     public void ReadNameTableIndex(ByteArrayReader reader, DomainHeader header) {
       Index   = reader.ReadInt32();
       Numeric = reader.ReadInt32();

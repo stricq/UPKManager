@@ -24,7 +24,7 @@ namespace UpkManager.Lzo {
     public LzoCompression() {
       int init = is64Bit ? Lzo2.lzo_init_64(1, -1, -1, -1, -1, -1, -1, -1, -1, -1) : Lzo2.lzo_init_32(1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
 
-      if(init != 0) throw new Exception("Initialization of lzo2.dll failed.");
+      if (init != 0) throw new Exception("Initialization of lzo2.dll failed.");
     }
 
     #endregion Constructor

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -58,7 +59,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects {
       await Task.CompletedTask;
     }
 
-    public virtual async Task SetObject(string filename) {
+    public virtual async Task SetObject(string filename, List<DomainNameTableEntry> nameTable) {
       await Task.CompletedTask;
     }
 
