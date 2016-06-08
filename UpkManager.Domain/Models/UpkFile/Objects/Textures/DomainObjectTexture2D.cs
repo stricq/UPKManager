@@ -129,6 +129,9 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       if (pfFormat != null) {
         string formatStr =  imageFormat.ToString().Replace("DDS", "PF");
 
+        if (formatStr.Contains("ARGB")) formatStr = "PF_A8R8G8B8";
+        else if (formatStr.Contains("G8")) formatStr = "PF_G8";
+
         DomainNameTableEntry formatTableEntry = nameTable.SingleOrDefault(nt => nt.Name.String == formatStr) ?? nameTable.AddDomainNameTableEntry(formatStr);
 
         pfFormat.SetPropertyValue(formatTableEntry);
