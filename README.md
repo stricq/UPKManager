@@ -17,7 +17,7 @@ Name: STR Programming Services
 Source: http://nuget.stricq.com/nuget
 
 # Download
-[UPK Manager v1.3](https://bns.stricq.com/Files/UpkManager.Installer_1.3.zip)
+[UPK Manager v1.3.2](https://bns.stricq.com/Files/UpkManager.Installer_1.3.2.zip)
 
 # Instructions for Viewing and Saving Textures
 ### Settings
@@ -59,6 +59,12 @@ Once you have finished modifying the textures in the Export Path switch to the R
 Any textures not checked will be pulled from the source game file and copied unmodified into the repackaged UPK file.
 
 Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
+
+# Changes for Release 1.3.2
+
+* Changes the rebuild package process to use the file format of the saved texture rather than converting it internally to the original format in the game file.
+* Now creates the mod directory if it doesn't already exist.
+* Other misc issues that were in 1.3.1 that was not officially versioned.
 
 # Changes for Release 1.3
 
