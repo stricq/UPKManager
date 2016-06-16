@@ -7,6 +7,12 @@ Extract and re-integrate Texture2D and other object types.
 
 Visual Studio 2015 .Net 4.6.1
 
+### Download
+[UPK Manager v1.3.2](https://forums.stricq.com/resources/upk-manager.1/)
+
+### Support
+[UPK Manager Forums](https://forums.stricq.com/)
+
 # External NuGet Source
 In Visual Studio:
 
@@ -15,9 +21,6 @@ Tools -> Options -> NuGet Package Manager -> Package Sources
 Name: STR Programming Services
 
 Source: http://nuget.stricq.com/nuget
-
-# Download
-[UPK Manager v1.3.2](https://bns.stricq.com/Files/UpkManager.Installer_1.3.2.zip)
 
 # Instructions for Viewing and Saving Textures
 ### Settings
