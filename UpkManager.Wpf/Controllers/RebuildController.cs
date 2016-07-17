@@ -34,7 +34,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class RebuildController : IController {
+  public sealed class RebuildController : IController {
 
     #region Private Fields
 
@@ -208,7 +208,9 @@ namespace UpkManager.Wpf.Controllers {
 
         viewModel.ExportsTree?.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged -= onExportedObjectViewEntityChanged);
 
-        viewModel.ExportsTree = new ObservableCollection<ExportedObjectViewEntity>(mapper.Map<IEnumerable<ExportedObjectViewEntity>>(root.Children));
+        IEnumerable<ExportedObjectViewEntity> temp = mapper.Map<IEnumerable<ExportedObjectViewEntity>>(root.Children);
+
+        viewModel.ExportsTree = new ObservableCollection<ExportedObjectViewEntity>(temp);
 
         viewModel.ExportsTree.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged += onExportedObjectViewEntityChanged);
       }

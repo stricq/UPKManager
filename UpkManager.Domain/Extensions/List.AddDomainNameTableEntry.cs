@@ -7,7 +7,7 @@ using UpkManager.Domain.Models.UpkFile.Tables;
 
 namespace UpkManager.Domain.Extensions {
 
-  public static class ListExtensions {
+  internal static class ListExtensions {
 
     public static DomainNameTableEntry AddDomainNameTableEntry(this List<DomainNameTableEntry> nameTable, string value) {
       DomainString valueString = new DomainString();

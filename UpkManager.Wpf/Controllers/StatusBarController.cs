@@ -13,7 +13,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class StatusBarController : IController {
+  public sealed class StatusBarController : IController {
 
     #region Private Fields
 

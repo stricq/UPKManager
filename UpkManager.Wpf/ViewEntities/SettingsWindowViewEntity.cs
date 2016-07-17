@@ -1,10 +1,15 @@
-﻿using System.Windows;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Windows;
 
 using STR.MvvmCommon;
 
 
 namespace UpkManager.Wpf.ViewEntities {
 
+  [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  [SuppressMessage("ReSharper", "UnusedMember.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
   public class SettingsWindowViewEntity : ObservableObject {
 
     #region Private Fields

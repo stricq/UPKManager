@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 using STR.Common.Contracts;
 
@@ -7,6 +8,8 @@ using STR.MvvmCommon;
 
 namespace UpkManager.Wpf.ViewEntities {
 
+  [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
   public class ExportedObjectViewEntity : ObservableObject, ITraversable<ExportedObjectViewEntity> {
 
     #region Private Fields

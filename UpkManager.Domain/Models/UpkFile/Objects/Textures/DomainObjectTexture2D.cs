@@ -101,18 +101,29 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
     public override async Task SetObject(string filename, List<DomainNameTableEntry> nameTable) {
       ImageEngineImage image = await Task.Run(() => new ImageEngineImage(filename));
 
+      bool skipFirstMip = false;
+
       int width  = image.Width;
       int height = image.Height;
+
+      if (MipMaps[0].ImageData == null || MipMaps[0].ImageData.Length == 0) {
+        width  *= 2;
+        height *= 2;
+
+        skipFirstMip = true;
+      }
 
       DomainPropertyIntValue sizeX = PropertyHeader.GetProperty("SizeX").FirstOrDefault()?.Value as DomainPropertyIntValue;
       DomainPropertyIntValue sizeY = PropertyHeader.GetProperty("SizeY").FirstOrDefault()?.Value as DomainPropertyIntValue;
 
-      sizeX?.SetPropertyValue(width);
-      sizeY?.SetPropertyValue(height);
+      sizeX?.SetPropertyValue(skipFirstMip ? width  * 2 : width);
+      sizeY?.SetPropertyValue(skipFirstMip ? height * 2 : height);
 
       DomainPropertyIntValue mipTailBaseIdx = PropertyHeader.GetProperty("MipTailBaseIdx").FirstOrDefault()?.Value as DomainPropertyIntValue;
 
-      mipTailBaseIdx?.SetPropertyValue((int)Math.Log(width > height ? width : height, 2));
+      int indexSize = width > height ? width : height;
+
+      mipTailBaseIdx?.SetPropertyValue((int)Math.Log(skipFirstMip ? indexSize * 2 : indexSize , 2));
 
       DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").FirstOrDefault()?.Value as DomainPropertyStringValue;
       DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").FirstOrDefault()?.Value as DomainPropertyStringValue;
@@ -142,14 +153,16 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       while(true) {
         MemoryStream stream = new MemoryStream();
 
-        image.Save(stream, imageFormat, MipHandling.KeepTopOnly);
+        if (!skipFirstMip) {
+          image.Save(stream, imageFormat, MipHandling.KeepTopOnly);
 
-        await stream.FlushAsync();
+          await stream.FlushAsync();
+        }
 
         MipMaps.Add(new DomainMipMap {
-          ImageData = (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(), // Strip off 128 bytes for the DDS header
-          Width     = image.Width,
-          Height    = image.Height
+          ImageData = skipFirstMip ? null : (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(), // Strip off 128 bytes for the DDS header
+          Width     = skipFirstMip ? image.Width  * 2 : image.Width,
+          Height    = skipFirstMip ? image.Height * 2 : image.Height
         });
 
         if (width == 1 && height == 1) break;
@@ -157,7 +170,9 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         if (width  > 1) width  /= 2;
         if (height > 1) height /= 2;
 
-        if (image.Width > 4 && image.Height > 4) image.Resize(0.5, false);
+        if (!skipFirstMip && image.Width > 4 && image.Height > 4) image.Resize(0.5, false);
+
+        skipFirstMip = false;
       }
     }
 

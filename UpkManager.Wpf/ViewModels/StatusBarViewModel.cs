@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 
 using STR.MvvmCommon;
 
@@ -7,7 +8,8 @@ namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("StatusBarViewModel")]
-  public class StatusBarViewModel : ObservableObject {
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  public sealed class StatusBarViewModel : ObservableObject {
 
     #region Private Fields
 

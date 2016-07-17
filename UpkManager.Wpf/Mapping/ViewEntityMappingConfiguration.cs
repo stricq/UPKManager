@@ -12,6 +12,7 @@ using UpkManager.Domain.Models.UpkFile.Compression;
 using UpkManager.Domain.Models.UpkFile.Objects.Textures;
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
+
 using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewEntities.Tables;
@@ -20,11 +21,11 @@ using UpkManager.Wpf.ViewEntities.Tables;
 namespace UpkManager.Wpf.Mapping {
 
   [Export(typeof(IAutoMapperConfiguration))]
-  public class ViewEntityMappingConfiguration : IAutoMapperConfiguration {
+  public sealed class ViewEntityMappingConfiguration : IAutoMapperConfiguration {
 
     #region IAutoMapperConfiguration Implementation
 
-    public void RegisterMappings(IMapperConfiguration config) {
+    public void RegisterMappings(IMapperConfigurationExpression config) {
 
       #region Settings
 
@@ -116,7 +117,8 @@ namespace UpkManager.Wpf.Mapping {
                                                         .ForMember(dest => dest.Level,     opt => opt.Ignore());
 
       config.CreateMap<DomainExportedObject, ExportedObjectViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
-                                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore());
+                                                                        .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
+                                                                        .PreserveReferences();
 
       #endregion Objects
 

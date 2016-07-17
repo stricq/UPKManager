@@ -7,6 +7,7 @@ using System.Windows;
 using AutoMapper;
 
 using STR.Common.Extensions;
+
 using STR.MvvmCommon.Contracts;
 using STR.MvvmCommon.Mef;
 
@@ -15,7 +16,7 @@ using UpkManager.Domain.Contracts;
 
 namespace UpkManager.Wpf {
 
-  public partial class App : Application {
+  internal sealed partial class App : Application {
 
     #region Private Fields
 

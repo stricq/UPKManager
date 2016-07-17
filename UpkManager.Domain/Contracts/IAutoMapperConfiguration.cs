@@ -5,7 +5,7 @@ namespace UpkManager.Domain.Contracts {
 
   public interface IAutoMapperConfiguration {
 
-    void RegisterMappings(IMapperConfiguration config);
+    void RegisterMappings(IMapperConfigurationExpression config);
 
   }
 

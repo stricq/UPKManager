@@ -11,11 +11,11 @@ using UpkManager.Entities;
 namespace UpkManager.Repository.Mapping {
 
   [Export(typeof(IAutoMapperConfiguration))]
-  public class AutoMapperConfiguration : IAutoMapperConfiguration {
+  public sealed class AutoMapperConfiguration : IAutoMapperConfiguration {
 
     #region IAutoMapperConfiguration Implementation
 
-    public void RegisterMappings(IMapperConfiguration config) {
+    public void RegisterMappings(IMapperConfigurationExpression config) {
 
       #region DTOs
 

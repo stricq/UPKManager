@@ -13,7 +13,7 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
 
     #region Constructor
 
-    public DomainPropertyHeader() {
+    internal DomainPropertyHeader() {
       Properties = new List<DomainProperty>();
     }
 
@@ -29,7 +29,7 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
 
     #region Domain Methods
 
-    public async Task ReadPropertyHeader(ByteArrayReader reader, DomainHeader header) {
+    internal async Task ReadPropertyHeader(ByteArrayReader reader, DomainHeader header) {
       TypeIndex = reader.ReadInt32();
 
       do {
@@ -44,7 +44,7 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
       while(true);
     }
 
-    public List<DomainProperty> GetProperty(string name) {
+    internal List<DomainProperty> GetProperty(string name) {
       return Properties.Where(p => p.NameIndex.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
     }
 
