@@ -89,11 +89,11 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       ImageEngineImage ddsImage = new ImageEngineImage(memory);
 
-      FileStream stream = new FileStream(filename, FileMode.Create);
+      FileStream streamDds = new FileStream(filename, FileMode.Create);
 
-      await Task.Run(() => ddsImage.Save(stream, format, MipHandling.KeepTopOnly));
+      await Task.Run(() => ddsImage.Save(streamDds, format, MipHandling.KeepTopOnly));
 
-      stream.Close();
+      streamDds.Close();
 
       memory.Close();
     }

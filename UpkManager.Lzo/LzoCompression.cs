@@ -1,11 +1,13 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 
 namespace UpkManager.Lzo {
 
-  public class LzoCompression : ILzoCompression {
+  [Export(typeof(ILzoCompression))]
+  public sealed class LzoCompression : ILzoCompression {
 
     #region Private Fields
 
