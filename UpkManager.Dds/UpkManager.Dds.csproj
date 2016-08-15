@@ -36,12 +36,17 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WriteableBitmapEx.Wpf, Version=1.5.0.0, Culture=neutral, PublicKeyToken=50375ca6144f1c69, processorArchitecture=MSIL">
+      <HintPath>..\packages\WriteableBitmapEx.1.5.0.0\lib\net40\WriteableBitmapEx.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\CubeMapFlags.cs" />
     <Compile Include="Constants\FileFormat.cs" />
     <Compile Include="Constants\FourCCFormat.cs" />
     <Compile Include="Constants\HeaderFlags.cs" />
+    <Compile Include="Constants\HeaderValues.cs" />
     <Compile Include="Constants\PixelFormatFlags.cs" />
     <Compile Include="Constants\SquishFlags.cs" />
     <Compile Include="Constants\SurfaceFlags.cs" />
@@ -49,10 +54,15 @@
     <Compile Include="DdsFile.cs" />
     <Compile Include="DdsHeader.cs" />
     <Compile Include="DdsPixelFormat.cs" />
+    <Compile Include="DdsSaveConfig.cs" />
     <Compile Include="DdsSquish.cs" />
+    <Compile Include="Extensions\WriteableBitmapExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RgbaBitmapSource.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="lib32\Squish_x86.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -60,11 +70,12 @@
     <Content Include="lib32\Squish_x86_SSE2.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lib64\Squish_x64.dll">
+    <Content Include="lib64\Squish_x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="License.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

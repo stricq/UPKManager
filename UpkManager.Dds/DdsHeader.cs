@@ -11,8 +11,18 @@ namespace UpkManager.Dds {
 
     internal DdsHeader() { }
 
-    public DdsHeader(FileFormat format) {
+    public DdsHeader(FileFormat format, int width, int height) {
       PixelFormat = new DdsPixelFormat(format);
+
+      Width  = (uint)width;
+      Height = (uint)height;
+
+      Size = 18 * 4 + PixelFormat.Size + 5 * 4;
+
+      HeaderFlags  = (uint)Constants.HeaderFlags.Texture;
+      SurfaceFlags = (uint)Constants.SurfaceFlags.Texture;
+
+      MipMapCount = 1;
     }
 
     #endregion Constructor
@@ -71,6 +81,11 @@ namespace UpkManager.Dds {
 
     #region Public Methods
 
+    public void Resize(int width, int height) {
+      Width  = (uint)width;
+      Height = (uint)height;
+    }
+
     public void Read(BinaryReader reader) {
       Size              = reader.ReadUInt32();
       HeaderFlags       = reader.ReadUInt32();
@@ -103,6 +118,8 @@ namespace UpkManager.Dds {
     }
 
     public void Write(BinaryWriter writer) {
+      writer.Write(HeaderValues.DdsSignature); // "DDS "
+
       writer.Write(Size);
       writer.Write(HeaderFlags);
       writer.Write(Height);
@@ -129,6 +146,8 @@ namespace UpkManager.Dds {
       writer.Write(Reserved2_0);
       writer.Write(Reserved2_1);
       writer.Write(Reserved2_2);
+
+      writer.Flush();
     }
 
     #endregion Public Methods

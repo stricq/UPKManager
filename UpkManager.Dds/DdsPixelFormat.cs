@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using UpkManager.Dds.Constants;
 
@@ -9,9 +10,9 @@ namespace UpkManager.Dds {
 
     #region Constructor
 
-    public DdsPixelFormat() { }
+    internal DdsPixelFormat() { }
 
-    public DdsPixelFormat(FileFormat fileFormat) {
+    internal DdsPixelFormat(FileFormat fileFormat) {
       Size = 8 * 4;
 
       switch(fileFormat) {
@@ -27,12 +28,13 @@ namespace UpkManager.Dds {
           BBitMask = 0;
           ABitMask = 0;
 
-          if (fileFormat == FileFormat.DXT1) FourCC = 0x31545844; // "DXT1"
-          if (fileFormat == FileFormat.DXT3) FourCC = 0x33545844; // "DXT3"
-          if (fileFormat == FileFormat.DXT5) FourCC = 0x35545844; // "DXT5"
+          if (fileFormat == FileFormat.DXT1) FourCC = FourCCFormat.Dxt1;
+          if (fileFormat == FileFormat.DXT3) FourCC = FourCCFormat.Dxt3;
+          if (fileFormat == FileFormat.DXT5) FourCC = FourCCFormat.Dxt5;
 
           break;
         }
+
         case FileFormat.A8R8G8B8: {
           Flags = (int)PixelFormatFlags.RGBA;
 
@@ -145,6 +147,20 @@ namespace UpkManager.Dds {
 
           break;
         }
+        case FileFormat.G8: {
+          Flags = (int)PixelFormatFlags.Gray;
+
+          FourCC = 0;
+
+          RgbBitCount = 8;
+
+          RBitMask = 0x000000ff;
+          GBitMask = 0x00000000;
+          BBitMask = 0x00000000;
+          ABitMask = 0x00000000;
+
+          break;
+        }
       }
     }
 
@@ -172,6 +188,16 @@ namespace UpkManager.Dds {
 
     #region Public Methods
 
+    public static FileFormat ParseFileFormat(string format) {
+      if (format.ToLowerInvariant().Contains("dxt1"))     return FileFormat.DXT1;
+      if (format.ToLowerInvariant().Contains("dxt3"))     return FileFormat.DXT3;
+      if (format.ToLowerInvariant().Contains("dxt5"))     return FileFormat.DXT5;
+      if (format.ToLowerInvariant().Contains("a8r8g8b8")) return FileFormat.A8R8G8B8;
+      if (format.ToLowerInvariant().Contains("g8"))       return FileFormat.G8;
+
+      throw new FormatException("Not a known DDS format.");
+    }
+
     internal void Read(BinaryReader reader) {
       Size			  = reader.ReadUInt32();
       Flags		    = reader.ReadUInt32();
@@ -192,8 +218,6 @@ namespace UpkManager.Dds {
       writer.Write(GBitMask);
       writer.Write(BBitMask);
       writer.Write(ABitMask);
-
-      writer.Flush();
     }
 
     #endregion Public Methods

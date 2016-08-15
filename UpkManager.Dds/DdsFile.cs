@@ -1,20 +1,34 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Media.Imaging;
 
 using UpkManager.Dds.Constants;
+using UpkManager.Dds.Extensions;
 
 
 namespace UpkManager.Dds {
 
-  public class DdsFile {
+  public sealed class DdsFile {
 
     #region Private Fields
-
-    private const uint ddsSignature = 0x20534444;
 
     private DdsHeader header;
 
     #endregion Private Fields
+
+    #region Constructors
+
+    public DdsFile() { }
+
+    public DdsFile(string filename) {
+      Load(filename);
+    }
+
+    public DdsFile(Stream stream) {
+      Load(stream);
+    }
+
+    #endregion Constructors
 
     #region Public Properties
 
@@ -24,9 +38,27 @@ namespace UpkManager.Dds {
 
     public byte[] PixelData { get; private set; }
 
+    public BitmapSource BitmapSource => new RgbaBitmapSource(PixelData, Width);
+
     #endregion Public Properties
 
     #region Public Methods
+
+    public static void Initialize() {
+      DdsSquish.Initialize();
+    }
+
+    public void Load(string filename) {
+      Load(File.OpenRead(filename));
+    }
+
+    public void Resize(int width, int height) {
+      if (!isPowerOfTwo(width) || !isPowerOfTwo(height)) throw new ArgumentException($"Both width ({width}) and height ({height}) must be a power of 2.");
+
+      PixelData = BitmapSource.ResizeHighQuality(width, height).ConvertToRgba();
+
+      header.Resize(width, height);
+    }
 
     public void Load(Stream input) {
       BinaryReader reader = new BinaryReader(input);
@@ -35,19 +67,13 @@ namespace UpkManager.Dds {
       //
       uint signature = reader.ReadUInt32();
 
-      if (signature != ddsSignature) throw new FormatException("File does not appear to be a DDS image");
+      if (signature != HeaderValues.DdsSignature) throw new FormatException("File does not appear to be a DDS image");
 
       header = new DdsHeader();
       //
       // Read everything in.. for now assume it worked like a charm..
       //
       header.Read(reader);
-
-      Load(header, input);
-    }
-
-    public void Load(DdsHeader ddsHeader, Stream input) {
-      header = ddsHeader;
 
       if ((header.PixelFormat.Flags & (int)PixelFormatFlags.FourCC) != 0) {
         int squishFlags;
@@ -84,8 +110,9 @@ namespace UpkManager.Dds {
         byte[] compressedBlocks = new byte[blockCount * blockSize];
 
         input.Read(compressedBlocks, 0, compressedBlocks.GetLength(0));
-
+        //
         // Now decompress..
+        //
         PixelData = DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
       }
       else {
@@ -96,7 +123,7 @@ namespace UpkManager.Dds {
         FileFormat fileFormat = FileFormat.Unknown;
 
         if ((header.PixelFormat.Flags == (int)PixelFormatFlags.RGBA) && (header.PixelFormat.RgbBitCount == 32) &&
-            (header.PixelFormat.ABitMask == 0x00ff0000) && (header.PixelFormat.GBitMask == 0x0000ff00) &&
+            (header.PixelFormat.RBitMask == 0x00ff0000) && (header.PixelFormat.GBitMask == 0x0000ff00) &&
             (header.PixelFormat.BBitMask == 0x000000ff) && (header.PixelFormat.ABitMask == 0xff000000)) fileFormat = FileFormat.A8R8G8B8;
         else if ((header.PixelFormat.Flags == (int)PixelFormatFlags.RGB) && (header.PixelFormat.RgbBitCount == 32) &&
                  (header.PixelFormat.RBitMask == 0x00ff0000) && (header.PixelFormat.GBitMask == 0x0000ff00) &&
@@ -119,6 +146,9 @@ namespace UpkManager.Dds {
         else if ((header.PixelFormat.Flags == (int)PixelFormatFlags.RGB) && (header.PixelFormat.RgbBitCount == 16) &&
                  (header.PixelFormat.RBitMask == 0x0000f800) && (header.PixelFormat.GBitMask == 0x000007e0) &&
                  (header.PixelFormat.BBitMask == 0x0000001f) && (header.PixelFormat.ABitMask == 0x00000000)) fileFormat = FileFormat.R5G6B5;
+        else if ((header.PixelFormat.Flags == (int)PixelFormatFlags.Gray) && (header.PixelFormat.RgbBitCount == 8) &&
+                 (header.PixelFormat.RBitMask == 0x000000ff) && (header.PixelFormat.GBitMask == 0x00000000) &&
+                 (header.PixelFormat.BBitMask == 0x00000000) && (header.PixelFormat.ABitMask == 0x00000000)) fileFormat = FileFormat.G8;
         //
         // If fileFormat is still invalid, then it's an unsupported format.
         //
@@ -269,6 +299,13 @@ namespace UpkManager.Dds {
 
                 break;
               }
+              case FileFormat.G8: {
+                pixelAlpha = 0xff;
+
+                pixelRed = pixelGreen = pixelBlue = pixelColour & 0xff;
+
+                break;
+              }
             }
             //
             // Write the colours away..
@@ -284,7 +321,20 @@ namespace UpkManager.Dds {
       }
     }
 
+    public void Save(Stream output, DdsSaveConfig saveConfig) {
+
+    }
+
     #endregion Public Methods
+
+    #region Private Methods
+
+    private static bool isPowerOfTwo(int x)
+    {
+        return (x != 0) && ((x & (x - 1)) == 0);
+    }
+
+    #endregion Private Methods
 
   }
 

@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using CSharpImageLibrary.General;
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Extensions;
@@ -77,29 +78,31 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
     public override async Task SaveObject(string filename) {
       if (MipMaps == null || !MipMaps.Any()) return;
 
-      ImageEngineFormat format;
+      FileFormat format;
 
       DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
 
       if (mipMap == null) return;
 
-      MemoryStream memory = buildDdsImage(MipMaps.IndexOf(mipMap), out format);
+      Stream memory = buildDdsImage(MipMaps.IndexOf(mipMap), out format);
 
       if (memory == null) return;
 
-      ImageEngineImage ddsImage = new ImageEngineImage(memory);
+      DdsFile ddsImage = new DdsFile(memory);
 
-      FileStream streamDds = new FileStream(filename, FileMode.Create);
+      FileStream ddsStream = new FileStream(filename, FileMode.Create);
 
-      await Task.Run(() => ddsImage.Save(streamDds, format, MipHandling.KeepTopOnly));
+      DdsSaveConfig config = new DdsSaveConfig(format, 0, 0, false, false);
 
-      streamDds.Close();
+      await Task.Run(() => ddsImage.Save(ddsStream, config));
+
+      ddsStream.Close();
 
       memory.Close();
     }
 
     public override async Task SetObject(string filename, List<DomainNameTableEntry> nameTable) {
-      ImageEngineImage image = await Task.Run(() => new ImageEngineImage(filename));
+      DdsFile image = await Task.Run(() => new DdsFile(filename));
 
       bool skipFirstMip = false;
 
@@ -133,20 +136,11 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
-      ImageEngineFormat imageFormat = image.Format.InternalFormat;
+      FileFormat imageFormat = FileFormat.Unknown;
 
-      if (!imageFormat.ToString().Contains("DDS")) throw new Exception($"Image is not in a DDS format.  It is actually {imageFormat}.");
+      if (pfFormat != null) imageFormat = DdsPixelFormat.ParseFileFormat(pfFormat.PropertyString);
 
-      if (pfFormat != null) {
-        string formatStr =  imageFormat.ToString().Replace("DDS", "PF");
-
-        if (formatStr.Contains("ARGB")) formatStr = "PF_A8R8G8B8";
-        else if (formatStr.Contains("G8")) formatStr = "PF_G8";
-
-        DomainNameTableEntry formatTableEntry = nameTable.SingleOrDefault(nt => nt.Name.String == formatStr) ?? nameTable.AddDomainNameTableEntry(formatStr);
-
-        pfFormat.SetPropertyValue(formatTableEntry);
-      }
+      if (imageFormat == FileFormat.Unknown) throw new Exception("Unknown DDS File Format.");
 
       MipMaps.Clear();
 
@@ -154,7 +148,9 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         MemoryStream stream = new MemoryStream();
 
         if (!skipFirstMip) {
-          image.Save(stream, imageFormat, MipHandling.KeepTopOnly);
+          DdsSaveConfig config = new DdsSaveConfig(imageFormat, 0, 0, false, false);
+
+          image.Save(stream, config);
 
           await stream.FlushAsync();
         }
@@ -170,7 +166,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         if (width  > 1) width  /= 2;
         if (height > 1) height /= 2;
 
-        if (!skipFirstMip && image.Width > 4 && image.Height > 4) image.Resize(0.5, false);
+        if (!skipFirstMip && image.Width > 4 && image.Height > 4) image.Resize(image.Width / 2, image.Height / 2);
 
         skipFirstMip = false;
       }
@@ -179,7 +175,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
     public override Stream GetObjectStream() {
       if (MipMaps == null || !MipMaps.Any()) return null;
 
-      ImageEngineFormat format;
+      FileFormat format;
 
       DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
 
@@ -187,7 +183,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
     }
 
     public Stream GetObjectStream(int mipMapIndex) {
-      ImageEngineFormat format;
+      FileFormat format;
 
       return buildDdsImage(mipMapIndex, out format);
     }
@@ -234,50 +230,26 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
     #region Private Methods
 
-    private MemoryStream buildDdsImage(int mipMapIndex, out ImageEngineFormat imageFormat) {
+    private Stream buildDdsImage(int mipMapIndex, out FileFormat imageFormat) {
       DomainPropertyByteValue formatProp = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
-      imageFormat = ImageEngineFormat.Unknown;
+      imageFormat = FileFormat.Unknown;
 
       if (formatProp == null) return null;
 
-      string format = formatProp.PropertyString.Replace("PF_", null);
-
-      switch(format) {
-        case "DXT1": {
-          imageFormat = ImageEngineFormat.DDS_DXT1;
-
-          break;
-        }
-        case "DXT5": {
-          imageFormat = ImageEngineFormat.DDS_DXT5;
-
-          break;
-        }
-        case "G8": {
-          imageFormat = ImageEngineFormat.DDS_G8_L8;
-
-          break;
-        }
-        case "A8R8G8B8": {
-          imageFormat = ImageEngineFormat.DDS_ARGB;
-
-          break;
-        }
-        default: {
-          return null;
-        }
-      }
+      string format = formatProp.PropertyString;
 
       DomainMipMap mipMap = MipMaps[mipMapIndex];
 
-      DDSGeneral.DDS_HEADER header = DDSGeneral.Build_DDS_Header(0, mipMap.Height, mipMap.Width, imageFormat);
+      imageFormat = DdsPixelFormat.ParseFileFormat(format);
+
+      DdsHeader ddsHeader = new DdsHeader(imageFormat, mipMap.Width, mipMap.Height);
 
       MemoryStream stream = new MemoryStream();
 
       BinaryWriter writer = new BinaryWriter(stream);
 
-      DDSGeneral.Write_DDS_Header(header, writer);
+      ddsHeader.Write(writer);
 
       stream.Write(mipMap.ImageData, 0, mipMap.ImageData.Length);
 

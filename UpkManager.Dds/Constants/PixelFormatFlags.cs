@@ -8,7 +8,8 @@ namespace UpkManager.Dds.Constants {
 
     FourCC = 0x00000004,
     RGB    = 0x00000040,
-    RGBA   = 0x00000041
+    RGBA   = 0x00000041,
+    Gray   = 0x00020000
 
   }
 

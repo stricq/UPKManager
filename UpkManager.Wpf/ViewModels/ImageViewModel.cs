@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media.Imaging;
 
 using STR.MvvmCommon;
@@ -12,7 +13,9 @@ namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("ImageViewModel")]
-  public class ImageViewModel : ObservableObject {
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  public sealed class ImageViewModel : ObservableObject {
 
     #region Private Fields
 

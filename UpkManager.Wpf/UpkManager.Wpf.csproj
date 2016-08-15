@@ -48,10 +48,6 @@
       <HintPath>..\packages\AutoMapper.5.0.2\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CSharpImageLibrary, Version=3.1.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CSharpImageLibrary.3.1.6.0\lib\net45\CSharpImageLibrary.exe</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.1.1.0.0\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
       <Private>True</Private>
@@ -406,6 +402,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\UpkManager.Dds\UpkManager.Dds.csproj">
+      <Project>{63287c47-8658-4401-9c51-d06c2a95af99}</Project>
+      <Name>UpkManager.Dds</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UpkManager.Domain\UpkManager.Domain.csproj">
       <Project>{04c2cfaf-8f1e-4631-88a6-0b9dc017452e}</Project>
       <Name>UpkManager.Domain</Name>

@@ -16,7 +16,8 @@ namespace UpkManager.Dds.Constants {
     A1R5G5B5,
     A4R4G4B4,
     R8G8B8,
-    R5G6B5
+    R5G6B5,
+    G8
 
   }
 
