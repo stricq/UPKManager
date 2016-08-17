@@ -8,7 +8,7 @@ using UpkManager.Domain.Models.UpkFile.Tables;
 
 namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
-  public class DomainObjectTextureMovie : DomainObjectCompressionBase {
+  public sealed class DomainObjectTextureMovie : DomainObjectCompressionBase {
 
     #region Properties
 
@@ -40,7 +40,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       });
     }
 
-    public override async Task SaveObject(string filename) {
+    public override async Task SaveObject(string filename, object configuration) {
       if (Movie == null || Movie.Length == 0) return;
 
       await Task.Run(() => File.WriteAllBytes(filename, Movie));

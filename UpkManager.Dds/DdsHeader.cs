@@ -11,18 +11,89 @@ namespace UpkManager.Dds {
 
     internal DdsHeader() { }
 
-    public DdsHeader(FileFormat format, int width, int height) {
-      PixelFormat = new DdsPixelFormat(format);
+    public DdsHeader(DdsSaveConfig config, int width, int height) {
+      PixelFormat = new DdsPixelFormat(config.FileFormat);
+
+      bool isCompressed = config.FileFormat == FileFormat.DXT1
+                       || config.FileFormat == FileFormat.DXT3
+                       || config.FileFormat == FileFormat.DXT5;
+      //
+      // Compute mip map count..
+      //
+      int mipCount  = 1;
+
+      int mipWidth  = width;
+      int mipHeight = height;
+
+      if (config.GenerateMipMaps) {
+        while(mipWidth > 1 || mipHeight > 1) {
+          mipCount++;
+
+          if (mipWidth  > 1) mipWidth  /= 2;
+          if (mipHeight > 1) mipHeight /= 2;
+        }
+      }
+
+      Size = 18 * 4 + PixelFormat.Size + 5 * 4;
 
       Width  = (uint)width;
       Height = (uint)height;
 
-      Size = 18 * 4 + PixelFormat.Size + 5 * 4;
+      MipMapCount = mipCount == 1 ? 0 : (uint)mipCount;
 
-      HeaderFlags  = (uint)Constants.HeaderFlags.Texture;
-      SurfaceFlags = (uint)Constants.SurfaceFlags.Texture;
+      HeaderFlags = (uint)(Constants.HeaderFlags.Texture | (isCompressed ? Constants.HeaderFlags.LinearSize : Constants.HeaderFlags.Pitch)
+                                                         | (mipCount > 1 ? Constants.HeaderFlags.MipMap     : Constants.HeaderFlags.None));
 
-      MipMapCount = 1;
+      SurfaceFlags = (uint)(Constants.SurfaceFlags.Texture | (mipCount > 1 ? Constants.SurfaceFlags.MipMap : Constants.SurfaceFlags.None));
+
+      if (isCompressed) {
+        //
+        // Compresssed textures have the linear flag set.  So pitchOrLinearSize
+        // needs to contain the entire size of the DXT block.
+        //
+        int blockCount = (width + 3) / 4 * ((height + 3) / 4);
+
+        int blockSize = config.FileFormat == FileFormat.Unknown ? 8 : 16;
+
+        PitchOrLinearSize = (uint)(blockCount * blockSize);
+      }
+      else {
+        //
+        // Non-compressed textures have the pitch flag set. So pitchOrLinearSize
+        // needs to contain the row pitch of the main image.
+        //
+        int pixelWidth = 0;
+
+        switch(config.FileFormat) {
+          case FileFormat.A8R8G8B8:
+          case FileFormat.X8R8G8B8:
+          case FileFormat.A8B8G8R8:
+          case FileFormat.X8B8G8R8: {
+            pixelWidth = 4;
+
+            break;
+          }
+          case FileFormat.R8G8B8: {
+            pixelWidth = 3;
+
+            break;
+          }
+          case FileFormat.A1R5G5B5:
+          case FileFormat.A4R4G4B4:
+          case FileFormat.R5G6B5: {
+            pixelWidth = 2;
+
+            break;
+          }
+          case FileFormat.G8: {
+            pixelWidth = 1;
+
+            break;
+          }
+        }
+
+        PitchOrLinearSize = (uint)(width * pixelWidth);
+      }
     }
 
     #endregion Constructor

@@ -17,6 +17,8 @@ using STR.DialogView.Domain.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
@@ -522,6 +524,12 @@ namespace UpkManager.Wpf.Controllers {
     private async Task exportFileObjects(List<DomainUpkFile> files) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Exporting...", Total = files.Count };
 
+      int compressor = menuViewModel.IsCompressorClusterFit ? 0 : menuViewModel.IsCompressorRangeFit ? 1 : 2;
+
+      int errorMetric = menuViewModel.IsErrorMetricPerceptual ? 0 : 1;
+
+      DdsSaveConfig config = new DdsSaveConfig(FileFormat.Unknown, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
+
       foreach(DomainUpkFile file in files) {
         FileViewEntity fileEntity = viewModel.Files.Single(fe => fe.Id == file.Id);
 
@@ -570,7 +578,7 @@ namespace UpkManager.Wpf.Controllers {
 
           messenger.Send(message);
 
-          await export.DomainObject.SaveObject(filename);
+          await export.DomainObject.SaveObject(filename, config);
         }
 
         file.Header = null;

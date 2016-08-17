@@ -14,6 +14,8 @@ using STR.Common.Extensions;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
 using UpkManager.Wpf.Messages.FileListing;
@@ -25,7 +27,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class PropertyController : IController {
+  public sealed class PropertyController : IController {
 
     #region Private Fields
 
@@ -107,7 +109,13 @@ namespace UpkManager.Wpf.Controllers {
 
       if (!result.HasValue || !result.Value) return;
 
-      await export.DomainObject.SaveObject(sfd.FileName);
+      int compressor = menuViewModel.IsCompressorClusterFit ? 0 : menuViewModel.IsCompressorRangeFit ? 1 : 2;
+
+      int errorMetric = menuViewModel.IsErrorMetricPerceptual ? 0 : 1;
+
+      DdsSaveConfig config = new DdsSaveConfig(FileFormat.Unknown, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
+
+      await export.DomainObject.SaveObject(sfd.FileName, config);
     }
 
     #endregion Commands

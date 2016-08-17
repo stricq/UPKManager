@@ -55,11 +55,11 @@ namespace UpkManager.Domain.Models.UpkFile.Objects {
       AdditionalDataReader = await reader.Splice();
     }
 
-    public virtual async Task SaveObject(string filename) {
+    public virtual async Task SaveObject(string filename, object configuration) {
       await Task.CompletedTask;
     }
 
-    public virtual async Task SetObject(string filename, List<DomainNameTableEntry> nameTable) {
+    public virtual async Task SetObject(string filename, List<DomainNameTableEntry> nameTable, object configuration) {
       await Task.CompletedTask;
     }
 

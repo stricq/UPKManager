@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+using UpkManager.Dds.Constants;
+
 
 namespace UpkManager.Dds {
 
@@ -68,15 +70,25 @@ namespace UpkManager.Dds {
       else SquishInitialize_32();
     }
 
-    internal static unsafe void CompressImage(byte[] rgba, int width, int height, byte[] blocks, int flags, ProgressFn progressFn) {
+    internal static unsafe byte[] CompressImage(byte[] rgba, int width, int height, int flags, ProgressFn progressFn) {
+      int blockCount = (width + 3 ) / 4 * ((height + 3) / 4);
+
+      int blockSize = (flags & (int)SquishFlags.Dxt1) != 0 ? 8 : 16;
+      //
+      // Allocate room for compressed blocks
+      //
+      byte[] blockData = new byte[blockCount * blockSize];
+
       fixed(byte* pRgba = rgba) {
-        fixed(byte* pBlocks = blocks) {
+        fixed(byte* pBlocks = blockData) {
           if (is64Bit) SquishCompressImage_64(pRgba, width, height, pBlocks, flags, progressFn);
           else SquishCompressImage_32(pRgba, width, height, pBlocks, flags, progressFn);
         }
       }
 
       GC.KeepAlive(progressFn);
+
+      return blockData;
     }
 
     internal static unsafe byte[] DecompressImage(int width, int height, byte[] blocks, int flags, ProgressFn progressFn) {

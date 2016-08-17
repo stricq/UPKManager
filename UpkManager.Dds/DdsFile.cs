@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 using UpkManager.Dds.Constants;
@@ -322,7 +323,129 @@ namespace UpkManager.Dds {
     }
 
     public void Save(Stream output, DdsSaveConfig saveConfig) {
+      BinaryWriter writer = new BinaryWriter(output);
 
+      header = new DdsHeader(saveConfig, Width, Height);
+      //
+      // For non-compressed textures, we need pixel width.
+      //
+      int pixelWidth = (int)header.PitchOrLinearSize / Width;
+
+      int mipCount = header.MipMapCount == 0 ? 1 : (int)header.MipMapCount;
+
+      header.Write(writer);
+
+      int mipWidth  = Width;
+      int mipHeight = Height;
+
+      Size[] writeSizes = new Size[mipCount];
+
+      for(int mipLoop = 0; mipLoop < mipCount; mipLoop++) {
+        Size writeSize = new Size(mipWidth, mipHeight);
+
+        writeSizes[mipLoop] = writeSize;
+
+        if (mipWidth  > 1) mipWidth  /= 2;
+        if (mipHeight > 1) mipHeight /= 2;
+      }
+
+      for(int mipLoop = 0; mipLoop < mipCount; ++mipLoop) {
+        Size writeSize = writeSizes[mipLoop];
+
+        WriteableBitmap writeSurface = new WriteableBitmap(BitmapSource);
+
+        if (mipLoop > 0) writeSurface = writeSurface.ResizeHighQuality((int)writeSize.Width, (int)writeSize.Height);
+
+        byte[] outputData;
+
+        if (saveConfig.FileFormat >= FileFormat.DXT1 && saveConfig.FileFormat <= FileFormat.DXT5) {
+          outputData = DdsSquish.CompressImage(writeSurface.ConvertToRgba(), (int)writeSize.Width, (int)writeSize.Height, saveConfig.GetSquishFlags(), null);
+        }
+        else {
+          int mipPitch = pixelWidth * (int)writeSize.Width;
+
+          outputData = new byte[mipPitch * (int)writeSize.Height];
+
+          outputData.Initialize();
+
+          byte[] rgba = writeSurface.ConvertToRgba();
+
+          for(int i = 0; i < rgba.Length; i += 4) {
+            uint pixelData = 0;
+
+            byte R = rgba[i + 0];
+            byte G = rgba[i + 1];
+            byte B = rgba[i + 2];
+            byte A = rgba[i + 3];
+
+            switch(saveConfig.FileFormat) {
+              case FileFormat.A8R8G8B8: {
+                pixelData = ((uint)A << 24) |
+                            ((uint)R << 16) |
+                            ((uint)G <<  8) |
+                            ((uint)B <<  0);
+                break;
+              }
+              case FileFormat.X8R8G8B8: {
+                pixelData = ((uint)R << 16) |
+                            ((uint)G <<  8) |
+                            ((uint)B <<  0);
+                break;
+              }
+              case FileFormat.A8B8G8R8: {
+                pixelData = ((uint)A << 24) |
+                            ((uint)B << 16) |
+                            ((uint)G <<  8) |
+                            ((uint)R <<  0);
+                break;
+              }
+              case FileFormat.X8B8G8R8: {
+                pixelData = ((uint)B << 16) |
+                            ((uint)G <<  8) |
+                            ((uint)R <<  0);
+                break;
+              }
+              case FileFormat.A1R5G5B5: {
+                pixelData = ((uint)(A != 0 ? 1 : 0) << 15) |
+                            ((uint)(R >> 3) << 10) |
+                            ((uint)(G >> 3) <<  5) |
+                            ((uint)(B >> 3) <<  0);
+                break;
+              }
+              case FileFormat.A4R4G4B4: {
+                pixelData = ((uint)(A >> 4) << 12) |
+                            ((uint)(R >> 4) <<  8) |
+                            ((uint)(G >> 4) <<  4) |
+                            ((uint)(B >> 4) <<  0);
+                break;
+              }
+              case FileFormat.R8G8B8: {
+                pixelData = ((uint)R << 16) |
+                            ((uint)G <<  8) |
+                            ((uint)B <<  0);
+                break;
+              }
+              case FileFormat.R5G6B5: {
+                pixelData = ((uint)(R >> 3) << 11) |
+                            ((uint)(G >> 2) <<  5) |
+                            ((uint)(B >> 3) <<  0);
+                break;
+              }
+              case FileFormat.G8: {
+                pixelData = R;
+
+                break;
+              }
+            }
+
+            int pixelOffset = i / 4 * pixelWidth;
+
+            for(int j = 0; j < pixelWidth; j++) outputData[pixelOffset + j] = (byte)((pixelData >> (8 * j)) & 0xff);
+          }
+        }
+
+        output.Write(outputData, 0, outputData.GetLength(0));
+      }
     }
 
     #endregion Public Methods

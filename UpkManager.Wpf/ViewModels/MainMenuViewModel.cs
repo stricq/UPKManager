@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 
 using STR.MvvmCommon;
 
@@ -7,7 +8,9 @@ namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("MainMenuViewModel")]
-  public class MainMenuViewModel : ObservableObject {
+  [SuppressMessage("ReSharper", "UnusedMember.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  public sealed class MainMenuViewModel : ObservableObject {
 
     #region Private Fields
 
@@ -16,6 +19,17 @@ namespace UpkManager.Wpf.ViewModels {
     private bool isSkipParsing;
 
     private bool isHexViewObject;
+
+    private bool isCompressorRangeFit;
+    private bool isCompressorClusterFit;
+    private bool isCompressorIterativeFit;
+
+    private bool isErrorMetricUniform;
+    private bool isErrorMetricPerceptual;
+
+    private bool isWeightColorByAlpha;
+
+    private bool isWeightingEnabled;
 
     private RelayCommandAsync reloadFiles;
 
@@ -59,6 +73,41 @@ namespace UpkManager.Wpf.ViewModels {
     public bool IsHexViewObject {
       get { return isHexViewObject; }
       set { SetField(ref isHexViewObject, value, () => IsHexViewObject); }
+    }
+
+    public bool IsCompressorRangeFit {
+      get { return isCompressorRangeFit; }
+      set { SetField(ref isCompressorRangeFit, value, () => IsCompressorRangeFit); }
+    }
+
+    public bool IsCompressorClusterFit {
+      get { return isCompressorClusterFit; }
+      set { SetField(ref isCompressorClusterFit, value, () => IsCompressorClusterFit); }
+    }
+
+    public bool IsCompressorIterativeFit {
+      get { return isCompressorIterativeFit; }
+      set { SetField(ref isCompressorIterativeFit, value, () => IsCompressorIterativeFit); }
+    }
+
+    public bool IsErrorMetricUniform {
+      get { return isErrorMetricUniform; }
+      set { SetField(ref isErrorMetricUniform, value, () => IsErrorMetricUniform); }
+    }
+
+    public bool IsErrorMetricPerceptual {
+      get { return isErrorMetricPerceptual; }
+      set { SetField(ref isErrorMetricPerceptual, value, () => IsErrorMetricPerceptual); }
+    }
+
+    public bool IsWeightColorByAlpha {
+      get { return isWeightColorByAlpha; }
+      set { SetField(ref isWeightColorByAlpha, value, () => IsWeightColorByAlpha); }
+    }
+
+    public bool IsWeightingEnabled {
+      get { return isWeightingEnabled; }
+      set { SetField(ref isWeightingEnabled, value, () => IsWeightingEnabled); }
     }
 
     public RelayCommandAsync ReloadFiles {

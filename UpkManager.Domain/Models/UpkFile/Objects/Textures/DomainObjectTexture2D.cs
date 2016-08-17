@@ -8,7 +8,6 @@ using UpkManager.Dds;
 using UpkManager.Dds.Constants;
 
 using UpkManager.Domain.Constants;
-using UpkManager.Domain.Extensions;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
@@ -75,8 +74,10 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       Guid = await reader.ReadBytes(16);
     }
 
-    public override async Task SaveObject(string filename) {
+    public override async Task SaveObject(string filename, object configuration) {
       if (MipMaps == null || !MipMaps.Any()) return;
+
+      DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
 
       FileFormat format;
 
@@ -92,7 +93,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       FileStream ddsStream = new FileStream(filename, FileMode.Create);
 
-      DdsSaveConfig config = new DdsSaveConfig(format, 0, 0, false, false);
+      config.FileFormat = format;
 
       await Task.Run(() => ddsImage.Save(ddsStream, config));
 
@@ -101,7 +102,9 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       memory.Close();
     }
 
-    public override async Task SetObject(string filename, List<DomainNameTableEntry> nameTable) {
+    public override async Task SetObject(string filename, List<DomainNameTableEntry> nameTable, object configuration) {
+      DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
+
       DdsFile image = await Task.Run(() => new DdsFile(filename));
 
       bool skipFirstMip = false;
@@ -140,7 +143,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       if (pfFormat != null) imageFormat = DdsPixelFormat.ParseFileFormat(pfFormat.PropertyString);
 
-      if (imageFormat == FileFormat.Unknown) throw new Exception("Unknown DDS File Format.");
+      if (imageFormat == FileFormat.Unknown) throw new Exception($"Unknown DDS File Format ({pfFormat?.PropertyString ?? "Unknown"}).");
 
       MipMaps.Clear();
 
@@ -148,7 +151,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         MemoryStream stream = new MemoryStream();
 
         if (!skipFirstMip) {
-          DdsSaveConfig config = new DdsSaveConfig(imageFormat, 0, 0, false, false);
+          config.FileFormat = imageFormat;
 
           image.Save(stream, config);
 
@@ -166,7 +169,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
         if (width  > 1) width  /= 2;
         if (height > 1) height /= 2;
 
-        if (!skipFirstMip && image.Width > 4 && image.Height > 4) image.Resize(image.Width / 2, image.Height / 2);
+        if (!skipFirstMip && image.Width > 4 && image.Height > 4) image.Resize(image.Width > 4 ? image.Width / 2 : 4, image.Height > 4 ? image.Height / 2 : 4);
 
         skipFirstMip = false;
       }
@@ -243,7 +246,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       imageFormat = DdsPixelFormat.ParseFileFormat(format);
 
-      DdsHeader ddsHeader = new DdsHeader(imageFormat, mipMap.Width, mipMap.Height);
+      DdsHeader ddsHeader = new DdsHeader(new DdsSaveConfig(imageFormat, 0, 0, false, false), mipMap.Width, mipMap.Height);
 
       MemoryStream stream = new MemoryStream();
 

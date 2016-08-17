@@ -47,11 +47,28 @@
       </MenuItem>
 
       <MenuItem Header="He_x View" Foreground="{StaticResource BackgroundColor}">
-        <MenuItem Header="View Whole Object" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsHexViewObject}" />
+        <MenuItem Header="_View Whole Object" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsHexViewObject}" />
 
         <Separator />
 
-        <MenuItem Header="Export as Text..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ExportHexView}" />
+        <MenuItem Header="_Export as Text..." Foreground="{StaticResource BackgroundColor}" Command="{Binding Path=ExportHexView}" />
+      </MenuItem>
+
+      <Separator />
+
+      <MenuItem Header="_Texture Export" Foreground="{StaticResource BackgroundColor}">
+        <MenuItem Header="_Compressor Type" Foreground="{StaticResource BackgroundColor}">
+          <MenuItem Header="_Range Fit (Fast/LQ)"         Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorRangeFit}" />
+          <MenuItem Header="_Cluster Fit (Slow/HQ)"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorClusterFit}" />
+          <MenuItem Header="_Iterative Fit (Slowest/HQ)"  Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorIterativeFit}" />
+        </MenuItem>
+
+        <MenuItem Header="_Error Metric">
+          <MenuItem Header="_Uniform"    Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsErrorMetricUniform}" />
+          <MenuItem Header="_Perceptual" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsErrorMetricPerceptual}" />
+        </MenuItem>
+
+        <MenuItem Header="_Weight Color by Alpha" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsWeightColorByAlpha}" IsEnabled="{Binding Path=IsWeightingEnabled}" />
       </MenuItem>
 
       <Separator />

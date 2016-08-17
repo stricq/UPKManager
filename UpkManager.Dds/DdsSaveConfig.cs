@@ -13,23 +13,23 @@ namespace UpkManager.Dds {
       FileFormat = fileFormat;
 
       CompressorType = compressorType;
-      ErrorMetric = errorMetric;
+      ErrorMetric    = errorMetric;
 
       WeightColorByAlpha = weightColorByAlpha;
-      GenerateMipMaps = generateMipMaps;
+      GenerateMipMaps    = generateMipMaps;
     }
 
     #endregion Constructor
 
     #region Properties
 
-    public bool GenerateMipMaps { get; set; }
+    public bool GenerateMipMaps { get; }
 
-    public bool WeightColorByAlpha { get; set; }
+    public bool WeightColorByAlpha { get; }
 
-    public int CompressorType { get; set; }
+    public int CompressorType { get; }
 
-    public int ErrorMetric { get; set; }
+    public int ErrorMetric { get; }
 
     public FileFormat FileFormat { get; set; }
 
@@ -37,7 +37,7 @@ namespace UpkManager.Dds {
 
     #region Public Methods
 
-    public int GetSquishFlags() {
+    internal int GetSquishFlags() {
       int squishFlags = 0;
       //
       // Translate file format

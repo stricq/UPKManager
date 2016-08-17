@@ -17,6 +17,8 @@ using STR.DialogView.Domain.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.UpkFile;
@@ -63,6 +65,12 @@ namespace UpkManager.Wpf.Controllers {
     public RebuildController(RebuildViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository Repository) {
           viewModel =     ViewModel;
       menuViewModel = MenuViewModel;
+
+      menuViewModel.IsCompressorClusterFit  = true;
+      menuViewModel.IsErrorMetricPerceptual = true;
+      menuViewModel.IsWeightingEnabled      = true;
+
+      menuViewModel.PropertyChanged += onMenuViewModelPropertyChanged;
 
       messenger = Messenger;
 
@@ -169,6 +177,53 @@ namespace UpkManager.Wpf.Controllers {
     #endregion Commands
 
     #region Private Methods
+
+    private void onMenuViewModelPropertyChanged(object sender, PropertyChangedEventArgs args) {
+      switch(args.PropertyName) {
+        case "IsCompressorRangeFit": {
+          if (menuViewModel.IsCompressorRangeFit) {
+            menuViewModel.IsCompressorClusterFit   = false;
+            menuViewModel.IsCompressorIterativeFit = false;
+
+            menuViewModel.IsWeightingEnabled   = false;
+            menuViewModel.IsWeightColorByAlpha = false;
+          }
+
+          break;
+        }
+        case "IsCompressorClusterFit": {
+          if (menuViewModel.IsCompressorClusterFit) {
+            menuViewModel.IsCompressorRangeFit     = false;
+            menuViewModel.IsCompressorIterativeFit = false;
+
+            menuViewModel.IsWeightingEnabled = true;
+          }
+
+          break;
+        }
+        case "IsCompressorIterativeFit": {
+          if (menuViewModel.IsCompressorIterativeFit) {
+            menuViewModel.IsCompressorClusterFit = false;
+            menuViewModel.IsCompressorRangeFit   = false;
+
+            menuViewModel.IsWeightingEnabled   = false;
+            menuViewModel.IsWeightColorByAlpha = false;
+          }
+
+          break;
+        }
+        case "IsErrorMetricUniform": {
+          if (menuViewModel.IsErrorMetricUniform) menuViewModel.IsErrorMetricPerceptual = false;
+
+          break;
+        }
+        case "IsErrorMetricPerceptual": {
+          if (menuViewModel.IsErrorMetricPerceptual) menuViewModel.IsErrorMetricUniform = false;
+
+          break;
+        }
+      }
+    }
 
     private void setupWatchers() {
       if (String.IsNullOrEmpty(settings.ExportPath)) return;
@@ -302,7 +357,13 @@ namespace UpkManager.Wpf.Controllers {
 
           await export.ParseDomainObject(header, false, false);
 
-          await export.DomainObject.SetObject(entity.Filename, header.NameTable);
+          int compressor = menuViewModel.IsCompressorClusterFit ? 0 : menuViewModel.IsCompressorRangeFit ? 1 : 2;
+
+          int errorMetric = menuViewModel.IsErrorMetricPerceptual ? 0 : 1;
+
+          DdsSaveConfig config = new DdsSaveConfig(FileFormat.Unknown, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
+
+          await export.DomainObject.SetObject(entity.Filename, header.NameTable, config);
 
           message.StatusText = entity.Filename;
 

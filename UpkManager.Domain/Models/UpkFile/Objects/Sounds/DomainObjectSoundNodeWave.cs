@@ -60,7 +60,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Sounds {
       } while(!done);
     }
 
-    public override async Task SaveObject(string filename) {
+    public override async Task SaveObject(string filename, object configuration) {
       if (!Sounds.Any()) return;
 
       await Task.Run(() => File.WriteAllBytes(filename, Sounds[0]));
