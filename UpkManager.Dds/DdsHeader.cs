@@ -20,19 +20,7 @@ namespace UpkManager.Dds {
       //
       // Compute mip map count..
       //
-      int mipCount  = 1;
-
-      int mipWidth  = width;
-      int mipHeight = height;
-
-      if (config.GenerateMipMaps) {
-        while(mipWidth > 1 || mipHeight > 1) {
-          mipCount++;
-
-          if (mipWidth  > 1) mipWidth  /= 2;
-          if (mipHeight > 1) mipHeight /= 2;
-        }
-      }
+      int mipCount = config.GenerateMipMaps ? CountMipMaps(width, height) : 1;
 
       Size = 18 * 4 + PixelFormat.Size + 5 * 4;
 
@@ -152,9 +140,17 @@ namespace UpkManager.Dds {
 
     #region Public Methods
 
-    public void Resize(int width, int height) {
-      Width  = (uint)width;
-      Height = (uint)height;
+    internal static int CountMipMaps(int width, int height) {
+      int mipCount = 1;
+
+      while(width > 1 || height > 1) {
+        mipCount++;
+
+        if (width  > 1) width  /= 2;
+        if (height > 1) height /= 2;
+      }
+
+      return mipCount;
     }
 
     public void Read(BinaryReader reader) {

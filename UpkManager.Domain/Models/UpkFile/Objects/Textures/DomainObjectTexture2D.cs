@@ -145,33 +145,26 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       if (imageFormat == FileFormat.Unknown) throw new Exception($"Unknown DDS File Format ({pfFormat?.PropertyString ?? "Unknown"}).");
 
+      config.FileFormat = imageFormat;
+
       MipMaps.Clear();
 
-      while(true) {
-        MemoryStream stream = new MemoryStream();
-
-        if (!skipFirstMip) {
-          config.FileFormat = imageFormat;
-
-          image.Save(stream, config);
-
-          await stream.FlushAsync();
-        }
-
+      if (skipFirstMip) {
         MipMaps.Add(new DomainMipMap {
-          ImageData = skipFirstMip ? null : (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(), // Strip off 128 bytes for the DDS header
-          Width     = skipFirstMip ? image.Width  * 2 : image.Width,
-          Height    = skipFirstMip ? image.Height * 2 : image.Height
+          ImageData = null,
+          Width     = width,
+          Height    = height
         });
+      }
 
-        if (width == 1 && height == 1) break;
+      image.GenerateMipMaps(4, 4);
 
-        if (width  > 1) width  /= 2;
-        if (height > 1) height /= 2;
-
-        if (!skipFirstMip && image.Width > 4 && image.Height > 4) image.Resize(image.Width > 4 ? image.Width / 2 : 4, image.Height > 4 ? image.Height / 2 : 4);
-
-        skipFirstMip = false;
+      foreach(DdsMipMap mipMap in image.MipMaps.OrderByDescending(mip => mip.Width)) {
+        MipMaps.Add(new DomainMipMap {
+          ImageData = image.WriteMipMap(mipMap, config),
+          Width     = mipMap.Width,
+          Height    = mipMap.Height
+        });
       }
     }
 

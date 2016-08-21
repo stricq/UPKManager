@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Windows;
+using System.Linq;
 using System.Windows.Media.Imaging;
 
 using UpkManager.Dds.Constants;
@@ -14,6 +15,8 @@ namespace UpkManager.Dds {
     #region Private Fields
 
     private DdsHeader header;
+
+    private byte[] largestMipMap;
 
     #endregion Private Fields
 
@@ -37,9 +40,9 @@ namespace UpkManager.Dds {
 
     public int Height => (int)header.Height;
 
-    public byte[] PixelData { get; private set; }
+    public List<DdsMipMap> MipMaps { get; private set; }
 
-    public BitmapSource BitmapSource => new RgbaBitmapSource(PixelData, Width);
+    public BitmapSource BitmapSource => new RgbaBitmapSource(largestMipMap, Width);
 
     #endregion Public Properties
 
@@ -49,16 +52,30 @@ namespace UpkManager.Dds {
       DdsSquish.Initialize();
     }
 
-    public void Load(string filename) {
-      Load(File.OpenRead(filename));
+    public void GenerateMipMaps(int minMipWidth = 1, int minMipHeight = 1) {
+      int mipCount = DdsHeader.CountMipMaps(Width, Height);
+
+      int mipWidth  = Width;
+      int mipHeight = Height;
+
+      MipMaps = new List<DdsMipMap> { new DdsMipMap(Width, Height, largestMipMap) };
+
+      for(int mipLoop = 1; mipLoop < mipCount; mipLoop++) {
+        if (mipWidth  > minMipWidth)  mipWidth  /= 2;
+        if (mipHeight > minMipHeight) mipHeight /= 2;
+
+        DdsMipMap writeSize = new DdsMipMap(mipWidth, mipHeight);
+
+        WriteableBitmap mipMap = new WriteableBitmap(BitmapSource);
+
+        writeSize.MipMap = mipMap.ResizeHighQuality(writeSize.Width, writeSize.Height).ConvertToRgba();
+
+        MipMaps.Add(writeSize);
+      }
     }
 
-    public void Resize(int width, int height) {
-      if (!isPowerOfTwo(width) || !isPowerOfTwo(height)) throw new ArgumentException($"Both width ({width}) and height ({height}) must be a power of 2.");
-
-      PixelData = BitmapSource.ResizeHighQuality(width, height).ConvertToRgba();
-
-      header.Resize(width, height);
+    public void Load(string filename) {
+      Load(File.OpenRead(filename));
     }
 
     public void Load(Stream input) {
@@ -114,7 +131,7 @@ namespace UpkManager.Dds {
         //
         // Now decompress..
         //
-        PixelData = DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
+        largestMipMap = DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
       }
       else {
         //
@@ -195,7 +212,7 @@ namespace UpkManager.Dds {
         //
         // We now need space for the real pixel data.. that's width * height * 4..
         //
-        PixelData = new byte[header.Width * header.Height * 4];
+        largestMipMap = new byte[header.Width * header.Height * 4];
         //
         // And now we have the arduous task of filling that up with stuff..
         //
@@ -313,151 +330,128 @@ namespace UpkManager.Dds {
             //
             int destPixelOffset = destY * (int)header.Width * 4 + destX * 4;
 
-            PixelData[destPixelOffset + 0] = (byte)pixelRed;
-            PixelData[destPixelOffset + 1] = (byte)pixelGreen;
-            PixelData[destPixelOffset + 2] = (byte)pixelBlue;
-            PixelData[destPixelOffset + 3] = (byte)pixelAlpha;
+            largestMipMap[destPixelOffset + 0] = (byte)pixelRed;
+            largestMipMap[destPixelOffset + 1] = (byte)pixelGreen;
+            largestMipMap[destPixelOffset + 2] = (byte)pixelBlue;
+            largestMipMap[destPixelOffset + 3] = (byte)pixelAlpha;
           }
         }
       }
+
+      MipMaps = new List<DdsMipMap> { new DdsMipMap(Width, Height, largestMipMap) };
     }
 
     public void Save(Stream output, DdsSaveConfig saveConfig) {
       BinaryWriter writer = new BinaryWriter(output);
 
       header = new DdsHeader(saveConfig, Width, Height);
-      //
-      // For non-compressed textures, we need pixel width.
-      //
-      int pixelWidth = (int)header.PitchOrLinearSize / Width;
-
-      int mipCount = header.MipMapCount == 0 ? 1 : (int)header.MipMapCount;
 
       header.Write(writer);
 
-      int mipWidth  = Width;
-      int mipHeight = Height;
+      if (saveConfig.GenerateMipMaps) GenerateMipMaps();
 
-      Size[] writeSizes = new Size[mipCount];
+      foreach(DdsMipMap mipMap in MipMaps.OrderByDescending(mip => mip.Width)) {
+        byte[] outputData = WriteMipMap(mipMap, saveConfig);
 
-      for(int mipLoop = 0; mipLoop < mipCount; mipLoop++) {
-        Size writeSize = new Size(mipWidth, mipHeight);
-
-        writeSizes[mipLoop] = writeSize;
-
-        if (mipWidth  > 1) mipWidth  /= 2;
-        if (mipHeight > 1) mipHeight /= 2;
+        output.Write(outputData, 0, outputData.Length);
       }
 
-      for(int mipLoop = 0; mipLoop < mipCount; ++mipLoop) {
-        Size writeSize = writeSizes[mipLoop];
+      output.Flush();
+    }
 
-        WriteableBitmap writeSurface = new WriteableBitmap(BitmapSource);
+    public byte[] WriteMipMap(DdsMipMap mipMap , DdsSaveConfig saveConfig) {
+      byte[] outputData;
 
-        if (mipLoop > 0) writeSurface = writeSurface.ResizeHighQuality((int)writeSize.Width, (int)writeSize.Height);
+      if (saveConfig.FileFormat >= FileFormat.DXT1 && saveConfig.FileFormat <= FileFormat.DXT5) {
+        outputData = DdsSquish.CompressImage(mipMap.MipMap, mipMap.Width, mipMap.Height, saveConfig.GetSquishFlags(), null);
+      }
+      else {
+        int pixelWidth = (int)header.PitchOrLinearSize / Width;
 
-        byte[] outputData;
+        int mipPitch = pixelWidth * mipMap.Width;
 
-        if (saveConfig.FileFormat >= FileFormat.DXT1 && saveConfig.FileFormat <= FileFormat.DXT5) {
-          outputData = DdsSquish.CompressImage(writeSurface.ConvertToRgba(), (int)writeSize.Width, (int)writeSize.Height, saveConfig.GetSquishFlags(), null);
-        }
-        else {
-          int mipPitch = pixelWidth * (int)writeSize.Width;
+        outputData = new byte[mipPitch * mipMap.Height];
 
-          outputData = new byte[mipPitch * (int)writeSize.Height];
+        outputData.Initialize();
 
-          outputData.Initialize();
+        for(int i = 0; i < mipMap.MipMap.Length; i += 4) {
+          uint pixelData = 0;
 
-          byte[] rgba = writeSurface.ConvertToRgba();
+          byte R = mipMap.MipMap[i + 0];
+          byte G = mipMap.MipMap[i + 1];
+          byte B = mipMap.MipMap[i + 2];
+          byte A = mipMap.MipMap[i + 3];
 
-          for(int i = 0; i < rgba.Length; i += 4) {
-            uint pixelData = 0;
-
-            byte R = rgba[i + 0];
-            byte G = rgba[i + 1];
-            byte B = rgba[i + 2];
-            byte A = rgba[i + 3];
-
-            switch(saveConfig.FileFormat) {
-              case FileFormat.A8R8G8B8: {
-                pixelData = ((uint)A << 24) |
-                            ((uint)R << 16) |
-                            ((uint)G <<  8) |
-                            ((uint)B <<  0);
-                break;
-              }
-              case FileFormat.X8R8G8B8: {
-                pixelData = ((uint)R << 16) |
-                            ((uint)G <<  8) |
-                            ((uint)B <<  0);
-                break;
-              }
-              case FileFormat.A8B8G8R8: {
-                pixelData = ((uint)A << 24) |
-                            ((uint)B << 16) |
-                            ((uint)G <<  8) |
-                            ((uint)R <<  0);
-                break;
-              }
-              case FileFormat.X8B8G8R8: {
-                pixelData = ((uint)B << 16) |
-                            ((uint)G <<  8) |
-                            ((uint)R <<  0);
-                break;
-              }
-              case FileFormat.A1R5G5B5: {
-                pixelData = ((uint)(A != 0 ? 1 : 0) << 15) |
-                            ((uint)(R >> 3) << 10) |
-                            ((uint)(G >> 3) <<  5) |
-                            ((uint)(B >> 3) <<  0);
-                break;
-              }
-              case FileFormat.A4R4G4B4: {
-                pixelData = ((uint)(A >> 4) << 12) |
-                            ((uint)(R >> 4) <<  8) |
-                            ((uint)(G >> 4) <<  4) |
-                            ((uint)(B >> 4) <<  0);
-                break;
-              }
-              case FileFormat.R8G8B8: {
-                pixelData = ((uint)R << 16) |
-                            ((uint)G <<  8) |
-                            ((uint)B <<  0);
-                break;
-              }
-              case FileFormat.R5G6B5: {
-                pixelData = ((uint)(R >> 3) << 11) |
-                            ((uint)(G >> 2) <<  5) |
-                            ((uint)(B >> 3) <<  0);
-                break;
-              }
-              case FileFormat.G8: {
-                pixelData = R;
-
-                break;
-              }
+          switch(saveConfig.FileFormat) {
+            case FileFormat.A8R8G8B8: {
+              pixelData = ((uint)A << 24) |
+                          ((uint)R << 16) |
+                          ((uint)G <<  8) |
+                          ((uint)B <<  0);
+              break;
             }
+            case FileFormat.X8R8G8B8: {
+              pixelData = ((uint)R << 16) |
+                          ((uint)G <<  8) |
+                          ((uint)B <<  0);
+              break;
+            }
+            case FileFormat.A8B8G8R8: {
+              pixelData = ((uint)A << 24) |
+                          ((uint)B << 16) |
+                          ((uint)G <<  8) |
+                          ((uint)R <<  0);
+              break;
+            }
+            case FileFormat.X8B8G8R8: {
+              pixelData = ((uint)B << 16) |
+                          ((uint)G <<  8) |
+                          ((uint)R <<  0);
+              break;
+            }
+            case FileFormat.A1R5G5B5: {
+              pixelData = ((uint)(A != 0 ? 1 : 0) << 15) |
+                          ((uint)(R >> 3) << 10) |
+                          ((uint)(G >> 3) <<  5) |
+                          ((uint)(B >> 3) <<  0);
+              break;
+            }
+            case FileFormat.A4R4G4B4: {
+              pixelData = ((uint)(A >> 4) << 12) |
+                          ((uint)(R >> 4) <<  8) |
+                          ((uint)(G >> 4) <<  4) |
+                          ((uint)(B >> 4) <<  0);
+              break;
+            }
+            case FileFormat.R8G8B8: {
+              pixelData = ((uint)R << 16) |
+                          ((uint)G <<  8) |
+                          ((uint)B <<  0);
+              break;
+            }
+            case FileFormat.R5G6B5: {
+              pixelData = ((uint)(R >> 3) << 11) |
+                          ((uint)(G >> 2) <<  5) |
+                          ((uint)(B >> 3) <<  0);
+              break;
+            }
+            case FileFormat.G8: {
+              pixelData = R;
 
-            int pixelOffset = i / 4 * pixelWidth;
-
-            for(int j = 0; j < pixelWidth; j++) outputData[pixelOffset + j] = (byte)((pixelData >> (8 * j)) & 0xff);
+              break;
+            }
           }
-        }
 
-        output.Write(outputData, 0, outputData.GetLength(0));
+          int pixelOffset = i / 4 * pixelWidth;
+
+          for(int j = 0; j < pixelWidth; j++) outputData[pixelOffset + j] = (byte)((pixelData >> (8 * j)) & 0xff);
+        }
       }
+
+      return outputData;
     }
 
     #endregion Public Methods
-
-    #region Private Methods
-
-    private static bool isPowerOfTwo(int x)
-    {
-        return (x != 0) && ((x & (x - 1)) == 0);
-    }
-
-    #endregion Private Methods
 
   }
 

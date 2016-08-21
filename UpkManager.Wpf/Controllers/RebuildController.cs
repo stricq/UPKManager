@@ -66,9 +66,8 @@ namespace UpkManager.Wpf.Controllers {
           viewModel =     ViewModel;
       menuViewModel = MenuViewModel;
 
-      menuViewModel.IsCompressorClusterFit  = true;
-      menuViewModel.IsErrorMetricPerceptual = true;
-      menuViewModel.IsWeightingEnabled      = true;
+      menuViewModel.IsCompressorIterativeFit = true;
+      menuViewModel.IsErrorMetricPerceptual  = true;
 
       menuViewModel.PropertyChanged += onMenuViewModelPropertyChanged;
 

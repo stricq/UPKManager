@@ -34,7 +34,6 @@ namespace UpkManager.Dds {
 
           break;
         }
-
         case FileFormat.A8R8G8B8: {
           Flags = (int)PixelFormatFlags.RGBA;
 

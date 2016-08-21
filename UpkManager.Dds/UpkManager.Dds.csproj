@@ -57,6 +57,7 @@
     <Compile Include="DdsSaveConfig.cs" />
     <Compile Include="DdsSquish.cs" />
     <Compile Include="Extensions\WriteableBitmapExtensions.cs" />
+    <Compile Include="DdsMipMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RgbaBitmapSource.cs" />
   </ItemGroup>
