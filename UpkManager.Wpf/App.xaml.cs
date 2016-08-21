@@ -53,7 +53,7 @@ namespace UpkManager.Wpf {
         container.GetAll<IController>();
       }
       catch(Exception ex) {
-        MessageBox.Show(ex.Message, "MEF or Mapping Error");
+        MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "MEF or Mapping Error");
       }
     }
 

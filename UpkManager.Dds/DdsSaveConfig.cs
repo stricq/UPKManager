@@ -1,10 +1,12 @@
-﻿using System;
+﻿using System.Diagnostics.CodeAnalysis;
 
 using UpkManager.Dds.Constants;
 
 
 namespace UpkManager.Dds {
 
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
   public sealed class DdsSaveConfig {
 
     #region Constructor

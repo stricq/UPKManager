@@ -75,13 +75,25 @@ namespace UpkManager.Dds {
 
     public override bool IsDownloading => false;
 
-    public override event EventHandler<DownloadProgressEventArgs> DownloadProgress;
+    public override event EventHandler<DownloadProgressEventArgs> DownloadProgress {
+      add { }
+      remove { }
+    }
 
-    public override event EventHandler DownloadCompleted;
+    public override event EventHandler DownloadCompleted {
+      add { }
+      remove { }
+    }
 
-    public override event EventHandler<ExceptionEventArgs> DownloadFailed;
+    public override event EventHandler<ExceptionEventArgs> DownloadFailed {
+      add { }
+      remove { }
+    }
 
-    public override event EventHandler<ExceptionEventArgs> DecodeFailed;
+    public override event EventHandler<ExceptionEventArgs> DecodeFailed {
+      add { }
+      remove { }
+    }
 
     #endregion Overrides
 

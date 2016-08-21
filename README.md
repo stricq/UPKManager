@@ -8,7 +8,11 @@ Extract and re-integrate Texture2D and other object types.
 Visual Studio 2015 .Net 4.6.1
 
 ### Download
-[UPK Manager v1.3.2](https://forums.stricq.com/resources/upk-manager.1/)
+[UPK Manager v1.4](https://forums.stricq.com/resources/upk-manager.1/)
+
+Dependency:
+
+[Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
 
 ### Support
 [UPK Manager Forums](https://forums.stricq.com/)
@@ -62,6 +66,17 @@ Once you have finished modifying the textures in the Export Path switch to the R
 Any textures not checked will be pulled from the source game file and copied unmodified into the repackaged UPK file.
 
 Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
+
+# Changes for Release 1.4
+
+* The DDS graphics library has been replaced with code pulled from Open Paint.NET.
+* Exporting textures to a file and rebuilding textures back into a UPK file now support several quality settings controlled from the main menu.  Settings -> Texture Quality.
+* The rebuild package process has several changes:
+  * Now uses the same DDS format that was in the original UPK file.  This reverses the change made in v1.3.2.
+  * Now uses the same minimum mip map size as the unmodified UPK files do which might help with texture streaming crashes.
+  * Some specular textures have a missing first mip map and a listed size four times larger than the actual first texture size.  This pattern is now maintained which might help with texture streaming crashes.
+* Now has a dependency on the Visual C++ Redistributable for Visual Studio 2015.  Sorry about that.  I will remove it for the next release.
+  * https://www.microsoft.com/en-us/download/details.aspx?id=48145
 
 # Changes for Release 1.3.2
 

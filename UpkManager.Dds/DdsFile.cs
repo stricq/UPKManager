@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -10,6 +11,7 @@ using UpkManager.Dds.Extensions;
 
 namespace UpkManager.Dds {
 
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
   public sealed class DdsFile {
 
     #region Private Fields
@@ -436,7 +438,7 @@ namespace UpkManager.Dds {
               break;
             }
             case FileFormat.G8: {
-              pixelData = R;
+              pixelData = (uint)((R + G + B) / 3.0 + 0.5);
 
               break;
             }

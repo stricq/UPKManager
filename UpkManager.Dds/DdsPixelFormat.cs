@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using UpkManager.Dds.Constants;
@@ -6,6 +7,7 @@ using UpkManager.Dds.Constants;
 
 namespace UpkManager.Dds {
 
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
   public sealed class DdsPixelFormat {
 
     #region Constructor

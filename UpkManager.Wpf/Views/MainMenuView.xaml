@@ -56,7 +56,7 @@
 
       <Separator />
 
-      <MenuItem Header="_Texture Export" Foreground="{StaticResource BackgroundColor}">
+      <MenuItem Header="_Texture Quality" Foreground="{StaticResource BackgroundColor}">
         <MenuItem Header="_Compressor Type" Foreground="{StaticResource BackgroundColor}">
           <MenuItem Header="_Range Fit (Fast/LQ)"         Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorRangeFit}" />
           <MenuItem Header="_Cluster Fit (Slow/HQ)"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorClusterFit}" />
