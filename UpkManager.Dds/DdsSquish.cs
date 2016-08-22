@@ -79,8 +79,8 @@ namespace UpkManager.Dds {
       //
       byte[] blockData = new byte[blockCount * blockSize];
 
-      fixed(byte* pRgba = rgba) {
-        fixed(byte* pBlocks = blockData) {
+      fixed(byte *pRgba = rgba) {
+        fixed(byte *pBlocks = blockData) {
           if (is64Bit) SquishCompressImage_64(pRgba, width, height, pBlocks, flags, progressFn);
           else SquishCompressImage_32(pRgba, width, height, pBlocks, flags, progressFn);
         }
@@ -94,8 +94,8 @@ namespace UpkManager.Dds {
     internal static unsafe byte[] DecompressImage(int width, int height, byte[] blocks, int flags, ProgressFn progressFn) {
       byte[] rgba = new byte[width * height * 4];
 
-      fixed(byte* pRgba = rgba) {
-        fixed(byte* pBlocks = blocks) {
+      fixed(byte *pRgba = rgba) {
+        fixed(byte *pBlocks = blocks) {
           if (is64Bit) SquishDecompressImage_64(pRgba, width, height, pBlocks, flags, progressFn);
           else SquishDecompressImage_32(pRgba, width, height, pBlocks, flags, progressFn);
         }

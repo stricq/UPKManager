@@ -96,22 +96,22 @@ namespace UpkManager.Dds {
       header.Read(reader);
 
       if ((header.PixelFormat.Flags & (int)PixelFormatFlags.FourCC) != 0) {
-        int squishFlags;
+        SquishFlags squishFlags;
 
         switch(header.PixelFormat.FourCC) {
           case FourCCFormat.Dxt1: {
-            squishFlags = (int)SquishFlags.Dxt1;
+            squishFlags = SquishFlags.Dxt1;
 
             break;
           }
           case FourCCFormat.Dxt3: {
-            squishFlags = (int)SquishFlags.Dxt3;
+            squishFlags = SquishFlags.Dxt3;
 
             break;
           }
 
           case FourCCFormat.Dxt5: {
-            squishFlags = (int)SquishFlags.Dxt5;
+            squishFlags = SquishFlags.Dxt5;
 
             break;
           }
@@ -123,7 +123,7 @@ namespace UpkManager.Dds {
         // Compute size of compressed block area
         //
         int blockCount = (Width + 3) / 4 * ((Height + 3) / 4);
-        int blockSize  = (squishFlags & (int)SquishFlags.Dxt1) != 0 ? 8 : 16;
+        int blockSize  = (squishFlags & SquishFlags.Dxt1) != 0 ? 8 : 16;
         //
         // Allocate room for compressed blocks, and read data into it.
         //
@@ -133,7 +133,7 @@ namespace UpkManager.Dds {
         //
         // Now decompress..
         //
-        largestMipMap = DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
+        largestMipMap = Compression.DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
       }
       else {
         //

@@ -43,6 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compression\DdsSquish.cs" />
     <Compile Include="Constants\CubeMapFlags.cs" />
     <Compile Include="Constants\FileFormat.cs" />
     <Compile Include="Constants\FourCCFormat.cs" />
@@ -66,6 +67,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Compression\License.txt" />
     <Content Include="lib32\Squish_x86.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
