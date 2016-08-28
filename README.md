@@ -8,11 +8,7 @@ Extract and re-integrate Texture2D and other object types.
 Visual Studio 2015 .Net 4.6.1
 
 ### Download
-[UPK Manager v1.4](https://forums.stricq.com/resources/upk-manager.1/)
-
-Dependency:
-
-[Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
+[UPK Manager v1.4.1](https://forums.stricq.com/resources/upk-manager.1/)
 
 ### Support
 [UPK Manager Forums](https://forums.stricq.com/)
@@ -66,6 +62,11 @@ Once you have finished modifying the textures in the Export Path switch to the R
 Any textures not checked will be pulled from the source game file and copied unmodified into the repackaged UPK file.
 
 Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
+
+# Changes for Release 1.4.1
+
+* Translated C++ DXT compression/decompression libraries to C#.  This removes the dependency on the Visual C++ Redistributable package.
+* Let me know if you notice any texture quality differences between 1.4 and 1.4.1.
 
 # Changes for Release 1.4
 
