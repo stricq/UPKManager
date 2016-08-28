@@ -62,8 +62,6 @@ namespace UpkManager.Wpf.Controllers {
       mapper = Mapper;
 
       registerMessages();
-
-      Task.Run(() => DdsFile.Initialize()).FireAndForget();
     }
 
     #endregion Constructor
