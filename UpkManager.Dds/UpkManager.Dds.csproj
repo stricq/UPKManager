@@ -84,15 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Compression\License.txt" />
-    <Content Include="lib32\Squish_x86.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib32\Squish_x86_SSE2.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib64\Squish_x64.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup />
