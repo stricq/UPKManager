@@ -365,7 +365,7 @@ namespace UpkManager.Dds {
       byte[] outputData;
 
       if (saveConfig.FileFormat >= FileFormat.DXT1 && saveConfig.FileFormat <= FileFormat.DXT5) {
-        outputData = DdsSquish.CompressImage(mipMap.MipMap, mipMap.Width, mipMap.Height, saveConfig.GetSquishFlags(), null);
+        outputData = Compression.DdsSquish.CompressImage(mipMap.MipMap, mipMap.Width, mipMap.Height, saveConfig.GetSquishFlags(), null);
       }
       else {
         int pixelWidth = (int)header.PitchOrLinearSize / Width;

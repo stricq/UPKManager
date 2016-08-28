@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 using UpkManager.Dds.Constants;
 
 
 namespace UpkManager.Dds.Compression {
 
-  internal static class DdsSquish {
+  internal static partial class DdsSquish {
 
     #region Public Methods
 
@@ -23,7 +25,7 @@ namespace UpkManager.Dds.Compression {
 
       int progress = 0;
 
-      progressFn?.Invoke(height, height);
+      progressFn?.Invoke(0, height);
       //
       // loop over blocks
       //
@@ -33,8 +35,8 @@ namespace UpkManager.Dds.Compression {
         fixed(byte *pDest = dest) {
           byte *rgba = pDest;
 
-          for(int y = 0; y < height; y += 4) {
-            for(int x = 0; x < width; x += 4) {
+          Parallel.ForEach(SteppedEnumerable.SteppedRange(0, height, 4), y => {
+            Parallel.ForEach(SteppedEnumerable.SteppedRange(0, width, 4), x => {
               //
               // decompress the block
               //
@@ -76,11 +78,11 @@ namespace UpkManager.Dds.Compression {
                 }
               }
 
-              progress += 4;
+              Interlocked.Add(ref progress, 4);
 
               progressFn?.Invoke(progress, height);
-            }
-          }
+            });
+          });
         }
       }
 
@@ -119,10 +121,6 @@ namespace UpkManager.Dds.Compression {
     }
 
     private static unsafe void decompress(byte *rgba, byte *block, SquishFlags flags) {
-      //
-      // fix any bad flags
-      //
-      flags = fixFlags(flags);
       //
       // get the block locations
       //
@@ -253,7 +251,7 @@ namespace UpkManager.Dds.Compression {
       }
     }
 
-    private static unsafe void decompressAlphaDxt5(byte *rgba, byte* block) {
+    private static unsafe void decompressAlphaDxt5(byte *rgba, byte *block) {
       //
       // get the two alpha values
       //

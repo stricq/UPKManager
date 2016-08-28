@@ -39,20 +39,20 @@ namespace UpkManager.Dds {
 
     #region Public Methods
 
-    internal int GetSquishFlags() {
-      int squishFlags = 0;
+    internal SquishFlags GetSquishFlags() {
+      SquishFlags squishFlags = SquishFlags.Unknown;
       //
       // Translate file format
       //
       switch(FileFormat) {
         case FileFormat.DXT1:
-          squishFlags |= (int)SquishFlags.Dxt1;
+          squishFlags |= SquishFlags.Dxt1;
           break;
         case FileFormat.DXT3:
-          squishFlags |= (int)SquishFlags.Dxt3;
+          squishFlags |= SquishFlags.Dxt3;
           break;
         case FileFormat.DXT5:
-          squishFlags |= (int)SquishFlags.Dxt5;
+          squishFlags |= SquishFlags.Dxt5;
           break;
       }
       //
@@ -64,24 +64,24 @@ namespace UpkManager.Dds {
       //
       switch(CompressorType) {
         case 0:
-          squishFlags |= (int)SquishFlags.ColourClusterFit;
+          squishFlags |= SquishFlags.ColourClusterFit;
           break;
         case 1:
-          squishFlags |= (int)SquishFlags.ColourRangeFit;
+          squishFlags |= SquishFlags.ColourRangeFit;
           break;
         default:
-          squishFlags |= (int)SquishFlags.ColourIterativeClusterFit;
+          squishFlags |= SquishFlags.ColourIterativeClusterFit;
           break;
       }
       //
       // Translate error metric
       //
-      if (ErrorMetric == 0) squishFlags |= (int)SquishFlags.ColourMetricPerceptual;
-      else squishFlags |= (int)SquishFlags.ColourMetricUniform;
+      if (ErrorMetric == 0) squishFlags |= SquishFlags.ColourMetricPerceptual;
+      else squishFlags |= SquishFlags.ColourMetricUniform;
       //
       // Now the colour weighting state (only valid for cluster fit)
       //
-      if ((CompressorType == 0) && WeightColorByAlpha) squishFlags |= (int)SquishFlags.WeightColourByAlpha;
+      if ((CompressorType == 0) && WeightColorByAlpha) squishFlags |= SquishFlags.WeightColourByAlpha;
 
       return squishFlags;
     }

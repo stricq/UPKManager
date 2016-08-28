@@ -91,21 +91,6 @@ namespace UpkManager.Dds {
       return blockData;
     }
 
-    internal static unsafe byte[] DecompressImage(int width, int height, byte[] blocks, int flags, ProgressFn progressFn) {
-      byte[] rgba = new byte[width * height * 4];
-
-      fixed(byte *pRgba = rgba) {
-        fixed(byte *pBlocks = blocks) {
-          if (is64Bit) SquishDecompressImage_64(pRgba, width, height, pBlocks, flags, progressFn);
-          else SquishDecompressImage_32(pRgba, width, height, pBlocks, flags, progressFn);
-        }
-      }
-
-      GC.KeepAlive(progressFn);
-
-      return rgba;
-    }
-
     #endregion Public Methods
 
   }

@@ -43,7 +43,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compression\DdsSquish.cs" />
+    <Compile Include="Compression\ClusterFit.cs" />
+    <Compile Include="Compression\ColourBlock.cs" />
+    <Compile Include="Compression\ColourFit.cs" />
+    <Compile Include="Compression\ColourSet.cs" />
+    <Compile Include="Compression\DdsSquishCompress.cs" />
+    <Compile Include="Compression\DdsSquishDecompress.cs" />
+    <Compile Include="Compression\LookupTables\Lookup_5_3.cs" />
+    <Compile Include="Compression\LookupTables\Lookup_5_4.cs" />
+    <Compile Include="Compression\LookupTables\Lookup_6_3.cs" />
+    <Compile Include="Compression\LookupTables\Lookup_6_4.cs" />
+    <Compile Include="Compression\LookupTables\SingleColourLookup.cs" />
+    <Compile Include="Compression\LookupTables\SourceBlock.cs" />
+    <Compile Include="Compression\Maths.cs" />
+    <Compile Include="Compression\RangeFit.cs" />
+    <Compile Include="Compression\SingleColourFit.cs" />
+    <Compile Include="Compression\SteppedEnumerable.cs" />
+    <Compile Include="Compression\Sym3x3.cs" />
+    <Compile Include="Compression\Vec3.cs" />
     <Compile Include="Constants\CubeMapFlags.cs" />
     <Compile Include="Constants\FileFormat.cs" />
     <Compile Include="Constants\FourCCFormat.cs" />
