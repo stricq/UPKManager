@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 using UpkManager.Dds.Constants;
 
@@ -36,8 +37,8 @@ namespace UpkManager.Dds.Compression {
         fixed(byte *pRgba = rgba) {
           byte *source = pRgba;
 
-          for(int y = 0; y < height; y += 4) {
-            for(int x = 0; x < width; x += 4) {
+          Parallel.ForEach(SteppedEnumerable.SteppedRange(0, height, 4), y => {
+            Parallel.ForEach(SteppedEnumerable.SteppedRange(0, width, 4), x => {
               //
               // build the 4x4 block of pixels
               //
@@ -87,12 +88,12 @@ namespace UpkManager.Dds.Compression {
 
                 compressMasked(pSourceRgba, mask, outputBlock, flags);
               }
-            }
+            });
 
             Interlocked.Add(ref progress, 4);
 
             progressFn?.Invoke(progress, height);
-          }
+          });
         }
       }
 
@@ -348,9 +349,9 @@ namespace UpkManager.Dds.Compression {
           }
         }
 
-        WriteAlphaBlock(alpha1, alpha0, swapped, block);
+        writeAlphaBlock(alpha1, alpha0, swapped, block);
       }
-      else WriteAlphaBlock(alpha0, alpha1, indices, block);
+      else writeAlphaBlock(alpha0, alpha1, indices, block);
     }
 
     private static unsafe void writeAlphaBlock7(int alpha0, int alpha1, byte[] indices, byte *block) {
@@ -382,12 +383,12 @@ namespace UpkManager.Dds.Compression {
           }
         }
 
-        WriteAlphaBlock(alpha1, alpha0, swapped, block);
+        writeAlphaBlock(alpha1, alpha0, swapped, block);
       }
-      else WriteAlphaBlock(alpha0, alpha1, indices, block);
+      else writeAlphaBlock(alpha0, alpha1, indices, block);
     }
 
-    private static unsafe void WriteAlphaBlock(int alpha0, int alpha1, byte[] indices, byte *block) {
+    private static unsafe void writeAlphaBlock(int alpha0, int alpha1, byte[] indices, byte *block) {
       byte *bytes = block;
       //
       // write the first two bytes

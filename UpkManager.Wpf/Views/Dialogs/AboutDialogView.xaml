@@ -6,7 +6,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
              mvvm:ViewModelLocator.ComposedViewModel="AboutDialogViewModel"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800">
 
   <Grid Margin="6">
     <Grid.RowDefinitions>
@@ -32,6 +32,8 @@
         <RowDefinition Height="Auto" />
         <RowDefinition Height="6" />
         <RowDefinition Height="Auto" />
+        <RowDefinition Height="6" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
@@ -39,9 +41,10 @@
       <TextBlock Grid.Row="1">STR Programming Services</TextBlock>
       <TextBlock Grid.Row="3">Extract and re-integrate Texture2D and other object types.</TextBlock>
       <TextBlock Grid.Row="5">Uses code obtained from Open Paint.Net <Hyperlink NavigateUri="https://raw.githubusercontent.com/stricq/UPKManager/master/UpkManager.Dds/License.txt" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">License</Hyperlink>.</TextBlock>
-      <TextBlock Grid.Row="7">Icon image provided by <Hyperlink NavigateUri="https://www.undertow.club/members/princessnicky.1428/" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">PrincessNicky</Hyperlink>.</TextBlock>
-      <TextBlock Grid.Row="9">Bitcoin Donations: <Hyperlink NavigateUri="bitcoin:1DUgsDPv5vuqNnF74GJi3L5NJxPbMBVJFn?amount=0.05&amp;label=UPK%20Manager" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">1DUgsDPv5vuqNnF74GJi3L5NJxPbMBVJFn</Hyperlink></TextBlock>
-      <TextBlock Grid.Row="10">Suggested Amount: 0.05 btc (approximately $20 USD)</TextBlock>
+      <TextBlock Grid.Row="7">Uses code obtained from Simon Brown <Hyperlink NavigateUri="https://raw.githubusercontent.com/stricq/UPKManager/master/UpkManager.Dds/Compression/License.txt" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">License</Hyperlink>.</TextBlock>
+      <TextBlock Grid.Row="9">Icon image provided by <Hyperlink NavigateUri="https://www.undertow.club/members/princessnicky.1428/" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">PrincessNicky</Hyperlink>.</TextBlock>
+      <TextBlock Grid.Row="11">Bitcoin Donations: <Hyperlink NavigateUri="bitcoin:1DUgsDPv5vuqNnF74GJi3L5NJxPbMBVJFn?amount=0.05&amp;label=UPK%20Manager" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">1DUgsDPv5vuqNnF74GJi3L5NJxPbMBVJFn</Hyperlink></TextBlock>
+      <TextBlock Grid.Row="12">Suggested Amount: 0.05 btc (approximately $20 USD)</TextBlock>
     </Grid>
 
     <Button Grid.Row="1" Grid.Column="1" Content="Ok!" Margin="0,12,0,0" Width="75" HorizontalAlignment="Right" Command="{Binding Path=Ok}" />

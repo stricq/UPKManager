@@ -74,7 +74,6 @@
     <Compile Include="DdsHeader.cs" />
     <Compile Include="DdsPixelFormat.cs" />
     <Compile Include="DdsSaveConfig.cs" />
-    <Compile Include="DdsSquish.cs" />
     <Compile Include="Extensions\WriteableBitmapExtensions.cs" />
     <Compile Include="DdsMipMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

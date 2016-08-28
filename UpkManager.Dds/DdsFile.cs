@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
+using UpkManager.Dds.Compression;
 using UpkManager.Dds.Constants;
 using UpkManager.Dds.Extensions;
 
@@ -49,10 +50,6 @@ namespace UpkManager.Dds {
     #endregion Public Properties
 
     #region Public Methods
-
-    public static void Initialize() {
-      DdsSquish.Initialize();
-    }
 
     public void GenerateMipMaps(int minMipWidth = 1, int minMipHeight = 1) {
       int mipCount = DdsHeader.CountMipMaps(Width, Height);
@@ -133,7 +130,7 @@ namespace UpkManager.Dds {
         //
         // Now decompress..
         //
-        largestMipMap = Compression.DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
+        largestMipMap = DdsSquish.DecompressImage(Width, Height, compressedBlocks, squishFlags, null);
       }
       else {
         //
@@ -365,7 +362,7 @@ namespace UpkManager.Dds {
       byte[] outputData;
 
       if (saveConfig.FileFormat >= FileFormat.DXT1 && saveConfig.FileFormat <= FileFormat.DXT5) {
-        outputData = Compression.DdsSquish.CompressImage(mipMap.MipMap, mipMap.Width, mipMap.Height, saveConfig.GetSquishFlags(), null);
+        outputData = DdsSquish.CompressImage(mipMap.MipMap, mipMap.Width, mipMap.Height, saveConfig.GetSquishFlags(), null);
       }
       else {
         int pixelWidth = (int)header.PitchOrLinearSize / Width;
