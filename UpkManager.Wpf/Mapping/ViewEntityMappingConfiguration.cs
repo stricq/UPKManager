@@ -124,9 +124,10 @@ namespace UpkManager.Wpf.Mapping {
 
       #region DTOs
 
-      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.IsChecked,  opt => opt.Ignore())
-                                                       .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
-                                                       .ForMember(dest => dest.IsErrored,  opt => opt.Ignore());
+      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
+                                                       .ForMember(dest => dest.IsSelected,           opt => opt.Ignore())
+                                                       .ForMember(dest => dest.IsErrored,            opt => opt.Ignore())
+                                                       .ForMember(dest => dest.ContainsTargetObject, opt => opt.Ignore());
 
       #endregion DTOs
 

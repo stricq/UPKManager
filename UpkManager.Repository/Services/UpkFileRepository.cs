@@ -15,7 +15,7 @@ using UpkManager.Domain.Models.UpkFile.Tables;
 namespace UpkManager.Repository.Services {
 
   [Export(typeof(IUpkFileRepository))]
-  public class UpkFileRepository : IUpkFileRepository {
+  public sealed class UpkFileRepository : IUpkFileRepository {
 
     #region IUpkFileRepository Implementation
 
@@ -108,19 +108,40 @@ namespace UpkManager.Repository.Services {
 
       FileInfo[] files = dirInfo.GetFiles("VersionInfo_BNS*.ini");
 
-      if (files.Length == 0) throw new FileNotFoundException("Could not find a matching VersionInfo_BNS*.ini file.");
+      string matchLine = "GlobalVersion";
 
-      StreamReader stream = new StreamReader(File.OpenRead(files.First().FullName));
+      StreamReader stream;
+
+      if (files.Length > 0) stream = new StreamReader(File.OpenRead(files.First().FullName));
+      else {
+        string gameVersion = Path.Combine(GamePath, @"..\bin\Version.ini");
+
+        if (!File.Exists(gameVersion)) throw new FileNotFoundException("Could not find a matching VersionInfo_BNS*.ini file.");
+
+        stream = new StreamReader(File.OpenRead(gameVersion));
+
+        matchLine = "ProductVersion";
+      }
+
+
 
       int version = 0;
 
       string line;
 
       while((line = await stream.ReadLineAsync()) != null) {
-        if (line.StartsWith("GlobalVersion", StringComparison.CurrentCultureIgnoreCase)) {
+        if (line.StartsWith(matchLine, StringComparison.CurrentCultureIgnoreCase)) {
           string[] parts = line.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 
-          if (parts.Length > 1) Int32.TryParse(parts[1], out version);
+          if (parts.Length > 1) {
+            string[] digits = parts[1].Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for(int i = 0; i < digits.Length; ++i) {
+              int segment;
+
+              if (Int32.TryParse(digits[i], out segment)) version = version * 1000 + segment;
+            }
+          }
 
           break;
         }

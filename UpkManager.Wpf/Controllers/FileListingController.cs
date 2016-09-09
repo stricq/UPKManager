@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -19,6 +21,7 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Dds;
 using UpkManager.Dds.Constants;
+
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
@@ -36,15 +39,20 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class FileListingController : IController {
+  public sealed class FileListingController : IController {
 
     #region Private Fields
 
     private string oldPathToGame;
 
+    private CancellationTokenSource tokenSource;
+
     private DomainSettings settings;
 
-    private readonly List<DomainUpkFile> allFiles;
+    private List<FileViewEntity> filesWithType;
+
+    private readonly List<DomainUpkFile>  allFiles;
+    private readonly List<FileViewEntity> allFileEntities;
 
     private readonly FileListingViewModel viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -72,10 +80,16 @@ namespace UpkManager.Wpf.Controllers {
 
       remoteRepository = RemoteRepository;
 
+      viewModel.Files = new ObservableCollection<FileViewEntity>();
+
+      viewModel.FilterText = String.Empty;
+
           viewModel.PropertyChanged += onViewModelPropertyChanged;
       menuViewModel.PropertyChanged += onMenuViewModelPropertyChanged;
 
       allFiles = new List<DomainUpkFile>();
+
+      allFileEntities = new List<FileViewEntity>();
 
       registerMessages();
       registerCommands();
@@ -219,6 +233,10 @@ namespace UpkManager.Wpf.Controllers {
     private async Task loadAllFiles() {
       messenger.Send(new FileLoadingMessage());
 
+      allFileEntities.ForEach(fe => fe.PropertyChanged -= onFileEntityViewModelChanged);
+
+      allFileEntities.Clear();
+
       allFiles.Clear();
 
       viewModel.Files.Clear();
@@ -235,7 +253,7 @@ namespace UpkManager.Wpf.Controllers {
         version = await repository.GetGameVersion(settings.PathToGame);
       }
       catch(FileNotFoundException) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The VersionInfo_BnS.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
+        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The VersionInfo_BnS*.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
 
         progress.IsComplete = true;
 
@@ -328,7 +346,11 @@ namespace UpkManager.Wpf.Controllers {
       allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
                                                                    && Path.GetDirectoryName(mf.GameFilename).StartsWith(Path.GetDirectoryName(f.GameFilename)))); });
 
-      filterFiles();
+      allFileEntities.AddRange(mapper.Map<List<FileViewEntity>>(allFiles));
+
+      allFileEntities.ForEach(fe => fe.PropertyChanged += onFileEntityViewModelChanged);
+
+      showFileTypes();
 
       progress.IsComplete = true;
 
@@ -368,14 +390,12 @@ namespace UpkManager.Wpf.Controllers {
 
             messenger.Send(new FileLoadingMessage());
 
-            DomainUpkFile upkFile = allFiles.Single(f => f.Id == file.Id);
+            DomainUpkFile upkFile = allFiles.First(f => f.Id == file.Id);
 
             if (upkFile.Header == null) {
               await loadUpkFile(file, upkFile);
 
               if (file.IsErrored) return;
-
-//            await repository.SaveUpkFile(upkFile.Header, $@"V:\{upkFile.Filename}");
             }
 
             upkFile.LastAccess = DateTime.Now;
@@ -395,7 +415,13 @@ namespace UpkManager.Wpf.Controllers {
       switch(e.PropertyName) {
         case "IsShowFilesWithType":
         case "SelectedType": {
-          filterFiles();
+          showFileTypes();
+
+          break;
+        }
+        case "IsFilterFiles":
+        case "FilterText": {
+          Task.Run(() => filterFiles(viewModel.FilterText, resetToken())).FireAndForget();
 
           break;
         }
@@ -423,25 +449,50 @@ namespace UpkManager.Wpf.Controllers {
       }
     }
 
-    private void filterFiles() {
-      List<DomainUpkFile> selectedFiles;
+    private void showFileTypes() {
+      List<FileViewEntity> selectedFiles = allFileEntities;
+
+      filesWithType = null;
 
       if (viewModel.IsShowFilesWithType) {
-        allFiles.ForEach(f => { f.ContainsTargetObject = f.ExportTypes.Any(t => t.Equals(viewModel.SelectedType, StringComparison.CurrentCultureIgnoreCase)); });
+        allFileEntities.ForEach(f => { f.ContainsTargetObject = f.ExportTypes.Any(t => t.Equals(viewModel.SelectedType, StringComparison.CurrentCultureIgnoreCase)); });
 
-        selectedFiles = allFiles.Where(f => f.ContainsTargetObject).ToList();
+        selectedFiles = allFileEntities.Where(f => f.ContainsTargetObject).ToList();
+
+        filesWithType = selectedFiles;
       }
-      else selectedFiles = allFiles;
-
-      List<FileViewEntity> fileEntities = mapper.Map<List<FileViewEntity>>(selectedFiles);
-
-      fileEntities.ForEach(fe => fe.PropertyChanged += onFileEntityViewModelChanged);
-
-      viewModel.Files.ForEach(fe => fe.PropertyChanged -= onFileEntityViewModelChanged);
 
       viewModel.Files.Clear();
 
-      viewModel.Files.AddRange(fileEntities);
+      viewModel.Files.AddRange(selectedFiles);
+    }
+
+    private void filterFiles(string filterText, CancellationToken token) {
+      try {
+        List<FileViewEntity> selectedFiles = filesWithType ?? allFileEntities;
+
+        if (viewModel.IsFilterFiles && !String.IsNullOrEmpty(filterText)) {
+          Regex regex = new Regex(filterText, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+          if (token.IsCancellationRequested) return;
+
+          selectedFiles = selectedFiles.Where(f => regex.IsMatch(f.Filename) || regex.IsMatch(f.GameVersion.ToString()) || regex.IsMatch(f.Notes ?? String.Empty)).ToList();
+        }
+
+        if (token.IsCancellationRequested) return;
+
+        viewModel.Files = new ObservableCollection<FileViewEntity>(selectedFiles);
+      }
+      catch(TaskCanceledException) { }
+      catch(OperationCanceledException) { }
+    }
+
+    private CancellationToken resetToken() {
+      tokenSource?.Cancel();
+
+      tokenSource = new CancellationTokenSource();
+
+      return tokenSource.Token;
     }
 
     private async Task loadUpkFile(FileViewEntity file, DomainUpkFile upkFile) {

@@ -6,12 +6,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mvvm="http://schemas.stricq.com/mvvmcommon/"
              mvvm:ViewModelLocator.ComposedViewModel="FileTreeViewModel"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800">
 
   <Grid Margin="6">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -72,6 +73,12 @@
         </ListView.View>
       </ListView>
     </HeaderedContentControl>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,6,0,0" HorizontalAlignment="Center">
+      <CheckBox Name="IsFilterFiles" Content="{x:Null}" IsChecked="{Binding Path=IsFilterFiles}" Margin="0,5,0,0" Focusable="False" />
+      <Label Content="Filter:" Foreground="{StaticResource ForegroundColor}" />
+      <TextBox Text="{Binding Path=FilterText, UpdateSourceTrigger=PropertyChanged}" Width="325" VerticalContentAlignment="Center" IsEnabled="{Binding Path=IsChecked, ElementName=IsFilterFiles}" />
+    </StackPanel>
 
   </Grid>
 

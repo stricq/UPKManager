@@ -8,7 +8,7 @@ using UpkManager.Domain.Models.UpkFile;
 
 namespace UpkManager.Domain.Models {
 
-  public class DomainUpkFile {
+  public sealed class DomainUpkFile {
 
     #region Constructor
 
@@ -41,8 +41,6 @@ namespace UpkManager.Domain.Models {
     public DomainHeader Header { get; set; }
 
     public string Filename => Path.GetFileName(GameFilename);
-
-    public bool ContainsTargetObject { get; set; }
 
     public List<DomainUpkFile> ModdedFiles { get; set; }
 

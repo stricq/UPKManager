@@ -1,13 +1,20 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 using STR.MvvmCommon;
 
 
 namespace UpkManager.Wpf.ViewEntities {
 
+  [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+  [SuppressMessage("ReSharper", "UnusedMember.Global")]
   public class FileViewEntity : ObservableObject {
 
     #region Private Fields
+
+    private bool containsTargetObject;
 
     private bool isChecked;
     private bool isSelected;
@@ -29,6 +36,11 @@ namespace UpkManager.Wpf.ViewEntities {
     #endregion Private Fields
 
     #region Properties
+
+    public bool ContainsTargetObject {
+      get { return containsTargetObject; }
+      set { SetField(ref containsTargetObject, value, () => ContainsTargetObject); }
+    }
 
     public bool IsChecked {
       get { return isChecked; }
