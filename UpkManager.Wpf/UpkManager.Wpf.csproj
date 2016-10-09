@@ -77,11 +77,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="STR.MvvmCommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\STR.MvvmCommon.Mef.1.0.16002.4\lib\net45\STR.MvvmCommon.dll</HintPath>
+      <HintPath>..\packages\STR.MvvmCommon.Mef.1.0.16249.1\lib\net45\STR.MvvmCommon.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="STR.MvvmCommon.Mef, Version=1.0.5845.33361, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\STR.MvvmCommon.Mef.1.0.16002.4\lib\net45\STR.MvvmCommon.Mef.dll</HintPath>
+    <Reference Include="STR.MvvmCommon.Mef, Version=1.0.6092.20304, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\STR.MvvmCommon.Mef.1.0.16249.1\lib\net45\STR.MvvmCommon.Mef.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="STR.TreeListView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

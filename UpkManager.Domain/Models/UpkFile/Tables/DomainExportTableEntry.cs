@@ -212,6 +212,7 @@ namespace UpkManager.Domain.Models.UpkFile.Tables {
       switch(type) {
         case ObjectTypes.ArchetypeObjectReference: return new DomainObjectArchetypeBase();
         case ObjectTypes.ObjectRedirector:         return new DomainObjectObjectRedirector();
+        case ObjectTypes.ShadowMapTexture2D:       return new DomainObjectShadowMapTexture2D();
         case ObjectTypes.SoundNodeWave:            return new DomainObjectSoundNodeWave();
         case ObjectTypes.Texture2D:                return new DomainObjectTexture2D();
         case ObjectTypes.TextureMovie:             return new DomainObjectTextureMovie();

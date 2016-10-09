@@ -123,6 +123,7 @@
     <Compile Include="Models\UpkFile\Objects\DomainObjectCompressionBase.cs" />
     <Compile Include="Models\UpkFile\Objects\DomainObjectObjectRedirector.cs" />
     <Compile Include="Models\UpkFile\Objects\Sounds\DomainObjectSoundNodeWave.cs" />
+    <Compile Include="Models\UpkFile\Objects\Textures\DomainObjectShadowMapTexture2D.cs" />
     <Compile Include="Models\UpkFile\Objects\Textures\DomainObjectTexture2D.cs" />
     <Compile Include="Models\UpkFile\Objects\Textures\DomainMipMap.cs" />
     <Compile Include="Models\UpkFile\Objects\Textures\DomainObjectTextureMovie.cs" />

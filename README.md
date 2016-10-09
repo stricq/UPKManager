@@ -8,7 +8,7 @@ Extract and re-integrate Texture2D and other object types.
 Visual Studio 2015 .Net 4.6.1
 
 ### Download
-[UPK Manager v1.4.1](https://forums.stricq.com/resources/upk-manager.1/)
+[UPK Manager v1.4.2](https://forums.stricq.com/resources/upk-manager.1/)
 
 ### Support
 [UPK Manager Forums](https://forums.stricq.com/)
@@ -55,13 +55,19 @@ All the texture objects in all the files that are checked will be saved as indiv
 ### Repackaging Modded Textures
 After exporting texture files to the chose Export Path, any of the exported textures can be modified or replaced.  Always ensure that you keep the same filename.  The program uses the filename to determine which textures to replace while rebuilding a package file.
 
-All textures must be saved in the DDS file format.  (JPG and PNG should work, too.  Just as long as the original image dimensions are the same.)
+All textures must be saved in the DDS file format.
 
 Once you have finished modifying the textures in the Export Path switch to the Rebuild tab.  Any textures listed in the tree that are checked will be rebuilt into a new modified UPK file after selecting Rebuild Selected Exports under the Rebuild menu.  The modified UPK file will automatically be placed in a mod folder with the game files ready to be used by the game.
 
 Any textures not checked will be pulled from the source game file and copied unmodified into the repackaged UPK file.
 
 Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
+
+# Changes for Release 1.4.2
+
+* Now uses a different version file if the normal version file cannot be found.
+* If there is more than one version of game file, now uses the first file rather than crashing.
+* The File Listing can now be filtered on filename, version, and notes.
 
 # Changes for Release 1.4.1
 

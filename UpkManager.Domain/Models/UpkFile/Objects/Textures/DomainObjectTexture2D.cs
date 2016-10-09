@@ -15,11 +15,11 @@ using UpkManager.Domain.Models.UpkFile.Tables;
 
 namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
-  public sealed class DomainObjectTexture2D : DomainObjectCompressionBase {
+  public class DomainObjectTexture2D : DomainObjectCompressionBase {
 
     #region Constructor
 
-    public DomainObjectTexture2D() {
+    internal DomainObjectTexture2D() {
       MipMaps = new List<DomainMipMap>();
     }
 

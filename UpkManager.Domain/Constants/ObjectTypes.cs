@@ -12,6 +12,8 @@ namespace UpkManager.Domain.Constants {
 
     ObjectRedirector,
 
+    ShadowMapTexture2D,
+
     SoundNodeWave,
 
     Texture2D,
