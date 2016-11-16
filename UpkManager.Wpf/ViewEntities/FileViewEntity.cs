@@ -20,7 +20,7 @@ namespace UpkManager.Wpf.ViewEntities {
     private bool isSelected;
     private bool isErrored;
 
-    private int gameVersion;
+    private string gameVersion;
 
     private long fileSize;
 
@@ -67,7 +67,7 @@ namespace UpkManager.Wpf.ViewEntities {
       set { SetField(ref id, value, () => Id); }
     }
 
-    public int GameVersion {
+    public string GameVersion {
       get { return gameVersion; }
       set { SetField(ref gameVersion, value, () => GameVersion); }
     }

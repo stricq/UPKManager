@@ -44,6 +44,7 @@ namespace UpkManager.Wpf.Controllers {
     #region Private Fields
 
     private string oldPathToGame;
+    private string version;
 
     private CancellationTokenSource tokenSource;
 
@@ -247,8 +248,6 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      int version;
-
       try {
         version = await repository.GetGameVersion(settings.PathToGame);
       }
@@ -262,7 +261,7 @@ namespace UpkManager.Wpf.Controllers {
         return;
       }
 
-      List<DomainUpkFile> localFiles = await loadGameFiles(version);
+      List<DomainUpkFile> localFiles = await loadGameFiles();
 
       if (!localFiles.Any()) {
         progress.IsComplete = true;
@@ -275,7 +274,7 @@ namespace UpkManager.Wpf.Controllers {
       List<DomainUpkFile> mods = (from row in localFiles
                                    let path = Path.GetDirectoryName(row.GameFilename)
                                  where path != null
-                                    && !path.ToLowerInvariant().EndsWith("cookedpc")
+                                    && !path.EndsWith("CookedPC", StringComparison.CurrentCultureIgnoreCase)
                                 select row).ToList();
 
       localFiles.RemoveAll(f => mods.Contains(f));
@@ -287,7 +286,7 @@ namespace UpkManager.Wpf.Controllers {
       List<DomainUpkFile> remoteFiles;
 
       try {
-        remoteFiles = await remoteRepository.LoadUpkFiles(version);
+        remoteFiles = await remoteRepository.LoadUpkFiles();
       }
       catch(Exception ex) {
         messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{ex.Message}", HasCancel = false });
@@ -300,25 +299,20 @@ namespace UpkManager.Wpf.Controllers {
       }
 
       List<DomainUpkFile> matches = (from row1 in localFiles
-                                     join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
+                                     join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
                                     where row1.FileSize == row2.FileSize
+                                      let a = row2.GameFilename = row1.GameFilename
                                    select row2).ToList();
 
       if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> changes = (from row1 in localFiles
-                                     join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
+                                     join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
                                     where row1.FileSize != row2.FileSize
+                                      let a = row2.GameFilename = row1.GameFilename
                                    select row2).ToList();
 
       if (changes.Any()) {
-        changes.ForEach(f => {
-          if (f.GameVersion != version) {
-            f.GameVersion = version;
-            f.Id          = null;
-          }
-        });
-
         allFiles.AddRange(changes.OrderBy(f => f.Filename));
 
         allFiles.Sort(domainUpkfileComparison);
@@ -327,7 +321,7 @@ namespace UpkManager.Wpf.Controllers {
       }
 
       List<DomainUpkFile> adds = (from row1 in localFiles
-                                  join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant() into fileGroup
+                                  join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package } into fileGroup
                                   from sub  in fileGroup.DefaultIfEmpty()
                                  where sub == null
                                 select row1).ToList();
@@ -340,7 +334,7 @@ namespace UpkManager.Wpf.Controllers {
         await scanUpkFiles(adds);
       }
 
-      viewModel.AllTypes = new ObservableCollection<string>(allFiles.SelectMany(f => f.ExportTypes).Distinct().OrderBy(s => s));
+      viewModel.AllTypes = new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
 
       // ReSharper disable once PossibleNullReferenceException
       allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
@@ -363,13 +357,13 @@ namespace UpkManager.Wpf.Controllers {
       return String.Compare(left.Filename, right.Filename, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private async Task<List<DomainUpkFile>> loadGameFiles(int version) {
+    private async Task<List<DomainUpkFile>> loadGameFiles() {
       List<DomainUpkFile> files = new List<DomainUpkFile>();
 
       if (String.IsNullOrEmpty(settings.PathToGame)) return files;
 
       try {
-        await repository.LoadDirectoryRecursiveFlat(files, version, settings.PathToGame, settings.PathToGame, "*.upk");
+        await repository.LoadDirectoryRecursiveFlat(files, settings.PathToGame, settings.PathToGame, "*.upk");
       }
       catch(Exception ex) {
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
@@ -529,11 +523,21 @@ namespace UpkManager.Wpf.Controllers {
 
         await scanUpkFile(fileEntity, file);
 
-        file.FileSize    = file.Header.FileSize;
-        file.ExportTypes = new List<string>(file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s));
+        file.FileSize = file.Header.FileSize;
+
+        List<DomainExportType> exports = new List<DomainExportType>();
+
+        foreach(string type in file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s)) {
+          exports.Add(new DomainExportType {
+            Name        = type,
+            ExportNames = file.Header.ExportTable.Where(e => e.TypeReferenceNameIndex.Name == type).Select(e => e.NameTableIndex.Name).Distinct().OrderBy(s => s).ToList()
+          });
+        }
+
+        file.Exports.Add(new DomainExportVersion { Version = version, Types = exports });
 
         fileEntity.FileSize    = file.Header.FileSize;
-        fileEntity.ExportTypes = new ObservableCollection<string>(file.ExportTypes);
+        fileEntity.ExportTypes = new ObservableCollection<string>(exports.Select(e => e.Name));
 
         file.Header = null;
 

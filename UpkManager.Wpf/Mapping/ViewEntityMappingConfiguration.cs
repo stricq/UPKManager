@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Windows;
 
 using AutoMapper;
@@ -68,6 +70,7 @@ namespace UpkManager.Wpf.Mapping {
                                                                       .ForMember(dest => dest.IsImport,   opt => opt.UseValue(false))
                                                                       .ForMember(dest => dest.IsExpanded, opt => opt.Ignore())
                                                                       .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
+                                                                      .ForMember(dest => dest.Parent,     opt => opt.Ignore())
                                                                       .ForMember(dest => dest.Children,   opt => opt.UseValue(new ObservableCollection<ObjectTreeViewEntity>()));
 
       config.CreateMap<DomainImportTableEntry, ImportTableEntryViewEntity>().ForMember(dest => dest.PackageName,        opt => opt.MapFrom(src => src.PackageNameIndex.Name))
@@ -82,6 +85,7 @@ namespace UpkManager.Wpf.Mapping {
                                                                       .ForMember(dest => dest.IsImport,   opt => opt.UseValue(true))
                                                                       .ForMember(dest => dest.IsExpanded, opt => opt.Ignore())
                                                                       .ForMember(dest => dest.IsSelected, opt => opt.Ignore())
+                                                                      .ForMember(dest => dest.Parent,     opt => opt.Ignore())
                                                                       .ForMember(dest => dest.Children,   opt => opt.UseValue(new ObservableCollection<ObjectTreeViewEntity>()));
 
       config.CreateMap<DomainNameTableEntry, NameTableEntryViewEntity>().ForMember(dest => dest.Name,       opt => opt.MapFrom(src => src.Name.String))
@@ -124,7 +128,9 @@ namespace UpkManager.Wpf.Mapping {
 
       #region DTOs
 
-      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
+      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.GameVersion,          opt => opt.ResolveUsing(src => src.GetMaxVersion()))
+                                                       .ForMember(dest => dest.ExportTypes,          opt => opt.ResolveUsing(src => src.GetBestExports()?.Select(e => e.Name) ?? new List<string>()))
+                                                       .ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
                                                        .ForMember(dest => dest.IsSelected,           opt => opt.Ignore())
                                                        .ForMember(dest => dest.IsErrored,            opt => opt.Ignore())
                                                        .ForMember(dest => dest.ContainsTargetObject, opt => opt.Ignore());

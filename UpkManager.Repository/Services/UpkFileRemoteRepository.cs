@@ -20,7 +20,7 @@ using UpkManager.Entities;
 namespace UpkManager.Repository.Services {
 
   [Export(typeof(IUpkFileRemoteRepository))]
-  public class UpkFileRemoteRepository : IUpkFileRemoteRepository {
+  public sealed class UpkFileRemoteRepository : IUpkFileRemoteRepository {
 
     #region Private Fields
 
@@ -43,10 +43,8 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRemoteRepository Implementation
 
-    public async Task<List<DomainUpkFile>> LoadUpkFiles(int GameVersion) {
-      RestRequest request = new RestRequest("UpkFile/{Version}", Method.GET) { RequestFormat = DataFormat.Json };
-
-      request.AddParameter("Version", GameVersion, ParameterType.UrlSegment);
+    public async Task<List<DomainUpkFile>> LoadUpkFiles() {
+      RestRequest request = new RestRequest("UpkFile", Method.GET) { RequestFormat = DataFormat.Json };
 
       IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request);
 

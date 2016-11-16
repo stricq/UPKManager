@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-
-using ManagedLZO;
 
 using UpkManager.Lzo;
 
 
 namespace UpkManager.Domain.Helpers {
 
-  public class ByteArrayReader {
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  public sealed class ByteArrayReader {
 
     #region Private Fields
 
@@ -115,8 +116,6 @@ namespace UpkManager.Domain.Helpers {
     }
 
     public async Task<byte[]> Compress() {
-//    await Task.Run(() => MiniLZO.Compress(data, out compressed));
-
       byte[] compressed = await compression.Compress(data);
 
       return compressed;
@@ -124,8 +123,6 @@ namespace UpkManager.Domain.Helpers {
 
     public async Task<byte[]> Decompress(int UncompressedSize) {
       byte[] decompressed = new byte[UncompressedSize];
-
-//    await Task.Run(() => MiniLZO.Decompress(data, decompressed));
 
       await compression.Decompress(data, decompressed);
 
