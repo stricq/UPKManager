@@ -534,6 +534,8 @@ namespace UpkManager.Wpf.Controllers {
           });
         }
 
+        file.Exports.Where(e => e.Version == version).ToList().ForEach(e => file.Exports.Remove(e));
+
         file.Exports.Add(new DomainExportVersion { Version = version, Types = exports });
 
         fileEntity.FileSize    = file.Header.FileSize;

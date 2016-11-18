@@ -62,6 +62,8 @@ namespace UpkManager.Repository.Services {
 
       IRestResponse<string> response = await client.ExecuteTaskAsync<string>(request);
 
+      if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
+
       File.Id = response.Data;
     }
 
