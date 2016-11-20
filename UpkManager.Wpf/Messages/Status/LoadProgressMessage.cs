@@ -3,7 +3,7 @@
 
 namespace UpkManager.Wpf.Messages.Status {
 
-  public class LoadProgressMessage : MessageBase {
+  internal sealed class LoadProgressMessage : MessageBase {
 
     #region Properties
 
@@ -16,6 +16,8 @@ namespace UpkManager.Wpf.Messages.Status {
     public string StatusText { get; set; }
 
     public bool IsComplete { get; set; }
+
+    public bool IsLocalMode { get; set; }
 
     #endregion Properties
 

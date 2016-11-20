@@ -42,6 +42,8 @@ namespace UpkManager.Domain.Models {
 
     public DomainHeader Header { get; set; }
 
+    public string CurrentVersion { get; set; } = "0.0.0.0";
+
     public string GameFilename { get; set; }
 
     public string Filename => $"{Package}.upk";
@@ -101,6 +103,8 @@ namespace UpkManager.Domain.Models {
     }
 
     public string GetMaxVersion() {
+      if (!Exports.Any()) return CurrentVersion;
+
       long numeric = 0;
 
       string version = "0.0.0.0";

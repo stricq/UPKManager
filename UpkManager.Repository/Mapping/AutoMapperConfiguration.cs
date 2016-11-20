@@ -19,12 +19,13 @@ namespace UpkManager.Repository.Mapping {
 
       #region DTOs
 
-      config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.Filename,     opt => opt.Ignore())
-                                                .ForMember(dest => dest.ModdedFiles,  opt => opt.Ignore())
-                                                .ForMember(dest => dest.IsModded,     opt => opt.Ignore())
-                                                .ForMember(dest => dest.Header,       opt => opt.Ignore())
-                                                .ForMember(dest => dest.LastAccess,   opt => opt.Ignore())
-                                                .ForMember(dest => dest.GameFilename, opt => opt.Ignore())
+      config.CreateMap<UpkFile, DomainUpkFile>().ForMember(dest => dest.Filename,       opt => opt.Ignore())
+                                                .ForMember(dest => dest.ModdedFiles,    opt => opt.Ignore())
+                                                .ForMember(dest => dest.IsModded,       opt => opt.Ignore())
+                                                .ForMember(dest => dest.Header,         opt => opt.Ignore())
+                                                .ForMember(dest => dest.LastAccess,     opt => opt.Ignore())
+                                                .ForMember(dest => dest.GameFilename,   opt => opt.Ignore())
+                                                .ForMember(dest => dest.CurrentVersion, opt => opt.Ignore())
                                                 .ReverseMap();
 
       config.CreateMap<ExportVersion, DomainExportVersion>().ReverseMap();

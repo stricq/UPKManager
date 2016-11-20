@@ -43,6 +43,8 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
+    private bool isLocalMode;
+
     private string oldPathToGame;
     private string version;
 
@@ -289,13 +291,15 @@ namespace UpkManager.Wpf.Controllers {
         remoteFiles = await remoteRepository.LoadUpkFiles();
       }
       catch(Exception ex) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{ex.Message}", HasCancel = false });
+        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{ex.Message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
 
-        progress.IsComplete = true;
+        progress.IsLocalMode = true;
 
-        messenger.Send(progress);
+        isLocalMode = true;
 
-        return;
+        viewModel.IsShowFilesWithType = false;
+
+        remoteFiles = new List<DomainUpkFile>();
       }
 
       List<DomainUpkFile> matches = (from row1 in localFiles
@@ -331,10 +335,11 @@ namespace UpkManager.Wpf.Controllers {
 
         allFiles.Sort(domainUpkfileComparison);
 
-        await scanUpkFiles(adds);
+        if (!isLocalMode) await scanUpkFiles(adds);
+        else adds.ForEach(f => f.CurrentVersion = version);
       }
 
-      viewModel.AllTypes = new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
+      viewModel.AllTypes = isLocalMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
 
       // ReSharper disable once PossibleNullReferenceException
       allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
@@ -384,7 +389,7 @@ namespace UpkManager.Wpf.Controllers {
 
             messenger.Send(new FileLoadingMessage());
 
-            DomainUpkFile upkFile = allFiles.First(f => f.Id == file.Id);
+            DomainUpkFile upkFile = allFiles.First(f => f.Filename == file.Filename);
 
             if (upkFile.Header == null) {
               await loadUpkFile(file, upkFile);
@@ -514,7 +519,7 @@ namespace UpkManager.Wpf.Controllers {
       List<DomainUpkFile> saveCache = new List<DomainUpkFile>();
 
       foreach(DomainUpkFile file in upkFiles) {
-        FileViewEntity fileEntity = viewModel.Files.SingleOrDefault(fe => fe.Id == file.Id) ?? mapper.Map<FileViewEntity>(file);
+        FileViewEntity fileEntity = viewModel.Files.SingleOrDefault(fe => fe.Filename == file.Filename) ?? mapper.Map<FileViewEntity>(file);
 
         message.Current++;
         message.StatusText = Path.Combine(settings.PathToGame, file.GameFilename);
@@ -546,7 +551,7 @@ namespace UpkManager.Wpf.Controllers {
         string path = Path.GetDirectoryName(file.GameFilename);
 
         if (path != null && path.ToLowerInvariant().EndsWith("cookedpc")) {
-          saveCache.Add(file);
+          if (!isLocalMode) saveCache.Add(file);
 
           if (saveCache.Count == 50) {
             remoteRepository.SaveUpkFile(saveCache).FireAndForget();

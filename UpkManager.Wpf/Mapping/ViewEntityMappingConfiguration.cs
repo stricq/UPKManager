@@ -44,7 +44,8 @@ namespace UpkManager.Wpf.Mapping {
 
       #region Messages
 
-      config.CreateMap<DomainLoadProgress, LoadProgressMessage>().ForMember(dest => dest.CanAsync, opt => opt.Ignore());
+      config.CreateMap<DomainLoadProgress, LoadProgressMessage>().ForMember(dest => dest.CanAsync,         opt => opt.Ignore())
+                                                                 .ForMember(dest => dest.IsLocalMode, opt => opt.Ignore());
 
       #endregion Messages
 

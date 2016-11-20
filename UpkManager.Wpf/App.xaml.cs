@@ -46,14 +46,19 @@ namespace UpkManager.Wpf {
 
         MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg => configurations.ForEach(configuration => configuration.RegisterMappings(cfg)));
 
-        mapperConfiguration.AssertConfigurationIsValid();
+        try {
+          mapperConfiguration.AssertConfigurationIsValid();
+        }
+        catch(Exception ex) {
+          MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "Mapping Validation Error");
+        }
 
         container.RegisterInstance(mapperConfiguration.CreateMapper());
 
         container.GetAll<IController>();
       }
       catch(Exception ex) {
-        MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "MEF or Mapping Error");
+        MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "MEF Composition Error");
       }
     }
 
