@@ -254,7 +254,7 @@ namespace UpkManager.Wpf.Controllers {
         version = await repository.GetGameVersion(settings.PathToGame);
       }
       catch(FileNotFoundException) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The VersionInfo_BnS*.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
+        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The ..\\bin\\Version.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
 
         progress.IsComplete = true;
 

@@ -44,7 +44,7 @@ namespace UpkManager.Repository.Services {
     #region IUpkFileRemoteRepository Implementation
 
     public async Task<List<DomainUpkFile>> LoadUpkFiles() {
-      RestRequest request = new RestRequest("UpkFiles", Method.GET) { RequestFormat = DataFormat.Json };
+      RestRequest request = new RestRequest("UpkFile", Method.GET) { RequestFormat = DataFormat.Json };
 
       IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request);
 
