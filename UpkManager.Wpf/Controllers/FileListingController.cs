@@ -45,6 +45,9 @@ namespace UpkManager.Wpf.Controllers {
 
     private bool isLocalMode;
 
+    private bool isLoadInProgress;
+    private bool isScanInProgress;
+
     private string oldPathToGame;
     private string version;
 
@@ -161,8 +164,8 @@ namespace UpkManager.Wpf.Controllers {
 
     #region ReloadFiles Command
 
-    private static bool canReloadFilesExecute() {
-      return true;
+    private bool canReloadFilesExecute() {
+      return !isLoadInProgress && !isScanInProgress;
     }
 
     private async Task onReloadFilesExecute() {
@@ -214,7 +217,7 @@ namespace UpkManager.Wpf.Controllers {
     #region ScanUpkFiles Command
 
     private bool canScanUpkFilesExecute() {
-      return allFiles.Any();
+      return allFiles.Any() && !isLoadInProgress && !isScanInProgress;
     }
 
     private void onScanUpkFilesExecute() {
@@ -234,6 +237,8 @@ namespace UpkManager.Wpf.Controllers {
     #region Private Methods
 
     private async Task loadAllFiles() {
+      isLoadInProgress = true;
+
       messenger.Send(new FileLoadingMessage());
 
       allFileEntities.ForEach(fe => fe.PropertyChanged -= onFileEntityViewModelChanged);
@@ -260,6 +265,8 @@ namespace UpkManager.Wpf.Controllers {
 
         messenger.Send(progress);
 
+        isLoadInProgress = false;
+
         return;
       }
 
@@ -269,6 +276,8 @@ namespace UpkManager.Wpf.Controllers {
         progress.IsComplete = true;
 
         messenger.Send(progress);
+
+        isLoadInProgress = false;
 
         return;
       }
@@ -356,6 +365,8 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Send(progress);
 
       messenger.Send(new FileListingLoadedMessage { Allfiles = allFiles });
+
+      isLoadInProgress = false;
     }
 
     private static int domainUpkfileComparison(DomainUpkFile left, DomainUpkFile right) {
@@ -449,21 +460,17 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private void showFileTypes() {
-      List<FileViewEntity> selectedFiles = allFileEntities;
-
       filesWithType = null;
 
       if (viewModel.IsShowFilesWithType) {
         allFileEntities.ForEach(f => { f.ContainsTargetObject = f.ExportTypes.Any(t => t.Equals(viewModel.SelectedType, StringComparison.CurrentCultureIgnoreCase)); });
 
-        selectedFiles = allFileEntities.Where(f => f.ContainsTargetObject).ToList();
+        List<FileViewEntity> selectedFiles = allFileEntities.Where(f => f.ContainsTargetObject).ToList();
 
         filesWithType = selectedFiles;
       }
 
-      viewModel.Files.Clear();
-
-      viewModel.Files.AddRange(selectedFiles);
+      Task.Run(() => filterFiles(viewModel.FilterText, resetToken())).FireAndForget();
     }
 
     private void filterFiles(string filterText, CancellationToken token) {
@@ -471,11 +478,14 @@ namespace UpkManager.Wpf.Controllers {
         List<FileViewEntity> selectedFiles = filesWithType ?? allFileEntities;
 
         if (viewModel.IsFilterFiles && !String.IsNullOrEmpty(filterText)) {
-          Regex regex = new Regex(filterText, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+          try {
+            Regex regex = new Regex(filterText, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-          if (token.IsCancellationRequested) return;
+            if (token.IsCancellationRequested) return;
 
-          selectedFiles = selectedFiles.Where(f => regex.IsMatch(f.Filename) || regex.IsMatch(f.GameVersion.ToString()) || regex.IsMatch(f.Notes ?? String.Empty)).ToList();
+            selectedFiles = selectedFiles.Where(f => regex.IsMatch(f.Filename) || regex.IsMatch(f.GameVersion.ToString()) || regex.IsMatch(f.Notes ?? String.Empty)).ToList();
+          }
+          catch(ArgumentException) { }
         }
 
         if (token.IsCancellationRequested) return;
@@ -514,6 +524,8 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private async Task scanUpkFiles(List<DomainUpkFile> upkFiles) {
+      isScanInProgress = true;
+
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
       List<DomainUpkFile> saveCache = new List<DomainUpkFile>();
@@ -566,6 +578,8 @@ namespace UpkManager.Wpf.Controllers {
       message.IsComplete = true;
 
       messenger.Send(message);
+
+      isScanInProgress = false;
     }
 
     private async Task scanUpkFile(FileViewEntity file, DomainUpkFile upkFile) {
