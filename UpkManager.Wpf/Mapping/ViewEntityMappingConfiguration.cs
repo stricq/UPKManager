@@ -129,7 +129,7 @@ namespace UpkManager.Wpf.Mapping {
 
       #region DTOs
 
-      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.GameVersion,          opt => opt.ResolveUsing(src => src.GetMaxVersion()))
+      config.CreateMap<DomainUpkFile, FileViewEntity>().ForMember(dest => dest.GameVersion,          opt => opt.ResolveUsing(src => src.GetMaxVersion().Version))
                                                        .ForMember(dest => dest.ExportTypes,          opt => opt.ResolveUsing(src => src.GetBestExports()?.Select(e => e.Name) ?? new List<string>()))
                                                        .ForMember(dest => dest.IsChecked,            opt => opt.Ignore())
                                                        .ForMember(dest => dest.IsSelected,           opt => opt.Ignore())

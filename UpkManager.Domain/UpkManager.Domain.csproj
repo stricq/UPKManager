@@ -80,9 +80,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=5.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.5.1.1\lib\net45\AutoMapper.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
     </Reference>
     <Reference Include="STR.Common, Version=1.0.5922.33591, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\STR.Common.1.0.16079.1\lib\net45\STR.Common.dll</HintPath>
@@ -107,6 +106,7 @@
     <Compile Include="Extensions\List.AddDomainNameTableEntry.cs" />
     <Compile Include="Helpers\ByteArrayWriter.cs" />
     <Compile Include="Helpers\MiniLZO.cs" />
+    <Compile Include="Models\DomainVersion.cs" />
     <Compile Include="Models\UpkFile\Compression\DomainCompressedChunkBulkData.cs" />
     <Compile Include="Models\DomainExportedObject.cs" />
     <Compile Include="Models\UpkFile\DomainHeaderBuilderBase.cs" />

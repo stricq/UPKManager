@@ -76,12 +76,22 @@ namespace UpkManager.Wpf.Controllers {
       mapper = Mapper;
 
       repository = Repository;
-
-      registerMessages();
-      registerCommands();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 

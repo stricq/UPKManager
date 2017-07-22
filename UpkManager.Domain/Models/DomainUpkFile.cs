@@ -42,7 +42,7 @@ namespace UpkManager.Domain.Models {
 
     public DomainHeader Header { get; set; }
 
-    public string CurrentVersion { get; set; } = "0.0.0.0";
+    public DomainVersion CurrentVersion { get; set; }
 
     public string GameFilename { get; set; }
 
@@ -62,91 +62,44 @@ namespace UpkManager.Domain.Models {
       return GetBestExports(GetMaxVersion());
     }
 
-    public List<DomainExportType> GetBestExports(string version) {
-      DomainExportVersion current = Exports.SingleOrDefault(v => v.Version == version);
+    public List<DomainExportType> GetBestExports(DomainVersion version) {
+      //
+      // Check for exact version match
+      //
+      DomainExportVersion found = Exports.SingleOrDefault(v => v.Version == version);
 
-      if (current != null) return current.Types;
+      if (found != null) return found.Types;
+      //
+      // Else look for the max of all versions less than the specified version
+      //
+      DomainVersion max = Exports.Where(v => v.Version < version).Max(v => v.Version);
 
-      int[] numeric = convertVersion(version);
+      if (max != null) {
+        found = Exports.Single(v => v.Version == max);
 
-      int lastSum = Int32.MinValue;
-
-      foreach(DomainExportVersion domainVersion in Exports) {
-        int[] n = convertVersion(domainVersion.Version);
-
-        int sum = 0;
-
-        for(int i = 0; i < 4; ++i) sum += numeric[i] - n[i] + (3 - i) * 100;
-
-        if (lastSum < 0 && sum > 0) {
-          lastSum = sum;
-
-          current = domainVersion;
-        }
-        else {
-          if (lastSum > 0 && sum > 0 && sum < lastSum) {
-            lastSum = sum;
-
-            current = domainVersion;
-          }
-          else {
-            if (lastSum < 0 && sum < 0 && sum > lastSum) {
-              lastSum = sum;
-
-              current = domainVersion;
-            }
-          }
-        }
+        return found.Types;
       }
+      //
+      // Otherwise just return for the max version
+      //
+      max = Exports.Max(v => v.Version);
 
-      return current?.Types;
+      if (max != null) {
+        found = Exports.Single(v => v.Version == max);
+
+        return found.Types;
+      }
+      //
+      // Otherwise there is nothing to return
+      //
+      return new List<DomainExportType>();
     }
 
-    public string GetMaxVersion() {
-      if (!Exports.Any()) return CurrentVersion;
-
-      long numeric = 0;
-
-      string version = "0.0.0.0";
-
-      foreach(string ver in Exports.Select(e => e.Version)) {
-        long current = convertToLong(ver);
-
-        if (current > numeric) {
-          numeric = current;
-
-          version = ver;
-        }
-      }
-
-      return version;
+    public DomainVersion GetMaxVersion() {
+      return !Exports.Any() ? CurrentVersion : Exports.Max(e => e.Version);
     }
 
     #endregion Domain Methods
-
-    #region Private Methods
-
-    private static int[] convertVersion(string version) {
-      int[] numeric = new int[4];
-
-      string[] parts = version.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-
-      for(int i = 0; i < 4; ++i) numeric[i] = i >= parts.Length ? 0 : Int32.Parse(parts[i]);
-
-      return numeric;
-    }
-
-    private static long convertToLong(string version) {
-      string[] parts = version.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-
-      long numeric = 0;
-
-      for(int i = 0; i < 4; ++i) numeric += Int32.Parse(parts[i]) + (3 - i) * 10000;
-
-      return numeric;
-    }
-
-    #endregion Private Methods
 
   }
 
@@ -156,7 +109,7 @@ namespace UpkManager.Domain.Models {
       Types = new List<DomainExportType>();
     }
 
-    public string Version { get; set; }
+    public DomainVersion Version { get; set; }
 
     public List<DomainExportType> Types { get; set; }
 

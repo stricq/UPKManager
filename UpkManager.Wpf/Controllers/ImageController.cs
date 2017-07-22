@@ -60,11 +60,21 @@ namespace UpkManager.Wpf.Controllers {
       messenger = Messenger;
 
       mapper = Mapper;
-
-      registerMessages();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 

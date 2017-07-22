@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="UpkManager.Wpf.Views.FileListingView"
+﻿<UserControl x:Class="UpkManager.Wpf.Views.FileListingView" x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:b="clr-namespace:UpkManager.Wpf.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -11,15 +11,29 @@
   <Grid Margin="6">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
+      <RowDefinition Height="9*" />
     </Grid.RowDefinitions>
 
-    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-      <CheckBox Name="IsShowFilesWithType" Content="{x:Null}" IsChecked="{Binding Path=IsShowFilesWithType}" Margin="0,5,0,0" Focusable="False" />
-      <Label Content="Show Files with Type:" Foreground="{StaticResource ForegroundColor}" />
-      <ComboBox ItemsSource="{Binding Path=AllTypes}" SelectedItem="{Binding Path=SelectedType}" Width="325" Height="20" IsEnabled="{Binding Path=IsChecked, ElementName=IsShowFilesWithType}" />
-    </StackPanel>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="2" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <CheckBox Grid.Row="0" Grid.Column="0" Name="IsShowFilesWithType" Content="{x:Null}" IsChecked="{Binding Path=IsShowFilesWithType}" Margin="0,5,0,0" Focusable="False" />
+      <Label    Grid.Row="0" Grid.Column="1" Content="Show Files with Type:" Foreground="{StaticResource ForegroundColor}" />
+      <ComboBox Grid.Row="0" Grid.Column="2" ItemsSource="{Binding Path=AllTypes}" SelectedItem="{Binding Path=SelectedType}" Width="325" Height="22" VerticalContentAlignment="Center" IsEnabled="{Binding Path=IsChecked, ElementName=IsShowFilesWithType}" />
+
+      <CheckBox Grid.Row="2" Grid.Column="0" Name="IsFilterFiles" Content="{x:Null}" IsChecked="{Binding Path=IsFilterFiles}" Margin="0,5,0,0" Focusable="False" />
+      <Label    Grid.Row="2" Grid.Column="1" Content="Filter:" Foreground="{StaticResource ForegroundColor}" HorizontalAlignment="Right" />
+      <TextBox  Grid.Row="2" Grid.Column="2" Text="{Binding Path=FilterText, UpdateSourceTrigger=PropertyChanged}" Width="325" Height="22" VerticalContentAlignment="Center" IsEnabled="{Binding Path=IsChecked, ElementName=IsFilterFiles}" />
+    </Grid>
 
     <HeaderedContentControl Grid.Row="1" Header="Files" Margin="0,6,0,0" Style="{StaticResource TallHeaderedContentStyle}">
       <ListView ItemsSource="{Binding Path=Files}" BorderThickness="0" BorderBrush="{StaticResource ContentControlBorderColor}" Foreground="{StaticResource ForegroundColor}" Background="{StaticResource BackgroundColor}" b:GridViewBehaviors.AutoResizeColumns="True"
@@ -56,7 +70,7 @@
             <GridViewColumn Header="Version">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>
@@ -74,12 +88,7 @@
       </ListView>
     </HeaderedContentControl>
 
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,6,0,0" HorizontalAlignment="Center">
-      <CheckBox Name="IsFilterFiles" Content="{x:Null}" IsChecked="{Binding Path=IsFilterFiles}" Margin="0,5,0,0" Focusable="False" />
-      <Label Content="Filter:" Foreground="{StaticResource ForegroundColor}" />
-      <TextBox Text="{Binding Path=FilterText, UpdateSourceTrigger=PropertyChanged}" Width="325" VerticalContentAlignment="Center" IsEnabled="{Binding Path=IsChecked, ElementName=IsFilterFiles}" />
-    </StackPanel>
-
   </Grid>
 
 </UserControl>
+

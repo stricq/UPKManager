@@ -26,7 +26,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class UpkManagerController : IController {
+  public sealed class UpkManagerController : IController {
 
     #region Private Fields
 
@@ -34,7 +34,7 @@ namespace UpkManager.Wpf.Controllers {
 
     private DateTime lastSave = DateTime.Now;
 
-    private readonly DomainSettings settings;
+    private DomainSettings settings;
 
     private readonly UpkManagerViewModel   viewModel;
     private readonly MainMenuViewModel menuViewModel;
@@ -71,8 +71,14 @@ namespace UpkManager.Wpf.Controllers {
       exceptionRepository = ExceptionRepository;
 
       mapper = Mapper;
+    }
 
-      settings = Task.Run(() => settingsRepository.LoadSettingsAsync()).Result;
+    #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      settings = await settingsRepository.LoadSettingsAsync();
 
       viewModel.Settings = mapper.Map<SettingsWindowViewEntity>(settings);
 
@@ -80,7 +86,9 @@ namespace UpkManager.Wpf.Controllers {
       registerCommands();
     }
 
-    #endregion Constructor
+    public int InitializePriority { get; } = 1000;
+
+    #endregion IController Implementation
 
     #region Messages
 

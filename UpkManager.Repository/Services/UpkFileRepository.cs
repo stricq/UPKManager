@@ -105,7 +105,7 @@ namespace UpkManager.Repository.Services {
       stream.Close();
     }
 
-    public async Task<string> GetGameVersion(string GamePath) {
+    public async Task<DomainVersion> GetGameVersion(string GamePath) {
       const string matchLine = "ProductVersion";
 
       string gameVersion = Combine(GamePath, @"..\bin\Version.ini");
@@ -128,7 +128,7 @@ namespace UpkManager.Repository.Services {
         }
       }
 
-      return version;
+      return new DomainVersion(version);
     }
 
     #endregion IUpkFileRepository Implementation

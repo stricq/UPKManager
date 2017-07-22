@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 
 using AutoMapper;
 
@@ -23,7 +24,7 @@ using UpkManager.Wpf.ViewModels.Tables;
 namespace UpkManager.Wpf.Controllers.Tables {
 
   [Export(typeof(IController))]
-  public class ExportTableController : IController {
+  public sealed class ExportTableController : IController {
 
     #region Private Fields
 
@@ -52,11 +53,21 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       messenger = Messenger;
          mapper = Mapper;
-
-      registerMessages();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 

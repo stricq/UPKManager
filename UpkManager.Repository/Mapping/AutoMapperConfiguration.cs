@@ -28,7 +28,9 @@ namespace UpkManager.Repository.Mapping {
                                                 .ForMember(dest => dest.CurrentVersion, opt => opt.Ignore())
                                                 .ReverseMap();
 
-      config.CreateMap<ExportVersion, DomainExportVersion>().ReverseMap();
+      config.CreateMap<ExportVersion, DomainExportVersion>().ForMember(dest => dest.Version, opt => opt.ResolveUsing(src => new DomainVersion(src.Version)))
+                                                            .ReverseMap()
+                                                            .ForMember(dest => dest.Version, opt => opt.MapFrom(src => src.Version.Version));
 
       config.CreateMap<ExportType, DomainExportType>().ReverseMap();
 

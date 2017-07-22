@@ -17,7 +17,7 @@ namespace UpkManager.Domain.Contracts {
 
     Task SaveUpkFile(DomainHeader Header, string Filename);
 
-    Task<string> GetGameVersion(string GamePath);
+    Task<DomainVersion> GetGameVersion(string GamePath);
 
   }
 

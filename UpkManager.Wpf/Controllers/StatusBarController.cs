@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
 using STR.MvvmCommon.Contracts;
@@ -19,6 +20,8 @@ namespace UpkManager.Wpf.Controllers {
 
     private int lastCurrent;
 
+    private readonly DispatcherTimer timer;
+
     private readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
 
     private readonly StatusBarViewModel viewModel;
@@ -35,19 +38,29 @@ namespace UpkManager.Wpf.Controllers {
 
       viewModel = ViewModel;
 
-      DispatcherTimer timer = new DispatcherTimer();
+      timer = new DispatcherTimer();
 
+      viewModel.JobProgressText = "Idle";
+    }
+
+    #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
       timer.Tick    += onTimerTick;
       timer.Interval = oneSecond;
 
       timer.Start();
 
-      viewModel.JobProgressText = "Idle";
-
       registerMessages();
+
+      await Task.CompletedTask;
     }
 
-    #endregion Constructor
+    public int InitializePriority { get; } = 500;
+
+    #endregion IController Implementation
 
     #region Messages
 

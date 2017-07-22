@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Navigation;
 
 using STR.DialogView.Domain.Messages;
@@ -17,7 +18,7 @@ using DialogNames = UpkManager.Wpf.Constants.DialogNames;
 namespace UpkManager.Wpf.Controllers.Dialogs {
 
   [Export(typeof(IController))]
-  public class AboutController : IController {
+  public sealed class AboutController : IController {
 
     #region Private Fields
 
@@ -34,12 +35,22 @@ namespace UpkManager.Wpf.Controllers.Dialogs {
       viewModel = ViewModel;
 
       messenger = Messenger;
-
-      registerMessages();
-      registerCommands();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 

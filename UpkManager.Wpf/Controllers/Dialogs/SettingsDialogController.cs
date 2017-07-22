@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 using Ookii.Dialogs.Wpf;
 
@@ -7,9 +8,6 @@ using STR.DialogView.Domain.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
-using UpkManager.Domain.Constants;
-
-using UpkManager.Wpf.Messages.Application;
 using UpkManager.Wpf.Messages.Settings;
 using UpkManager.Wpf.ViewModels.Dialogs;
 
@@ -19,7 +17,7 @@ using DialogNames = UpkManager.Wpf.Constants.DialogNames;
 namespace UpkManager.Wpf.Controllers.Dialogs {
 
   [Export(typeof(IController))]
-  public class SettingsDialogController : IController {
+  public sealed class SettingsDialogController : IController {
 
     #region Private Fields
 
@@ -38,12 +36,22 @@ namespace UpkManager.Wpf.Controllers.Dialogs {
       viewModel = ViewModel;
 
       messenger = Messenger;
-
-      registerMessages();
-      registerCommands();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 
