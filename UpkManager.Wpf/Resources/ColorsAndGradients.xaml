@@ -61,6 +61,11 @@
     <GradientStop Color="#FF1C1C64" Offset="1" />
   </LinearGradientBrush>
 
+  <LinearGradientBrush x:Key="TabItemHighlightGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF4545BF" Offset="0" />
+    <GradientStop Color="#FF2C2C74" Offset="1" />
+  </LinearGradientBrush>
+
   <LinearGradientBrush x:Key="TabItemUnSelectedGradient" EndPoint="0.5,1" StartPoint="0.5,0">
     <GradientStop Color="#FF8F8F8F" Offset="0" />
     <GradientStop Color="#FF565656" Offset="1" />

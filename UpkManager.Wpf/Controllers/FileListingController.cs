@@ -333,19 +333,25 @@ namespace UpkManager.Wpf.Controllers {
 
       List<DomainUpkFile> remoteFiles;
 
+      string message = "No files returned from repository.";
+
       try {
         remoteFiles = await remoteRepository.LoadUpkFiles();
       }
       catch(Exception ex) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{ex.Message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
+        message = ex.Message;
+
+        remoteFiles = new List<DomainUpkFile>();
+      }
+
+      if (!remoteFiles.Any()) {
+        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
 
         progress.IsLocalMode = true;
 
         isLocalMode = true;
 
         viewModel.IsShowFilesWithType = false;
-
-        remoteFiles = new List<DomainUpkFile>();
       }
 
       List<DomainUpkFile> matches = (from row1 in localFiles
@@ -355,7 +361,7 @@ namespace UpkManager.Wpf.Controllers {
                                       let b = row2.CurrentVersion = version
                                    select row2).ToList();
 
-      if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename).ThenBy(f => f.GetMaxVersion()));
+      if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> changes = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
@@ -365,7 +371,7 @@ namespace UpkManager.Wpf.Controllers {
                                    select row2).ToList();
 
       if (changes.Any()) {
-        allFiles.AddRange(changes.OrderBy(f => f.Filename).ThenBy(f => f.GetMaxVersion()));
+        allFiles.AddRange(changes.OrderBy(f => f.Filename));
 
         allFiles.Sort(domainUpkfileComparison);
 
@@ -379,7 +385,7 @@ namespace UpkManager.Wpf.Controllers {
                                 select row1).ToList();
 
       if (adds.Any()) {
-        allFiles.AddRange(adds.OrderBy(f => f.Filename).ThenBy(f => f.GetMaxVersion()));
+        allFiles.AddRange(adds.OrderBy(f => f.Filename));
 
         allFiles.Sort(domainUpkfileComparison);
 
@@ -388,9 +394,8 @@ namespace UpkManager.Wpf.Controllers {
 
       viewModel.AllTypes = isLocalMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
 
-      // ReSharper disable once PossibleNullReferenceException
-      allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
-                                                                   && Path.GetDirectoryName(mf.GameFilename).StartsWith(Path.GetDirectoryName(f.GameFilename)))); });
+      allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf =>  Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
+                                                                   && (Path.GetDirectoryName(mf.GameFilename) ?? String.Empty).StartsWith(Path.GetDirectoryName(f.GameFilename) ?? String.Empty))); });
 
       allFileEntities.AddRange(mapper.Map<List<FileViewEntity>>(allFiles));
 
@@ -474,9 +479,6 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-        default: {
-          break;
-        }
       }
     }
 
@@ -490,9 +492,6 @@ namespace UpkManager.Wpf.Controllers {
         case "IsSkipParsing": {
           if (!menuViewModel.IsSkipParsing) menuViewModel.IsSkipProperties = false;
 
-          break;
-        }
-        default: {
           break;
         }
       }

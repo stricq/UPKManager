@@ -70,7 +70,7 @@
             <GridViewColumn Header="Version">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Last Modified Version" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>

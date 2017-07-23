@@ -7,17 +7,21 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Resources/Converters.xaml" />
+
         <ResourceDictionary Source="Resources/ColorsAndGradients.xaml" />
-        <ResourceDictionary Source="Resources/TabItemStyle.xaml" />
+
+        <ResourceDictionary Source="Resources/ButtonStyle.xaml" />
         <ResourceDictionary Source="Resources/HeaderedContentStyle.xaml" />
         <ResourceDictionary Source="Resources/ListViewStyle.xaml" />
+        <ResourceDictionary Source="Resources/TabItemStyle.xaml" />
+        <ResourceDictionary Source="Resources/ToggleButtonStyle.xaml" />
+        <ResourceDictionary Source="Resources/TreeListViewItemStyle.xaml" />
+        <ResourceDictionary Source="Resources/TreeViewItemStyle.xaml" />
+
         <!--
         <ResourceDictionary Source="Resources/ScrollBarStyle.xaml" />
         <ResourceDictionary Source="Resources/ScrollViewerStyle.xaml" />
         -->
-        <ResourceDictionary Source="Resources/ToggleButtonStyle.xaml" />
-        <ResourceDictionary Source="Resources/TreeListViewItemStyle.xaml" />
-        <ResourceDictionary Source="Resources/TreeViewItemStyle.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>
