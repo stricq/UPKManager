@@ -8,7 +8,7 @@ Extract and re-integrate Texture2D and other object types.
 Visual Studio 2015 .Net 4.6.1
 
 ### Download
-[UPK Manager v1.4.2](https://forums.stricq.com/resources/upk-manager.1/)
+[UPK Manager v1.5](https://forums.stricq.com/resources/upk-manager.1/)
 
 ### Support
 [UPK Manager Forums](https://forums.stricq.com/)
@@ -62,6 +62,12 @@ Once you have finished modifying the textures in the Export Path switch to the R
 Any textures not checked will be pulled from the source game file and copied unmodified into the repackaged UPK file.
 
 Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
+
+# Changes for Release 1.5
+
+* Switch to a new database format so, unfortunately, all previous file notes are lost.
+* Offline Mode: If there are any connection issues with the remote database, the application will switch to offline mode that will still allow exporting and importing.
+* Rearranged the UI a bit to help with workflow and file commenting.
 
 # Changes for Release 1.4.2
 
