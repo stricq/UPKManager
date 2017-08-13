@@ -14,6 +14,8 @@ namespace UpkManager.Wpf.ViewModels {
 
     #region Private Fields
 
+    private bool isOfflineMode;
+
     private bool isViewRawData;
     private bool isSkipProperties;
     private bool isSkipParsing;
@@ -54,6 +56,11 @@ namespace UpkManager.Wpf.ViewModels {
     #endregion Private Fields
 
     #region Properties
+
+    public bool IsOfflineMode {
+      get { return isOfflineMode; }
+      set { SetField(ref isOfflineMode, value, () => IsOfflineMode); }
+    }
 
     public bool IsViewRawData {
       get { return isViewRawData; }

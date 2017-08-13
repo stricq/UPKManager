@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -44,18 +45,24 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRemoteRepository Implementation
 
-    public async Task<List<DomainUpkFile>> LoadUpkFiles() {
-      RestRequest request = new RestRequest("UpkFile", Method.GET) { RequestFormat = DataFormat.Json };
+    public async Task<List<DomainUpkFile>> LoadUpkFiles(CancellationToken token) {
+      try {
+        RestRequest request = new RestRequest("UpkFile", Method.GET) { RequestFormat = DataFormat.Json };
 
-      IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request);
+        IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request, token);
 
-      if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
+        if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
 
-      List<UpkFile> toKeep = response.Data.GroupBy(f => new { f.ContentsRoot, f.Package }).Select(fg => fg.Aggregate((f1, f2) => f1.Exports.Count > f2.Exports.Count ? f1 : f2)).ToList();
+        List<UpkFile> toKeep = response.Data.GroupBy(f => new { f.ContentsRoot, f.Package }).Select(fg => fg.Aggregate((f1, f2) => f1.Exports.Count > f2.Exports.Count ? f1 : f2)).ToList();
 
-      response.Data.Where(f => !toKeep.Contains(f)).ForEachAsync(f => DeleteUpkFile(f.Id)).FireAndForget();
+        response.Data.Where(f => !toKeep.Contains(f)).ForEachAsync(f => DeleteUpkFile(f.Id)).FireAndForget();
 
-      return await Task.Run(() => mapper.Map<List<DomainUpkFile>>(toKeep));
+        return await Task.Run(() => mapper.Map<List<DomainUpkFile>>(toKeep), token);
+      }
+      catch(TaskCanceledException) { }
+      catch(OperationCanceledException) { }
+
+      return new List<DomainUpkFile>();
     }
 
     public async Task SaveUpkFile(DomainUpkFile File) {

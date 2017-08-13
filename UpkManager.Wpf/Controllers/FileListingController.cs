@@ -43,14 +43,13 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Fields
 
-    private bool isLocalMode;
-
     private bool isLoadInProgress;
     private bool isScanInProgress;
 
     private string oldPathToGame;
 
-    private CancellationTokenSource tokenSource;
+    private CancellationTokenSource filterTokenSource;
+    private CancellationTokenSource remoteTokenSource;
 
     private DomainSettings settings;
 
@@ -182,7 +181,7 @@ namespace UpkManager.Wpf.Controllers {
     #region SaveNotes Command
 
     private bool canSaveNotesExecute() {
-      return String.Compare(notesViewModel.SelectedFile?.Notes, selectedFile?.Notes, StringComparison.CurrentCultureIgnoreCase) != 0 && !isLocalMode;
+      return String.Compare(notesViewModel.SelectedFile?.Notes, selectedFile?.Notes, StringComparison.CurrentCultureIgnoreCase) != 0 && !menuViewModel.IsOfflineMode;
     }
 
     private async Task onSaveNotesExecute() {
@@ -331,12 +330,14 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      List<DomainUpkFile> remoteFiles;
+      List<DomainUpkFile> remoteFiles = new List<DomainUpkFile>();
 
       string message = "No files returned from repository.";
 
+      CancellationToken token = resetToken(ref remoteTokenSource);
+
       try {
-        remoteFiles = await remoteRepository.LoadUpkFiles();
+        if (!menuViewModel.IsOfflineMode) remoteFiles = await remoteRepository.LoadUpkFiles(token);
       }
       catch(Exception ex) {
         message = ex.Message;
@@ -345,11 +346,13 @@ namespace UpkManager.Wpf.Controllers {
       }
 
       if (!remoteFiles.Any()) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
+        if (!token.IsCancellationRequested && !menuViewModel.IsOfflineMode) {
+          messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
+        }
 
         progress.IsLocalMode = true;
 
-        isLocalMode = true;
+        menuViewModel.IsOfflineMode = true;
 
         viewModel.IsShowFilesWithType = false;
       }
@@ -366,6 +369,7 @@ namespace UpkManager.Wpf.Controllers {
       List<DomainUpkFile> changes = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
                                     where row1.FileSize != row2.FileSize
+                                       && row2.Exports.All(e => e.Version != version)
                                       let a = row2.GameFilename = row1.GameFilename
                                       let b = row2.CurrentVersion = version
                                    select row2).ToList();
@@ -389,10 +393,10 @@ namespace UpkManager.Wpf.Controllers {
 
         allFiles.Sort(domainUpkfileComparison);
 
-        if (!isLocalMode) await scanUpkFiles(adds);
+        if (!menuViewModel.IsOfflineMode) await scanUpkFiles(adds);
       }
 
-      viewModel.AllTypes = isLocalMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
+      viewModel.AllTypes = menuViewModel.IsOfflineMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
 
       allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf =>  Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
                                                                    && (Path.GetDirectoryName(mf.GameFilename) ?? String.Empty).StartsWith(Path.GetDirectoryName(f.GameFilename) ?? String.Empty))); });
@@ -475,7 +479,7 @@ namespace UpkManager.Wpf.Controllers {
         }
         case "IsFilterFiles":
         case "FilterText": {
-          Task.Run(() => filterFiles(viewModel.FilterText, resetToken())).FireAndForget();
+          Task.Run(() => filterFiles(viewModel.FilterText, resetToken(ref filterTokenSource))).FireAndForget();
 
           break;
         }
@@ -494,6 +498,11 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
+        case "IsOfflineMode": {
+          if (menuViewModel.IsOfflineMode) resetToken(ref remoteTokenSource);
+
+          break;
+        }
       }
     }
 
@@ -508,7 +517,7 @@ namespace UpkManager.Wpf.Controllers {
         filesWithType = selectedFiles;
       }
 
-      Task.Run(() => filterFiles(viewModel.FilterText, resetToken())).FireAndForget();
+      Task.Run(() => filterFiles(viewModel.FilterText, resetToken(ref filterTokenSource))).FireAndForget();
     }
 
     private void filterFiles(string filterText, CancellationToken token) {
@@ -534,7 +543,7 @@ namespace UpkManager.Wpf.Controllers {
       catch(OperationCanceledException) { }
     }
 
-    private CancellationToken resetToken() {
+    private CancellationToken resetToken(ref CancellationTokenSource tokenSource) {
       tokenSource?.Cancel();
 
       tokenSource = new CancellationTokenSource();
@@ -601,7 +610,7 @@ namespace UpkManager.Wpf.Controllers {
         string path = Path.GetDirectoryName(file.GameFilename);
 
         if (path != null && path.ToLowerInvariant().EndsWith("cookedpc")) {
-          if (!isLocalMode) saveCache.Add(file);
+          if (!menuViewModel.IsOfflineMode) saveCache.Add(file);
 
           if (saveCache.Count == 50) {
             remoteRepository.SaveUpkFile(saveCache).FireAndForget();

@@ -163,9 +163,6 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-        default: {
-          break;
-        }
       }
     }
 
