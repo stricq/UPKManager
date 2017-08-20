@@ -61,6 +61,13 @@
       <Separator />
 
       <MenuItem Header="_Texture Quality" Foreground="{StaticResource BackgroundColor}">
+        <MenuItem Header="_DDS Format" Foreground="{StaticResource BackgroundColor}">
+          <MenuItem Header="Default"      Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsDefault}" />
+          <MenuItem Header="DDS _1"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsFormat1}" />
+          <MenuItem Header="DDS _5"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsFormat5}" />
+          <MenuItem Header="Uncompressed" Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsUncompressed}" />
+        </MenuItem>
+
         <MenuItem Header="_Compressor Type" Foreground="{StaticResource BackgroundColor}">
           <MenuItem Header="_Range Fit (Fast/LQ)"         Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorRangeFit}" />
           <MenuItem Header="_Cluster Fit (Slow/HQ)"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsCompressorClusterFit}" />

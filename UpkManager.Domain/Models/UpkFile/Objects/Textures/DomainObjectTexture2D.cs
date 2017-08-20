@@ -8,6 +8,7 @@ using UpkManager.Dds;
 using UpkManager.Dds.Constants;
 
 using UpkManager.Domain.Constants;
+using UpkManager.Domain.Extensions;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
@@ -145,7 +146,14 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
       if (imageFormat == FileFormat.Unknown) throw new Exception($"Unknown DDS File Format ({pfFormat?.PropertyString ?? "Unknown"}).");
 
-      config.FileFormat = imageFormat;
+      if (config.FileFormat == FileFormat.Unknown) config.FileFormat = imageFormat;
+      else {
+        string formatStr = DdsPixelFormat.BuildFileFormat(config.FileFormat);
+
+        DomainNameTableEntry formatTableEntry = nameTable.SingleOrDefault(nt => nt.Name.String == formatStr) ?? nameTable.AddDomainNameTableEntry(formatStr);
+
+        pfFormat?.SetPropertyValue(formatTableEntry);
+      }
 
       MipMaps.Clear();
 

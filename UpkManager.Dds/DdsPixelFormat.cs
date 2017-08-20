@@ -199,6 +199,14 @@ namespace UpkManager.Dds {
       throw new FormatException("Not a known DDS format.");
     }
 
+    public static string BuildFileFormat(FileFormat format) {
+      if (format == FileFormat.A8R8G8B8) return "PF_A8R8G8B8";
+      if (format == FileFormat.DXT1)     return "PF_DXT1";
+      if (format == FileFormat.DXT5)     return "PF_DXT5";
+
+      throw new FormatException("Not a known DDS format.");
+    }
+
     internal void Read(BinaryReader reader) {
       Size			  = reader.ReadUInt32();
       Flags		    = reader.ReadUInt32();

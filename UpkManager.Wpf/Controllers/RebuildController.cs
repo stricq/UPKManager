@@ -86,6 +86,8 @@ namespace UpkManager.Wpf.Controllers {
     #region IController Implementation
 
     public async Task InitializeAsync() {
+      menuViewModel.IsDdsUncompressed = true;
+
       registerMessages();
       registerCommands();
 
@@ -192,6 +194,42 @@ namespace UpkManager.Wpf.Controllers {
 
     private void onMenuViewModelPropertyChanged(object sender, PropertyChangedEventArgs args) {
       switch(args.PropertyName) {
+        case "IsDdsDefault": {
+          if (menuViewModel.IsDdsDefault) {
+            menuViewModel.IsDdsFormat1      = false;
+            menuViewModel.IsDdsFormat5      = false;
+            menuViewModel.IsDdsUncompressed = false;
+          }
+
+          break;
+        }
+        case "IsDdsFormat1": {
+          if (menuViewModel.IsDdsFormat1) {
+            menuViewModel.IsDdsDefault      = false;
+            menuViewModel.IsDdsFormat5      = false;
+            menuViewModel.IsDdsUncompressed = false;
+          }
+
+          break;
+        }
+        case "IsDdsFormat5": {
+          if (menuViewModel.IsDdsFormat5) {
+            menuViewModel.IsDdsDefault      = false;
+            menuViewModel.IsDdsFormat1      = false;
+            menuViewModel.IsDdsUncompressed = false;
+          }
+
+          break;
+        }
+        case "IsDdsUncompressed": {
+          if (menuViewModel.IsDdsUncompressed) {
+            menuViewModel.IsDdsDefault      = false;
+            menuViewModel.IsDdsFormat1      = false;
+            menuViewModel.IsDdsFormat5      = false;
+          }
+
+          break;
+        }
         case "IsCompressorRangeFit": {
           if (menuViewModel.IsCompressorRangeFit) {
             menuViewModel.IsCompressorClusterFit   = false;
@@ -373,7 +411,11 @@ namespace UpkManager.Wpf.Controllers {
 
           int errorMetric = menuViewModel.IsErrorMetricPerceptual ? 0 : 1;
 
-          DdsSaveConfig config = new DdsSaveConfig(FileFormat.Unknown, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
+          FileFormat fileFormat = menuViewModel.IsDdsDefault ? FileFormat.Unknown :
+                                  menuViewModel.IsDdsFormat1 ? FileFormat.DXT1    :
+                                  menuViewModel.IsDdsFormat5 ? FileFormat.DXT5    : FileFormat.A8R8G8B8;
+
+          DdsSaveConfig config = new DdsSaveConfig(fileFormat, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
 
           await export.DomainObject.SetObject(entity.Filename, header.NameTable, config);
 

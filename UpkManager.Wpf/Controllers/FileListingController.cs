@@ -394,6 +394,7 @@ namespace UpkManager.Wpf.Controllers {
         allFiles.Sort(domainUpkfileComparison);
 
         if (!menuViewModel.IsOfflineMode) await scanUpkFiles(adds);
+        else adds.ForEach(f => f.Id = Guid.NewGuid().ToString());
       }
 
       viewModel.AllTypes = menuViewModel.IsOfflineMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));

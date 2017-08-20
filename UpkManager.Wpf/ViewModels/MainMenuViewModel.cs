@@ -14,6 +14,11 @@ namespace UpkManager.Wpf.ViewModels {
 
     #region Private Fields
 
+    private bool isDdsDefault;
+    private bool isDdsFormat1;
+    private bool isDdsFormat5;
+    private bool isDdsUncompressed;
+
     private bool isOfflineMode;
 
     private bool isViewRawData;
@@ -56,6 +61,26 @@ namespace UpkManager.Wpf.ViewModels {
     #endregion Private Fields
 
     #region Properties
+
+    public bool IsDdsDefault {
+      get { return isDdsDefault; }
+      set { SetField(ref isDdsDefault, value, () => IsDdsDefault); }
+    }
+
+    public bool IsDdsFormat1 {
+      get { return isDdsFormat1; }
+      set { SetField(ref isDdsFormat1, value, () => IsDdsFormat1); }
+    }
+
+    public bool IsDdsFormat5 {
+      get { return isDdsFormat5; }
+      set { SetField(ref isDdsFormat5, value, () => IsDdsFormat5); }
+    }
+
+    public bool IsDdsUncompressed {
+      get { return isDdsUncompressed; }
+      set { SetField(ref isDdsUncompressed, value, () => IsDdsUncompressed); }
+    }
 
     public bool IsOfflineMode {
       get { return isOfflineMode; }
