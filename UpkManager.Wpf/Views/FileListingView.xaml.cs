@@ -3,7 +3,7 @@
 
 namespace UpkManager.Wpf.Views {
 
-  public partial class FileListingView : UserControl {
+  internal sealed partial class FileListingView : UserControl {
 
     public FileListingView() {
       InitializeComponent();

@@ -34,29 +34,42 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TabControl Grid.Column="0" Margin="0,-1,7,0" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}"
-                    mvvm:FrameworkElementBehaviors.SizeChangedCommand="{Binding Path=SizeChanged}">
-          <TabControl.Resources>
-            <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
-          </TabControl.Resources>
+        <Grid Grid.Column="0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="9*" />
+            <RowDefinition Height="6" />
+            <RowDefinition Height="1*" MinHeight="66" />
+          </Grid.RowDefinitions>
 
-          <TabItem Header="Game Files">
-            <v:FileListingView />
-          </TabItem>
+          <TabControl Grid.Row="0" Margin="0,-1,7,6" Padding="0" Background="{StaticResource BackgroundColor}" BorderBrush="{StaticResource ContentControlBorderColor}"
+                      mvvm:FrameworkElementBehaviors.SizeChangedCommand="{Binding Path=SizeChanged}">
+            <TabControl.Resources>
+              <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
+            </TabControl.Resources>
 
-          <TabItem Header="Rebuild">
-            <v:RebuildView />
-          </TabItem>
+            <TabItem Header="Game Files">
+              <v:FileListingView />
+            </TabItem>
 
-          <TabItem Header="Mod Files">
-            <v:ModsView />
-          </TabItem>
+            <TabItem Header="Rebuild">
+              <v:RebuildView />
+            </TabItem>
 
-          <TabItem Header="File Tables">
-            <v:HeaderTablesView />
-          </TabItem>
+            <TabItem Header="Mod Files">
+              <v:ModsView />
+            </TabItem>
 
-        </TabControl>
+            <TabItem Header="File Tables">
+              <v:HeaderTablesView />
+            </TabItem>
+
+          </TabControl>
+
+          <GridSplitter Grid.Row="1" Margin="-6,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource GridSplitterGradientUpDown}" />
+
+          <v:NotesView Grid.Row="2" />
+
+        </Grid>
 
         <GridSplitter Grid.Column="1" Margin="0,-6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource GridSplitterGradientLeftRight}" />
 
@@ -65,20 +78,20 @@
             <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}" />
           </TabControl.Resources>
 
-          <TabItem Header="File Detail">
-            <v:HeaderView />
+          <TabItem Header="Texture View">
+            <v:ImageView />
           </TabItem>
 
           <TabItem Header="Object Detail">
             <v:PropertyView />
           </TabItem>
 
-          <TabItem Header="Texture View">
-            <v:ImageView />
-          </TabItem>
-
           <TabItem Header="Hex View">
             <v:HexView />
+          </TabItem>
+
+          <TabItem Header="File Detail">
+            <v:HeaderView />
           </TabItem>
 
         </TabControl>

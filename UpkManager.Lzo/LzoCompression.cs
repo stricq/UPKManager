@@ -1,11 +1,13 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 
 namespace UpkManager.Lzo {
 
-  public class LzoCompression : ILzoCompression {
+  [Export(typeof(ILzoCompression))]
+  public sealed class LzoCompression : ILzoCompression {
 
     #region Private Fields
 
@@ -24,7 +26,7 @@ namespace UpkManager.Lzo {
     public LzoCompression() {
       int init = is64Bit ? Lzo2.lzo_init_64(1, -1, -1, -1, -1, -1, -1, -1, -1, -1) : Lzo2.lzo_init_32(1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
 
-      if(init != 0) throw new Exception("Initialization of lzo2.dll failed.");
+      if (init != 0) throw new Exception("Initialization of lzo2.dll failed.");
     }
 
     #endregion Constructor

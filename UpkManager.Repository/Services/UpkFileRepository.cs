@@ -11,15 +11,17 @@ using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.UpkFile;
 using UpkManager.Domain.Models.UpkFile.Tables;
 
+using static System.IO.Path;
+
 
 namespace UpkManager.Repository.Services {
 
   [Export(typeof(IUpkFileRepository))]
-  public class UpkFileRepository : IUpkFileRepository {
+  public sealed class UpkFileRepository : IUpkFileRepository {
 
     #region IUpkFileRepository Implementation
 
-    public async Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFiles, int Version, string ParentPath, string Path, string Filter) {
+    public async Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFiles, string ParentPath, string Path, string Filter) {
       DirectoryInfo   dirInfo  = new DirectoryInfo(Path);
       DirectoryInfo[] dirInfos = await Task.Run(() => dirInfo.GetDirectories());
 
@@ -29,7 +31,7 @@ namespace UpkManager.Repository.Services {
         foreach(DomainUpkFile upkFile in dirs.ToList()) {
           List<DomainUpkFile> children = new List<DomainUpkFile>();
 
-          await LoadDirectoryRecursiveFlat(children, Version, ParentPath, System.IO.Path.Combine(ParentPath, upkFile.GameFilename), Filter);
+          await LoadDirectoryRecursiveFlat(children, ParentPath, Combine(ParentPath, upkFile.GameFilename), Filter);
 
           if (children.Count == 0) dirs.Remove(upkFile);
           else ParentFiles.AddRange(children);
@@ -39,7 +41,7 @@ namespace UpkManager.Repository.Services {
       FileInfo[] files = await Task.Run(() => dirInfo.GetFiles(Filter));
 
       if (files.Length > 0) {
-        List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(ParentPath, null), FileSize = f.Length, GameVersion = Version }).ToList();
+        List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(ParentPath, null), ContentsRoot = f.FullName.Replace(ParentPath, null).Split('\\')[0].ToLowerInvariant(), Package = GetFileNameWithoutExtension(f.Name).ToLowerInvariant(), FileSize = f.Length }).ToList();
 
         ParentFiles.AddRange(upkFiles);
       }
@@ -103,30 +105,30 @@ namespace UpkManager.Repository.Services {
       stream.Close();
     }
 
-    public async Task<int> GetGameVersion(string GamePath) {
-      DirectoryInfo dirInfo = new DirectoryInfo(Path.Combine(GamePath, @"..\"));
+    public async Task<DomainVersion> GetGameVersion(string GamePath) {
+      const string matchLine = "ProductVersion";
 
-      FileInfo[] files = dirInfo.GetFiles("VersionInfo_BNS*.ini");
+      string gameVersion = Combine(GamePath, @"..\bin\Version.ini");
 
-      if (files.Length == 0) throw new FileNotFoundException("Could not find a matching VersionInfo_BNS*.ini file.");
+      if (!File.Exists(gameVersion)) throw new FileNotFoundException(@"Could not find the bin\Version.ini file.");
 
-      StreamReader stream = new StreamReader(File.OpenRead(files.First().FullName));
+      StreamReader stream = new StreamReader(File.OpenRead(gameVersion));
 
-      int version = 0;
+      string version = String.Empty;
 
       string line;
 
       while((line = await stream.ReadLineAsync()) != null) {
-        if (line.StartsWith("GlobalVersion", StringComparison.CurrentCultureIgnoreCase)) {
+        if (line.StartsWith(matchLine, StringComparison.CurrentCultureIgnoreCase)) {
           string[] parts = line.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 
-          if (parts.Length > 1) Int32.TryParse(parts[1], out version);
+          if (parts.Length > 1) version = parts[1];
 
           break;
         }
       }
 
-      return version;
+      return new DomainVersion(version);
     }
 
     #endregion IUpkFileRepository Implementation

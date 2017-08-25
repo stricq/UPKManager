@@ -1,19 +1,26 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 using STR.MvvmCommon;
 
 
 namespace UpkManager.Wpf.ViewEntities {
 
+  [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+  [SuppressMessage("ReSharper", "UnusedMember.Global")]
   public class FileViewEntity : ObservableObject {
 
     #region Private Fields
+
+    private bool containsTargetObject;
 
     private bool isChecked;
     private bool isSelected;
     private bool isErrored;
 
-    private int gameVersion;
+    private string gameVersion;
 
     private long fileSize;
 
@@ -29,6 +36,11 @@ namespace UpkManager.Wpf.ViewEntities {
     #endregion Private Fields
 
     #region Properties
+
+    public bool ContainsTargetObject {
+      get { return containsTargetObject; }
+      set { SetField(ref containsTargetObject, value, () => ContainsTargetObject); }
+    }
 
     public bool IsChecked {
       get { return isChecked; }
@@ -55,7 +67,7 @@ namespace UpkManager.Wpf.ViewEntities {
       set { SetField(ref id, value, () => Id); }
     }
 
-    public int GameVersion {
+    public string GameVersion {
       get { return gameVersion; }
       set { SetField(ref gameVersion, value, () => GameVersion); }
     }

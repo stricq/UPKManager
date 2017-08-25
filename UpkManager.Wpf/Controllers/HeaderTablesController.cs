@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 using STR.MvvmCommon.Contracts;
 
@@ -9,7 +10,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class HeaderTablesController : IController {
+  public sealed class HeaderTablesController : IController {
 
     #region Private Fields
 
@@ -27,6 +28,16 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Private Methods
 

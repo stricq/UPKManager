@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -16,6 +18,9 @@ using STR.DialogView.Domain.Messages;
 
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
+
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Contracts;
@@ -34,17 +39,31 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class FileListingController : IController {
+  public sealed class FileListingController : IController {
 
     #region Private Fields
 
+    private bool isLoadInProgress;
+    private bool isScanInProgress;
+
     private string oldPathToGame;
+
+    private CancellationTokenSource filterTokenSource;
+    private CancellationTokenSource remoteTokenSource;
 
     private DomainSettings settings;
 
-    private readonly List<DomainUpkFile> allFiles;
+    private DomainVersion version;
 
-    private readonly FileListingViewModel viewModel;
+    private DomainUpkFile selectedFile;
+
+    private List<FileViewEntity> filesWithType;
+
+    private readonly List<DomainUpkFile>  allFiles;
+    private readonly List<FileViewEntity> allFileEntities;
+
+    private readonly FileListingViewModel  viewModel;
+    private readonly NotesViewModel   notesViewModel;
     private readonly MainMenuViewModel menuViewModel;
 
     private readonly IMessenger messenger;
@@ -59,9 +78,10 @@ namespace UpkManager.Wpf.Controllers {
     #region Constructor
 
     [ImportingConstructor]
-    public FileListingController(FileListingViewModel ViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
-          viewModel = ViewModel;
-      menuViewModel = MenuViewModel;
+    public FileListingController(FileListingViewModel ViewModel, NotesViewModel NotesViewModel, MainMenuViewModel MenuViewModel, IMessenger Messenger, IMapper Mapper, IUpkFileRepository Repository, IUpkFileRemoteRepository RemoteRepository) {
+           viewModel = ViewModel;
+      notesViewModel = NotesViewModel;
+       menuViewModel = MenuViewModel;
 
       messenger = Messenger;
          mapper = Mapper;
@@ -70,16 +90,32 @@ namespace UpkManager.Wpf.Controllers {
 
       remoteRepository = RemoteRepository;
 
+      viewModel.Files = new ObservableCollection<FileViewEntity>();
+
+      viewModel.FilterText = String.Empty;
+
           viewModel.PropertyChanged += onViewModelPropertyChanged;
       menuViewModel.PropertyChanged += onMenuViewModelPropertyChanged;
 
       allFiles = new List<DomainUpkFile>();
 
-      registerMessages();
-      registerCommands();
+      allFileEntities = new List<FileViewEntity>();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 
@@ -130,6 +166,8 @@ namespace UpkManager.Wpf.Controllers {
     #region Commands
 
     private void registerCommands() {
+      notesViewModel.SaveNotes = new RelayCommandAsync(onSaveNotesExecute, canSaveNotesExecute);
+
       menuViewModel.ReloadFiles = new RelayCommandAsync(onReloadFilesExecute, canReloadFilesExecute);
 
       menuViewModel.ExportFiles = new RelayCommandAsync(onExportFilesExecute, canExportFilesExecute);
@@ -140,10 +178,24 @@ namespace UpkManager.Wpf.Controllers {
       menuViewModel.ScanUpkFiles = new RelayCommand(onScanUpkFilesExecute, canScanUpkFilesExecute);
     }
 
+    #region SaveNotes Command
+
+    private bool canSaveNotesExecute() {
+      return String.Compare(notesViewModel.SelectedFile?.Notes, selectedFile?.Notes, StringComparison.CurrentCultureIgnoreCase) != 0 && !menuViewModel.IsOfflineMode;
+    }
+
+    private async Task onSaveNotesExecute() {
+      selectedFile.Notes = notesViewModel.SelectedFile.Notes;
+
+      await remoteRepository.SaveUpkFile(selectedFile);
+    }
+
+    #endregion SaveNotes Command
+
     #region ReloadFiles Command
 
-    private static bool canReloadFilesExecute() {
-      return true;
+    private bool canReloadFilesExecute() {
+      return !isLoadInProgress && !isScanInProgress;
     }
 
     private async Task onReloadFilesExecute() {
@@ -195,7 +247,7 @@ namespace UpkManager.Wpf.Controllers {
     #region ScanUpkFiles Command
 
     private bool canScanUpkFilesExecute() {
-      return allFiles.Any();
+      return allFiles.Any() && !isLoadInProgress && !isScanInProgress;
     }
 
     private void onScanUpkFilesExecute() {
@@ -215,7 +267,17 @@ namespace UpkManager.Wpf.Controllers {
     #region Private Methods
 
     private async Task loadAllFiles() {
+      isLoadInProgress = true;
+
+      selectedFile = null;
+
+      notesViewModel.SelectedFile = null;
+
       messenger.Send(new FileLoadingMessage());
+
+      allFileEntities.ForEach(fe => fe.PropertyChanged -= onFileEntityViewModelChanged);
+
+      allFileEntities.Clear();
 
       allFiles.Clear();
 
@@ -227,35 +289,39 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      int version;
-
       try {
         version = await repository.GetGameVersion(settings.PathToGame);
       }
       catch(FileNotFoundException) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The VersionInfo_BnS.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
+        messenger.Send(new MessageBoxDialogMessage { Header = "Game Version File Not Found", Message = "The ..\\bin\\Version.ini file could not be found.\n\nPlease ensure your settings are pointed to the 'contents' directory.", HasCancel = false });
 
         progress.IsComplete = true;
 
         messenger.Send(progress);
 
+        isLoadInProgress = false;
+
         return;
       }
 
-      List<DomainUpkFile> localFiles = await loadGameFiles(version);
+      List<DomainUpkFile> localFiles = await loadGameFiles();
 
       if (!localFiles.Any()) {
         progress.IsComplete = true;
 
         messenger.Send(progress);
 
+        isLoadInProgress = false;
+
         return;
       }
+
+      localFiles.ForEach(f => f.CurrentVersion = version);
 
       List<DomainUpkFile> mods = (from row in localFiles
                                    let path = Path.GetDirectoryName(row.GameFilename)
                                  where path != null
-                                    && !path.ToLowerInvariant().EndsWith("cookedpc")
+                                    && !path.EndsWith("CookedPC", StringComparison.CurrentCultureIgnoreCase)
                                 select row).ToList();
 
       localFiles.RemoveAll(f => mods.Contains(f));
@@ -264,41 +330,51 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      List<DomainUpkFile> remoteFiles;
+      List<DomainUpkFile> remoteFiles = new List<DomainUpkFile>();
+
+      string message = "No files returned from repository.";
+
+      CancellationToken token = resetToken(ref remoteTokenSource);
 
       try {
-        remoteFiles = await remoteRepository.LoadUpkFiles(version);
+        if (!menuViewModel.IsOfflineMode) remoteFiles = await remoteRepository.LoadUpkFiles(token);
       }
       catch(Exception ex) {
-        messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{ex.Message}", HasCancel = false });
+        message = ex.Message;
 
-        progress.IsComplete = true;
+        remoteFiles = new List<DomainUpkFile>();
+      }
 
-        messenger.Send(progress);
+      if (!remoteFiles.Any()) {
+        if (!token.IsCancellationRequested && !menuViewModel.IsOfflineMode) {
+          messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
+        }
 
-        return;
+        progress.IsLocalMode = true;
+
+        menuViewModel.IsOfflineMode = true;
+
+        viewModel.IsShowFilesWithType = false;
       }
 
       List<DomainUpkFile> matches = (from row1 in localFiles
-                                     join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
+                                     join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
                                     where row1.FileSize == row2.FileSize
+                                      let a = row2.GameFilename = row1.GameFilename
+                                      let b = row2.CurrentVersion = version
                                    select row2).ToList();
 
       if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> changes = (from row1 in localFiles
-                                     join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant()
+                                     join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
                                     where row1.FileSize != row2.FileSize
+                                       && row2.Exports.All(e => e.Version != version)
+                                      let a = row2.GameFilename = row1.GameFilename
+                                      let b = row2.CurrentVersion = version
                                    select row2).ToList();
 
       if (changes.Any()) {
-        changes.ForEach(f => {
-          if (f.GameVersion != version) {
-            f.GameVersion = version;
-            f.Id          = null;
-          }
-        });
-
         allFiles.AddRange(changes.OrderBy(f => f.Filename));
 
         allFiles.Sort(domainUpkfileComparison);
@@ -307,7 +383,7 @@ namespace UpkManager.Wpf.Controllers {
       }
 
       List<DomainUpkFile> adds = (from row1 in localFiles
-                                  join row2 in remoteFiles on row1.GameFilename.ToLowerInvariant() equals row2.GameFilename.ToLowerInvariant() into fileGroup
+                                  join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package } into fileGroup
                                   from sub  in fileGroup.DefaultIfEmpty()
                                  where sub == null
                                 select row1).ToList();
@@ -317,35 +393,41 @@ namespace UpkManager.Wpf.Controllers {
 
         allFiles.Sort(domainUpkfileComparison);
 
-        await scanUpkFiles(adds);
+        if (!menuViewModel.IsOfflineMode) await scanUpkFiles(adds);
+        else adds.ForEach(f => f.Id = Guid.NewGuid().ToString());
       }
 
-      viewModel.AllTypes = new ObservableCollection<string>(allFiles.SelectMany(f => f.ExportTypes).Distinct().OrderBy(s => s));
+      viewModel.AllTypes = menuViewModel.IsOfflineMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
 
-      // ReSharper disable once PossibleNullReferenceException
-      allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf => Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
-                                                                   && Path.GetDirectoryName(mf.GameFilename).StartsWith(Path.GetDirectoryName(f.GameFilename)))); });
+      allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf =>  Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
+                                                                   && (Path.GetDirectoryName(mf.GameFilename) ?? String.Empty).StartsWith(Path.GetDirectoryName(f.GameFilename) ?? String.Empty))); });
 
-      filterFiles();
+      allFileEntities.AddRange(mapper.Map<List<FileViewEntity>>(allFiles));
+
+      allFileEntities.ForEach(fe => fe.PropertyChanged += onFileEntityViewModelChanged);
+
+      showFileTypes();
 
       progress.IsComplete = true;
 
       messenger.Send(progress);
 
       messenger.Send(new FileListingLoadedMessage { Allfiles = allFiles });
+
+      isLoadInProgress = false;
     }
 
     private static int domainUpkfileComparison(DomainUpkFile left, DomainUpkFile right) {
       return String.Compare(left.Filename, right.Filename, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private async Task<List<DomainUpkFile>> loadGameFiles(int version) {
+    private async Task<List<DomainUpkFile>> loadGameFiles() {
       List<DomainUpkFile> files = new List<DomainUpkFile>();
 
       if (String.IsNullOrEmpty(settings.PathToGame)) return files;
 
       try {
-        await repository.LoadDirectoryRecursiveFlat(files, version, settings.PathToGame, settings.PathToGame, "*.upk");
+        await repository.LoadDirectoryRecursiveFlat(files, settings.PathToGame, settings.PathToGame, "*.upk");
       }
       catch(Exception ex) {
         messenger.Send(new ApplicationErrorMessage { ErrorMessage = ex.Message, Exception = ex });
@@ -362,18 +444,20 @@ namespace UpkManager.Wpf.Controllers {
       switch(e.PropertyName) {
         case "IsSelected": {
           if (file.IsSelected) {
+            notesViewModel.SelectedFile = file;
+
             viewModel.Files.Where(f => f != file).ForEach(f => f.IsSelected = false);
 
             messenger.Send(new FileLoadingMessage());
 
-            DomainUpkFile upkFile = allFiles.Single(f => f.Id == file.Id);
+            DomainUpkFile upkFile = allFiles.First(f => f.Filename == file.Filename);
+
+            selectedFile = upkFile;
 
             if (upkFile.Header == null) {
               await loadUpkFile(file, upkFile);
 
               if (file.IsErrored) return;
-
-//            await repository.SaveUpkFile(upkFile.Header, $@"V:\{upkFile.Filename}");
             }
 
             upkFile.LastAccess = DateTime.Now;
@@ -383,9 +467,6 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-        default: {
-          break;
-        }
       }
     }
 
@@ -393,11 +474,14 @@ namespace UpkManager.Wpf.Controllers {
       switch(e.PropertyName) {
         case "IsShowFilesWithType":
         case "SelectedType": {
-          filterFiles();
+          showFileTypes();
 
           break;
         }
-        default: {
+        case "IsFilterFiles":
+        case "FilterText": {
+          Task.Run(() => filterFiles(viewModel.FilterText, resetToken(ref filterTokenSource))).FireAndForget();
+
           break;
         }
       }
@@ -415,31 +499,57 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-        default: {
+        case "IsOfflineMode": {
+          if (menuViewModel.IsOfflineMode) resetToken(ref remoteTokenSource);
+
           break;
         }
       }
     }
 
-    private void filterFiles() {
-      List<DomainUpkFile> selectedFiles;
+    private void showFileTypes() {
+      filesWithType = null;
 
       if (viewModel.IsShowFilesWithType) {
-        allFiles.ForEach(f => { f.ContainsTargetObject = f.ExportTypes.Any(t => t.Equals(viewModel.SelectedType, StringComparison.CurrentCultureIgnoreCase)); });
+        allFileEntities.ForEach(f => { f.ContainsTargetObject = f.ExportTypes.Any(t => t.Equals(viewModel.SelectedType, StringComparison.CurrentCultureIgnoreCase)); });
 
-        selectedFiles = allFiles.Where(f => f.ContainsTargetObject).ToList();
+        List<FileViewEntity> selectedFiles = allFileEntities.Where(f => f.ContainsTargetObject).ToList();
+
+        filesWithType = selectedFiles;
       }
-      else selectedFiles = allFiles;
 
-      List<FileViewEntity> fileEntities = mapper.Map<List<FileViewEntity>>(selectedFiles);
+      Task.Run(() => filterFiles(viewModel.FilterText, resetToken(ref filterTokenSource))).FireAndForget();
+    }
 
-      fileEntities.ForEach(fe => fe.PropertyChanged += onFileEntityViewModelChanged);
+    private void filterFiles(string filterText, CancellationToken token) {
+      try {
+        List<FileViewEntity> selectedFiles = filesWithType ?? allFileEntities;
 
-      viewModel.Files.ForEach(fe => fe.PropertyChanged -= onFileEntityViewModelChanged);
+        if (viewModel.IsFilterFiles && !String.IsNullOrEmpty(filterText)) {
+          try {
+            Regex regex = new Regex(filterText, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-      viewModel.Files.Clear();
+            if (token.IsCancellationRequested) return;
 
-      viewModel.Files.AddRange(fileEntities);
+            selectedFiles = selectedFiles.Where(f => regex.IsMatch(f.Filename) || regex.IsMatch(f.GameVersion.ToString()) || regex.IsMatch(f.Notes ?? String.Empty)).ToList();
+          }
+          catch(ArgumentException) { }
+        }
+
+        if (token.IsCancellationRequested) return;
+
+        viewModel.Files = new ObservableCollection<FileViewEntity>(selectedFiles);
+      }
+      catch(TaskCanceledException) { }
+      catch(OperationCanceledException) { }
+    }
+
+    private CancellationToken resetToken(ref CancellationTokenSource tokenSource) {
+      tokenSource?.Cancel();
+
+      tokenSource = new CancellationTokenSource();
+
+      return tokenSource.Token;
     }
 
     private async Task loadUpkFile(FileViewEntity file, DomainUpkFile upkFile) {
@@ -462,12 +572,14 @@ namespace UpkManager.Wpf.Controllers {
     }
 
     private async Task scanUpkFiles(List<DomainUpkFile> upkFiles) {
+      isScanInProgress = true;
+
       LoadProgressMessage message = new LoadProgressMessage { Text = "Scanning UPK Files", Current = 0, Total = upkFiles.Count };
 
       List<DomainUpkFile> saveCache = new List<DomainUpkFile>();
 
       foreach(DomainUpkFile file in upkFiles) {
-        FileViewEntity fileEntity = viewModel.Files.SingleOrDefault(fe => fe.Id == file.Id) ?? mapper.Map<FileViewEntity>(file);
+        FileViewEntity fileEntity = viewModel.Files.SingleOrDefault(fe => fe.Filename == file.Filename) ?? mapper.Map<FileViewEntity>(file);
 
         message.Current++;
         message.StatusText = Path.Combine(settings.PathToGame, file.GameFilename);
@@ -476,18 +588,30 @@ namespace UpkManager.Wpf.Controllers {
 
         await scanUpkFile(fileEntity, file);
 
-        file.FileSize    = file.Header.FileSize;
-        file.ExportTypes = new List<string>(file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s));
+        file.FileSize = file.Header.FileSize;
+
+        List<DomainExportType> exports = new List<DomainExportType>();
+
+        foreach(string type in file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s)) {
+          exports.Add(new DomainExportType {
+            Name        = type,
+            ExportNames = file.Header.ExportTable.Where(e => e.TypeReferenceNameIndex.Name == type).Select(e => e.NameTableIndex.Name).Distinct().OrderBy(s => s).ToList()
+          });
+        }
+
+        file.Exports.Where(e => e.Version == version).ToList().ForEach(e => file.Exports.Remove(e));
+
+        file.Exports.Add(new DomainExportVersion { Version = version, Types = exports });
 
         fileEntity.FileSize    = file.Header.FileSize;
-        fileEntity.ExportTypes = new ObservableCollection<string>(file.ExportTypes);
+        fileEntity.ExportTypes = new ObservableCollection<string>(exports.Select(e => e.Name));
 
         file.Header = null;
 
         string path = Path.GetDirectoryName(file.GameFilename);
 
         if (path != null && path.ToLowerInvariant().EndsWith("cookedpc")) {
-          saveCache.Add(file);
+          if (!menuViewModel.IsOfflineMode) saveCache.Add(file);
 
           if (saveCache.Count == 50) {
             remoteRepository.SaveUpkFile(saveCache).FireAndForget();
@@ -502,6 +626,8 @@ namespace UpkManager.Wpf.Controllers {
       message.IsComplete = true;
 
       messenger.Send(message);
+
+      isScanInProgress = false;
     }
 
     private async Task scanUpkFile(FileViewEntity file, DomainUpkFile upkFile) {
@@ -521,6 +647,12 @@ namespace UpkManager.Wpf.Controllers {
 
     private async Task exportFileObjects(List<DomainUpkFile> files) {
       LoadProgressMessage message = new LoadProgressMessage { Text = "Exporting...", Total = files.Count };
+
+      int compressor = menuViewModel.IsCompressorClusterFit ? 0 : menuViewModel.IsCompressorRangeFit ? 1 : 2;
+
+      int errorMetric = menuViewModel.IsErrorMetricPerceptual ? 0 : 1;
+
+      DdsSaveConfig config = new DdsSaveConfig(FileFormat.Unknown, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
 
       foreach(DomainUpkFile file in files) {
         FileViewEntity fileEntity = viewModel.Files.Single(fe => fe.Id == file.Id);
@@ -570,8 +702,10 @@ namespace UpkManager.Wpf.Controllers {
 
           messenger.Send(message);
 
-          await export.DomainObject.SaveObject(filename);
+          await export.DomainObject.SaveObject(filename, config);
         }
+
+        file.Header = null;
       }
 
       message.IsComplete = true;

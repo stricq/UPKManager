@@ -29,7 +29,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class ModsController : IController {
+  public sealed class ModsController : IController {
 
     #region Private Fields
 
@@ -62,11 +62,21 @@ namespace UpkManager.Wpf.Controllers {
       repository = Repository;
 
       allMods = new List<DomainUpkFile>();
-
-      registerMessages();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messenger
 
@@ -109,7 +119,13 @@ namespace UpkManager.Wpf.Controllers {
 
       allMods.Sort(domainUpkfileComparison);
 
-      viewModel.Mods = new ObservableCollection<FileViewEntity>(mapper.Map<IEnumerable<FileViewEntity>>(allMods));
+      viewModel.Mods.ForEach(mf => mf.PropertyChanged -= onFileViewEntityChanged);
+
+      viewModel.Mods.Clear();
+
+      viewModel.Mods.AddRange(mapper.Map<IEnumerable<FileViewEntity>>(allMods));
+
+      viewModel.Mods.ForEach(mf => mf.PropertyChanged += onFileViewEntityChanged);
     }
 
     #endregion Messenger
@@ -145,9 +161,6 @@ namespace UpkManager.Wpf.Controllers {
             messenger.Send(new FileLoadedMessage { FileViewEntity = file, File = upkFile });
           }
 
-          break;
-        }
-        default: {
           break;
         }
       }

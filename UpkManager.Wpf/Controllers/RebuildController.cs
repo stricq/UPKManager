@@ -17,6 +17,8 @@ using STR.DialogView.Domain.Messages;
 using STR.MvvmCommon;
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 using UpkManager.Domain.Models.UpkFile;
@@ -30,11 +32,14 @@ using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
+using static System.IO.Path;
+
+
 
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class RebuildController : IController {
+  public sealed class RebuildController : IController {
 
     #region Private Fields
 
@@ -64,17 +69,34 @@ namespace UpkManager.Wpf.Controllers {
           viewModel =     ViewModel;
       menuViewModel = MenuViewModel;
 
+      menuViewModel.IsCompressorIterativeFit = true;
+      menuViewModel.IsErrorMetricPerceptual  = true;
+
+      menuViewModel.PropertyChanged += onMenuViewModelPropertyChanged;
+
       messenger = Messenger;
 
       mapper = Mapper;
 
       repository = Repository;
-
-      registerMessages();
-      registerCommands();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      menuViewModel.IsDdsUncompressed = true;
+
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 
@@ -170,6 +192,89 @@ namespace UpkManager.Wpf.Controllers {
 
     #region Private Methods
 
+    private void onMenuViewModelPropertyChanged(object sender, PropertyChangedEventArgs args) {
+      switch(args.PropertyName) {
+        case "IsDdsDefault": {
+          if (menuViewModel.IsDdsDefault) {
+            menuViewModel.IsDdsFormat1      = false;
+            menuViewModel.IsDdsFormat5      = false;
+            menuViewModel.IsDdsUncompressed = false;
+          }
+
+          break;
+        }
+        case "IsDdsFormat1": {
+          if (menuViewModel.IsDdsFormat1) {
+            menuViewModel.IsDdsDefault      = false;
+            menuViewModel.IsDdsFormat5      = false;
+            menuViewModel.IsDdsUncompressed = false;
+          }
+
+          break;
+        }
+        case "IsDdsFormat5": {
+          if (menuViewModel.IsDdsFormat5) {
+            menuViewModel.IsDdsDefault      = false;
+            menuViewModel.IsDdsFormat1      = false;
+            menuViewModel.IsDdsUncompressed = false;
+          }
+
+          break;
+        }
+        case "IsDdsUncompressed": {
+          if (menuViewModel.IsDdsUncompressed) {
+            menuViewModel.IsDdsDefault      = false;
+            menuViewModel.IsDdsFormat1      = false;
+            menuViewModel.IsDdsFormat5      = false;
+          }
+
+          break;
+        }
+        case "IsCompressorRangeFit": {
+          if (menuViewModel.IsCompressorRangeFit) {
+            menuViewModel.IsCompressorClusterFit   = false;
+            menuViewModel.IsCompressorIterativeFit = false;
+
+            menuViewModel.IsWeightingEnabled   = false;
+            menuViewModel.IsWeightColorByAlpha = false;
+          }
+
+          break;
+        }
+        case "IsCompressorClusterFit": {
+          if (menuViewModel.IsCompressorClusterFit) {
+            menuViewModel.IsCompressorRangeFit     = false;
+            menuViewModel.IsCompressorIterativeFit = false;
+
+            menuViewModel.IsWeightingEnabled = true;
+          }
+
+          break;
+        }
+        case "IsCompressorIterativeFit": {
+          if (menuViewModel.IsCompressorIterativeFit) {
+            menuViewModel.IsCompressorClusterFit = false;
+            menuViewModel.IsCompressorRangeFit   = false;
+
+            menuViewModel.IsWeightingEnabled   = false;
+            menuViewModel.IsWeightColorByAlpha = false;
+          }
+
+          break;
+        }
+        case "IsErrorMetricUniform": {
+          if (menuViewModel.IsErrorMetricUniform) menuViewModel.IsErrorMetricPerceptual = false;
+
+          break;
+        }
+        case "IsErrorMetricPerceptual": {
+          if (menuViewModel.IsErrorMetricPerceptual) menuViewModel.IsErrorMetricUniform = false;
+
+          break;
+        }
+      }
+    }
+
     private void setupWatchers() {
       if (String.IsNullOrEmpty(settings.ExportPath)) return;
 
@@ -208,7 +313,9 @@ namespace UpkManager.Wpf.Controllers {
 
         viewModel.ExportsTree?.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged -= onExportedObjectViewEntityChanged);
 
-        viewModel.ExportsTree = new ObservableCollection<ExportedObjectViewEntity>(mapper.Map<IEnumerable<ExportedObjectViewEntity>>(root.Children));
+        IEnumerable<ExportedObjectViewEntity> temp = mapper.Map<IEnumerable<ExportedObjectViewEntity>>(root.Children);
+
+        viewModel.ExportsTree = new ObservableCollection<ExportedObjectViewEntity>(temp);
 
         viewModel.ExportsTree.Traverse(e => true).ToList().ForEach(e => e.PropertyChanged += onExportedObjectViewEntityChanged);
       }
@@ -300,18 +407,32 @@ namespace UpkManager.Wpf.Controllers {
 
           await export.ParseDomainObject(header, false, false);
 
-          await export.DomainObject.SetObject(entity.Filename);
+          int compressor = menuViewModel.IsCompressorClusterFit ? 0 : menuViewModel.IsCompressorRangeFit ? 1 : 2;
+
+          int errorMetric = menuViewModel.IsErrorMetricPerceptual ? 0 : 1;
+
+          FileFormat fileFormat = menuViewModel.IsDdsDefault ? FileFormat.Unknown :
+                                  menuViewModel.IsDdsFormat1 ? FileFormat.DXT1    :
+                                  menuViewModel.IsDdsFormat5 ? FileFormat.DXT5    : FileFormat.A8R8G8B8;
+
+          DdsSaveConfig config = new DdsSaveConfig(fileFormat, compressor, errorMetric, menuViewModel.IsWeightColorByAlpha, false);
+
+          await export.DomainObject.SetObject(entity.Filename, header.NameTable, config);
 
           message.StatusText = entity.Filename;
 
           messenger.Send(message);
         }
 
-        string filename = Path.Combine(settings.PathToGame, Path.GetDirectoryName(file.GameFilename), "mod", Path.GetFileName(file.GameFilename));
+        string directory = Path.Combine(settings.PathToGame, Path.GetDirectoryName(file.GameFilename), "mod");
+
+        string filename = Path.Combine(directory, Path.GetFileName(file.GameFilename));
+
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
         await repository.SaveUpkFile(header, filename);
 
-        DomainUpkFile upkFile = new DomainUpkFile { GameFilename = filename.Replace(settings.PathToGame, null), FileSize = new FileInfo(filename).Length };
+        DomainUpkFile upkFile = new DomainUpkFile { GameFilename = filename.Replace(settings.PathToGame, null), FileSize = new FileInfo(filename).Length, Package = GetFileNameWithoutExtension(filename).ToLowerInvariant() };
 
         messenger.Send(new ModFileBuiltMessage { UpkFile = upkFile });
       }

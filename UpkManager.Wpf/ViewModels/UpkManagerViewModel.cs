@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 
 using STR.MvvmCommon;
@@ -11,7 +12,9 @@ namespace UpkManager.Wpf.ViewModels {
 
   [Export]
   [ViewModel("UpkManagerViewModel")]
-  public class UpkManagerViewModel : ObservableObject {
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+  public sealed class UpkManagerViewModel : ObservableObject {
 
     #region Private Fields
 

@@ -26,7 +26,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class HexController : IController {
+  public sealed class HexController : IController {
 
     #region Private Fields
 
@@ -58,12 +58,22 @@ namespace UpkManager.Wpf.Controllers {
       messenger = Messenger;
 
       asyncService = AsyncService;
-
-      registerMessages();
-      registerCommands();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 

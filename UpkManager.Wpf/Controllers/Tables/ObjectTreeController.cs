@@ -28,9 +28,11 @@ using UpkManager.Wpf.ViewModels.Tables;
 namespace UpkManager.Wpf.Controllers.Tables {
 
   [Export(typeof(IController))]
-  public class ObjectTreeController : IController {
+  public sealed class ObjectTreeController : IController {
 
     #region Private Fields
+
+    private int importRecursion = 0;
 
     private CancellationTokenSource tokenSource;
 
@@ -58,11 +60,21 @@ namespace UpkManager.Wpf.Controllers.Tables {
 
       messenger = Messenger;
       mapper    = Mapper;
-
-      registerMessages();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 
@@ -112,20 +124,39 @@ namespace UpkManager.Wpf.Controllers.Tables {
       messenger.SendUi(message);
 
       try {
-        List<string> packages = imports.Select(import => import.PackageNameIndex.Name).Distinct().ToList();
+        List<ObjectTreeViewEntity> packages = imports.Where(import => import.OwnerReferenceNameIndex ==  null)
+                                                     .Select(import => import.PackageNameIndex.Name)
+                                                     .Distinct()
+                                                     .Select(packageName => new ObjectTreeViewEntity { Name = packageName, IsExpanded = packageName.Equals("Core", StringComparison.CurrentCultureIgnoreCase) })
+                                                     .ToList();
 
-        imports.RemoveAll(import => packages.Contains(import.NameTableIndex.Name));
+        viewModel.ObjectTree = new ObservableCollection<ObjectTreeViewEntity>(packages.OrderBy(package => package.Name));
 
-        List<ObjectTreeViewEntity> entities = packages.Select(package => new ObjectTreeViewEntity { Name = package, IsExpanded = package.Equals("Core", StringComparison.CurrentCultureIgnoreCase)}).ToList();
+        foreach(ObjectTreeViewEntity package in packages) {
+          List<ObjectTreeViewEntity> firstTypes = imports.Where(import => import.OwnerReferenceNameIndex == null
+                                                                       && package.Name == import.PackageNameIndex.Name)
+                                                         .Select(import => import.TypeNameIndex.Name)
+                                                         .Distinct()
+                                                         .Select(typeName1 => new ObjectTreeViewEntity { Name = typeName1, Parent = package, IsExpanded = typeName1.Equals("Package", StringComparison.CurrentCultureIgnoreCase) })
+                                                         .ToList();
 
-        viewModel.ObjectTree = new ObservableCollection<ObjectTreeViewEntity>(entities.OrderBy(entity => entity.Name));
+          package.Children = new ObservableCollection<ObjectTreeViewEntity>(firstTypes.OrderBy(type => type.Name));
 
-        foreach(ObjectTreeViewEntity childEntity in viewModel.ObjectTree) {
-          if (token.IsCancellationRequested) return;
+          List<string> names = new List<string> { "Engine", "Core" };
 
-          buildObjectTypes(childEntity, token);
+          foreach(ObjectTreeViewEntity type1 in firstTypes) {
+            List<ObjectTreeViewEntity> firstNames = imports.Where(import => import.OwnerReferenceNameIndex == null
+                                                                         && package.Name == import.PackageNameIndex.Name
+                                                                         &&   type1.Name == import.TypeNameIndex.Name)
+                                                           .Select(import => import.NameTableIndex.Name)
+                                                           .Distinct()
+                                                           .Select(name1 => new ObjectTreeViewEntity { Name = name1, Parent = type1, IsExpanded = names.Contains(name1) })
+                                                           .ToList();
 
-          if (token.IsCancellationRequested) return;
+            type1.Children = new ObservableCollection<ObjectTreeViewEntity>(firstNames.OrderBy(name => name.Name));
+
+            recursiveImports(firstNames);
+          }
         }
       }
       catch(Exception ex) {
@@ -135,6 +166,73 @@ namespace UpkManager.Wpf.Controllers.Tables {
       message.IsComplete = true;
 
       messenger.SendUi(message);
+    }
+
+    private void recursiveImports(List<ObjectTreeViewEntity> parents) {
+      foreach(ObjectTreeViewEntity parent in parents) {
+        List<ObjectTreeViewEntity> secondTypes = imports.Where(import => import.OwnerReferenceNameIndex != null
+                                                                      && parent.Name == import.OwnerReferenceNameIndex.Name)
+                                                        .Select(import => import.TypeNameIndex.Name)
+                                                        .Distinct()
+                                                        .Select(typeName2 => new ObjectTreeViewEntity { Name = typeName2, Parent = parent, IsExpanded = typeName2.Equals("Class", StringComparison.CurrentCultureIgnoreCase) })
+                                                        .ToList();
+
+        if (secondTypes.Any()) parent.Children = new ObservableCollection<ObjectTreeViewEntity>(secondTypes.OrderBy(type => type.Name));
+
+        foreach(ObjectTreeViewEntity type2 in secondTypes) {
+          List<ObjectTreeViewEntity> secondNames = imports.Where(import => import.OwnerReferenceNameIndex != null
+                                                                        && parent.Name == import.OwnerReferenceNameIndex.Name
+                                                                        && type2.Name == import.TypeNameIndex.Name)
+                                                          .Select(import => import.NameTableIndex.Name)
+                                                          .Distinct()
+                                                          .Select(name2 => new ObjectTreeViewEntity { Name = name2, Parent = type2, IsImport = true })
+                                                          .ToList();
+
+          if (secondNames.Any()) type2.Children = new ObservableCollection<ObjectTreeViewEntity>(secondNames.OrderBy(name => name.Name));
+
+          if (secondNames.Any()) {
+            importRecursion++;
+
+            if (importRecursion < 11) recursiveImports(secondNames);
+
+            importRecursion--;
+          }
+
+          foreach(ObjectTreeViewEntity name2 in secondNames) {
+            List<ObjectTreeViewEntity> exportNames = exports.Where(export => export.ArchetypeReferenceNameIndex != null
+                                                                          && name2.Name == export.ArchetypeReferenceNameIndex.Name)
+                                                            .Select(export => mapper.Map<ObjectTreeViewEntity>(export))
+                                                            .ToList();
+
+            if (!exportNames.Any()) continue;
+
+            exportNames.ForEach(exportName => {
+              exportName.Parent           = name2;
+              exportName.PropertyChanged += onObjectTreeViewEntityPropertyChanged;
+            });
+
+            name2.IsImport = !exportNames.Any();
+            name2.Children = new ObservableCollection<ObjectTreeViewEntity>(exportNames.OrderBy(name => name.Name));
+          }
+
+          foreach(ObjectTreeViewEntity name2 in secondNames) {
+            List<ObjectTreeViewEntity> exportNames = exports.Where(export => export.ArchetypeReferenceNameIndex == null
+                                                                          && name2.Name == export.TypeReferenceNameIndex.Name)
+                                                            .Select(export => mapper.Map<ObjectTreeViewEntity>(export))
+                                                            .ToList();
+
+            if (!exportNames.Any()) continue;
+
+            exportNames.ForEach(exportName => {
+              exportName.Parent           = name2;
+              exportName.PropertyChanged += onObjectTreeViewEntityPropertyChanged;
+            });
+
+            name2.IsImport = !exportNames.Any();
+            name2.Children = new ObservableCollection<ObjectTreeViewEntity>(exportNames.OrderBy(name => name.Name));
+          }
+        }
+      }
     }
 
     private void buildObjectTypes(ObjectTreeViewEntity parentEntity, CancellationToken token) {

@@ -22,6 +22,8 @@
   <SolidColorBrush x:Key="TabItemBorderSelectedColor"   Color="#FF363EF8" />
   <SolidColorBrush x:Key="TabItemBorderUnSelectedColor" Color="#FF3A3A3A" />
 
+  <SolidColorBrush x:Key="ScrollBarTrackColor" Color="#4A4A4A" />
+
   <SolidColorBrush x:Key="TextBoxBackgroundColor" Color="#FF2E2F34" />
 
   <SolidColorBrush x:Key="ExportObjectColor" Color="LightGreen" />
@@ -57,6 +59,11 @@
   <LinearGradientBrush x:Key="TabItemSelectedGradient" EndPoint="0.5,1" StartPoint="0.5,0">
     <GradientStop Color="#FF3535AF" Offset="0" />
     <GradientStop Color="#FF1C1C64" Offset="1" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="TabItemHighlightGradient" EndPoint="0.5,1" StartPoint="0.5,0">
+    <GradientStop Color="#FF4545BF" Offset="0" />
+    <GradientStop Color="#FF2C2C74" Offset="1" />
   </LinearGradientBrush>
 
   <LinearGradientBrush x:Key="TabItemUnSelectedGradient" EndPoint="0.5,1" StartPoint="0.5,0">

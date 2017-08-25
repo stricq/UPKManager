@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Configuration;
+using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -20,7 +22,7 @@ using UpkManager.Entities;
 namespace UpkManager.Repository.Services {
 
   [Export(typeof(IUpkFileRemoteRepository))]
-  public class UpkFileRemoteRepository : IUpkFileRemoteRepository {
+  public sealed class UpkFileRemoteRepository : IUpkFileRemoteRepository {
 
     #region Private Fields
 
@@ -43,16 +45,24 @@ namespace UpkManager.Repository.Services {
 
     #region IUpkFileRemoteRepository Implementation
 
-    public async Task<List<DomainUpkFile>> LoadUpkFiles(int GameVersion) {
-      RestRequest request = new RestRequest("UpkFile/{Version}", Method.GET) { RequestFormat = DataFormat.Json };
+    public async Task<List<DomainUpkFile>> LoadUpkFiles(CancellationToken token) {
+      try {
+        RestRequest request = new RestRequest("UpkFile", Method.GET) { RequestFormat = DataFormat.Json };
 
-      request.AddParameter("Version", GameVersion, ParameterType.UrlSegment);
+        IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request, token);
 
-      IRestResponse<List<UpkFile>> response = await client.ExecuteGetTaskAsync<List<UpkFile>>(request);
+        if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
 
-      if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
+        List<UpkFile> toKeep = response.Data.GroupBy(f => new { f.ContentsRoot, f.Package }).Select(fg => fg.Aggregate((f1, f2) => f1.Exports.Count > f2.Exports.Count ? f1 : f2)).ToList();
 
-      return await Task.Run(() => mapper.Map<List<DomainUpkFile>>(response.Data));
+        response.Data.Where(f => !toKeep.Contains(f)).ForEachAsync(f => DeleteUpkFile(f.Id)).FireAndForget();
+
+        return await Task.Run(() => mapper.Map<List<DomainUpkFile>>(toKeep), token);
+      }
+      catch(TaskCanceledException) { }
+      catch(OperationCanceledException) { }
+
+      return new List<DomainUpkFile>();
     }
 
     public async Task SaveUpkFile(DomainUpkFile File) {
@@ -64,11 +74,23 @@ namespace UpkManager.Repository.Services {
 
       IRestResponse<string> response = await client.ExecuteTaskAsync<string>(request);
 
+      if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
+
       File.Id = response.Data;
     }
 
     public async Task SaveUpkFile(List<DomainUpkFile> Files) {
       await Files.ForEachAsync(SaveUpkFile);
+    }
+
+    public async Task DeleteUpkFile(string Id) {
+      RestRequest request = new RestRequest("UpkFile/{upkFileId}", Method.DELETE) { RequestFormat = DataFormat.Json };
+
+      request.AddUrlSegment("upkFileId", Id);
+
+      IRestResponse response = await client.ExecuteTaskAsync(request);
+
+      if (response.StatusCode != HttpStatusCode.OK) throw new Exception(response.StatusDescription);
     }
 
     #endregion IUpkFileRemoteRepository Implementation

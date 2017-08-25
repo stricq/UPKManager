@@ -11,6 +11,7 @@ using UpkManager.Domain.Contracts;
 using UpkManager.Domain.Models;
 
 using UpkManager.Wpf.Messages.FileListing;
+using UpkManager.Wpf.Messages.Status;
 using UpkManager.Wpf.ViewEntities;
 using UpkManager.Wpf.ViewModels;
 
@@ -18,9 +19,11 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class HeaderController : IController {
+  public sealed class HeaderController : IController {
 
     #region Private Fields
+
+    private bool isLocalMode;
 
     private DomainUpkFile upkfile;
 
@@ -43,12 +46,22 @@ namespace UpkManager.Wpf.Controllers {
          mapper = Mapper;
 
       remoteRepository = RemoteRepository;
-
-      registerMessages();
-      registerCommands();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+      registerCommands();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 
@@ -56,6 +69,8 @@ namespace UpkManager.Wpf.Controllers {
       messenger.Register<FileLoadingMessage>(this, onHeaderLoading);
 
       messenger.Register<FileLoadedMessage>(this, onFileLoaded);
+
+      messenger.Register<LoadProgressMessage>(this, onLoadProgress);
     }
 
     private void onHeaderLoading(FileLoadingMessage message) {
@@ -72,6 +87,12 @@ namespace UpkManager.Wpf.Controllers {
       upkfile = message.File;
     }
 
+    private void onLoadProgress(LoadProgressMessage message) {
+      if (!message.IsComplete) return;
+
+      isLocalMode = message.IsLocalMode;
+    }
+
     #endregion Messages
 
     #region Commands
@@ -83,7 +104,7 @@ namespace UpkManager.Wpf.Controllers {
     #region SaveNotes Command
 
     private bool canSaveNotesExecute() {
-      return String.Compare(viewModel.File?.Notes, upkfile?.Notes, StringComparison.CurrentCultureIgnoreCase) != 0;
+      return String.Compare(viewModel.File?.Notes, upkfile?.Notes, StringComparison.CurrentCultureIgnoreCase) != 0 && !isLocalMode;
     }
 
     private async Task onSaveNotesExecute() {

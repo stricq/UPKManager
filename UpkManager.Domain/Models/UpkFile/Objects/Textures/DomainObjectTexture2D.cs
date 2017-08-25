@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using CSharpImageLibrary.General;
+using UpkManager.Dds;
+using UpkManager.Dds.Constants;
 
 using UpkManager.Domain.Constants;
+using UpkManager.Domain.Extensions;
 using UpkManager.Domain.Helpers;
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
@@ -14,11 +16,11 @@ using UpkManager.Domain.Models.UpkFile.Tables;
 
 namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
-  public sealed class DomainObjectTexture2D : DomainObjectCompressionBase {
+  public class DomainObjectTexture2D : DomainObjectCompressionBase {
 
     #region Constructor
 
-    public DomainObjectTexture2D() {
+    internal DomainObjectTexture2D() {
       MipMaps = new List<DomainMipMap>();
     }
 
@@ -73,86 +75,111 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
       Guid = await reader.ReadBytes(16);
     }
 
-    public override async Task SaveObject(string filename) {
+    public override async Task SaveObject(string filename, object configuration) {
       if (MipMaps == null || !MipMaps.Any()) return;
 
-      ImageEngineFormat format;
+      DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
+
+      FileFormat format;
 
       DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
 
       if (mipMap == null) return;
 
-      MemoryStream memory = buildDdsImage(MipMaps.IndexOf(mipMap), out format);
+      Stream memory = buildDdsImage(MipMaps.IndexOf(mipMap), out format);
 
       if (memory == null) return;
 
-      ImageEngineImage ddsImage = new ImageEngineImage(memory);
+      DdsFile ddsImage = new DdsFile(memory);
 
-      FileStream stream = new FileStream(filename, FileMode.Create);
+      FileStream ddsStream = new FileStream(filename, FileMode.Create);
 
-      await Task.Run(() => ddsImage.Save(stream, format, MipHandling.KeepTopOnly));
+      config.FileFormat = format;
 
-      stream.Close();
+      await Task.Run(() => ddsImage.Save(ddsStream, config));
+
+      ddsStream.Close();
 
       memory.Close();
     }
 
-    public override async Task SetObject(string filename) {
-      ImageEngineImage image = await Task.Run(() => new ImageEngineImage(filename));
+    public override async Task SetObject(string filename, List<DomainNameTableEntry> nameTable, object configuration) {
+      DdsSaveConfig config = configuration as DdsSaveConfig ?? new DdsSaveConfig(FileFormat.Unknown, 0, 0, false, false);
+
+      DdsFile image = await Task.Run(() => new DdsFile(filename));
+
+      bool skipFirstMip = false;
 
       int width  = image.Width;
       int height = image.Height;
 
-      DomainPropertyIntValue sizeX = PropertyHeader.GetProperty("SizeX").First()?.Value as DomainPropertyIntValue;
-      DomainPropertyIntValue sizeY = PropertyHeader.GetProperty("SizeY").First()?.Value as DomainPropertyIntValue;
+      if (MipMaps[0].ImageData == null || MipMaps[0].ImageData.Length == 0) {
+        width  *= 2;
+        height *= 2;
 
-      sizeX?.SetPropertyValue(width);
-      sizeY?.SetPropertyValue(height);
+        skipFirstMip = true;
+      }
 
-      DomainPropertyIntValue mipTailBaseIdx = PropertyHeader.GetProperty("MipTailBaseIdx").First()?.Value as DomainPropertyIntValue;
+      DomainPropertyIntValue sizeX = PropertyHeader.GetProperty("SizeX").FirstOrDefault()?.Value as DomainPropertyIntValue;
+      DomainPropertyIntValue sizeY = PropertyHeader.GetProperty("SizeY").FirstOrDefault()?.Value as DomainPropertyIntValue;
 
-      mipTailBaseIdx?.SetPropertyValue((int)Math.Log(width > height ? width : height, 2));
+      sizeX?.SetPropertyValue(skipFirstMip ? width  * 2 : width);
+      sizeY?.SetPropertyValue(skipFirstMip ? height * 2 : height);
 
-      DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").First()?.Value as DomainPropertyStringValue;
-      DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").First()?.Value as DomainPropertyStringValue;
+      DomainPropertyIntValue mipTailBaseIdx = PropertyHeader.GetProperty("MipTailBaseIdx").FirstOrDefault()?.Value as DomainPropertyIntValue;
+
+      int indexSize = width > height ? width : height;
+
+      mipTailBaseIdx?.SetPropertyValue((int)Math.Log(skipFirstMip ? indexSize * 2 : indexSize , 2));
+
+      DomainPropertyStringValue filePath = PropertyHeader.GetProperty("SourceFilePath").FirstOrDefault()?.Value as DomainPropertyStringValue;
+      DomainPropertyStringValue fileTime = PropertyHeader.GetProperty("SourceFileTimestamp").FirstOrDefault()?.Value as DomainPropertyStringValue;
 
       filePath?.SetPropertyValue(filename);
       fileTime?.SetPropertyValue(File.GetLastWriteTime(filename).ToString("yyyy-MM-dd hh:mm:ss"));
 
-      DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").First()?.Value as DomainPropertyByteValue;
+      DomainPropertyByteValue pfFormat = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
-      string format = pfFormat?.PropertyString ?? "PF_DXT5";
+      FileFormat imageFormat = FileFormat.Unknown;
 
-      ImageEngineFormat imageFormat = ImageEngine.ParseFromString(format);
+      if (pfFormat != null) imageFormat = DdsPixelFormat.ParseFileFormat(pfFormat.PropertyString);
+
+      if (imageFormat == FileFormat.Unknown) throw new Exception($"Unknown DDS File Format ({pfFormat?.PropertyString ?? "Unknown"}).");
+
+      if (config.FileFormat == FileFormat.Unknown) config.FileFormat = imageFormat;
+      else {
+        string formatStr = DdsPixelFormat.BuildFileFormat(config.FileFormat);
+
+        DomainNameTableEntry formatTableEntry = nameTable.SingleOrDefault(nt => nt.Name.String == formatStr) ?? nameTable.AddDomainNameTableEntry(formatStr);
+
+        pfFormat?.SetPropertyValue(formatTableEntry);
+      }
 
       MipMaps.Clear();
 
-      while(true) {
-        MemoryStream stream = new MemoryStream();
-
-        image.Save(stream, imageFormat, MipHandling.KeepTopOnly);
-
-        await stream.FlushAsync();
-
+      if (skipFirstMip) {
         MipMaps.Add(new DomainMipMap {
-          ImageData = (await ByteArrayReader.CreateNew(stream.ToArray(), 0x80).Splice()).GetBytes(), // Strip off 128 bytes for the DDS header
-          Width     = image.Width,
-          Height    = image.Height
+          ImageData = null,
+          Width     = width,
+          Height    = height
         });
+      }
 
-        if (width == 1 && height == 1) break;
+      image.GenerateMipMaps(4, 4);
 
-        if (width  > 1) width  /= 2;
-        if (height > 1) height /= 2;
-
-        if (image.Width > 4 && image.Height > 4) image.Resize(0.5);
+      foreach(DdsMipMap mipMap in image.MipMaps.OrderByDescending(mip => mip.Width)) {
+        MipMaps.Add(new DomainMipMap {
+          ImageData = image.WriteMipMap(mipMap, config),
+          Width     = mipMap.Width,
+          Height    = mipMap.Height
+        });
       }
     }
 
     public override Stream GetObjectStream() {
       if (MipMaps == null || !MipMaps.Any()) return null;
 
-      ImageEngineFormat format;
+      FileFormat format;
 
       DomainMipMap mipMap = MipMaps.Where(mm => mm.ImageData != null && mm.ImageData.Length > 0).OrderByDescending(mm => mm.Width > mm.Height ? mm.Width : mm.Height).FirstOrDefault();
 
@@ -160,7 +187,7 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
     }
 
     public Stream GetObjectStream(int mipMapIndex) {
-      ImageEngineFormat format;
+      FileFormat format;
 
       return buildDdsImage(mipMapIndex, out format);
     }
@@ -207,50 +234,26 @@ namespace UpkManager.Domain.Models.UpkFile.Objects.Textures {
 
     #region Private Methods
 
-    private MemoryStream buildDdsImage(int mipMapIndex, out ImageEngineFormat imageFormat) {
+    private Stream buildDdsImage(int mipMapIndex, out FileFormat imageFormat) {
       DomainPropertyByteValue formatProp = PropertyHeader.GetProperty("Format").FirstOrDefault()?.Value as DomainPropertyByteValue;
 
-      imageFormat = ImageEngineFormat.Unknown;
+      imageFormat = FileFormat.Unknown;
 
       if (formatProp == null) return null;
 
-      string format = formatProp.PropertyString.Replace("PF_", null);
-
-      switch(format) {
-        case "DXT1": {
-          imageFormat = ImageEngineFormat.DDS_DXT1;
-
-          break;
-        }
-        case "DXT5": {
-          imageFormat = ImageEngineFormat.DDS_DXT5;
-
-          break;
-        }
-        case "G8": {
-          imageFormat = ImageEngineFormat.DDS_G8_L8;
-
-          break;
-        }
-        case "A8R8G8B8": {
-          imageFormat = ImageEngineFormat.DDS_ARGB;
-
-          break;
-        }
-        default: {
-          return null;
-        }
-      }
+      string format = formatProp.PropertyString;
 
       DomainMipMap mipMap = MipMaps[mipMapIndex];
 
-      DDSGeneral.DDS_HEADER header = DDSGeneral.Build_DDS_Header(0, mipMap.Height, mipMap.Width, imageFormat);
+      imageFormat = DdsPixelFormat.ParseFileFormat(format);
+
+      DdsHeader ddsHeader = new DdsHeader(new DdsSaveConfig(imageFormat, 0, 0, false, false), mipMap.Width, mipMap.Height);
 
       MemoryStream stream = new MemoryStream();
 
       BinaryWriter writer = new BinaryWriter(stream);
 
-      DDSGeneral.Write_DDS_Header(header, writer);
+      ddsHeader.Write(writer);
 
       stream.Write(mipMap.ImageData, 0, mipMap.ImageData.Length);
 

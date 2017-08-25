@@ -9,7 +9,7 @@ namespace UpkManager.Domain.Contracts {
 
   public interface IUpkFileRepository {
 
-    Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFile, int Version, string ParentPath, string Path, string Filter);
+    Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFile, string ParentPath, string Path, string Filter);
 
     Task LoadDirectoryRecursive(DomainExportedObject Parent, string Path);
 
@@ -17,7 +17,7 @@ namespace UpkManager.Domain.Contracts {
 
     Task SaveUpkFile(DomainHeader Header, string Filename);
 
-    Task<int> GetGameVersion(string GamePath);
+    Task<DomainVersion> GetGameVersion(string GamePath);
 
   }
 

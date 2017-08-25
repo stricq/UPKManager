@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 using STR.Common.Contracts;
 
@@ -7,7 +8,8 @@ using STR.MvvmCommon;
 
 namespace UpkManager.Wpf.ViewEntities.Tables {
 
-  public class ObjectTreeViewEntity : ObservableObject, ITraversable<ObjectTreeViewEntity> {
+  [SuppressMessage("ReSharper", "MemberCanBeInternal")]
+  public sealed class ObjectTreeViewEntity : ObservableObject, ITraversable<ObjectTreeViewEntity> {
 
     #region Private Fields
 
@@ -21,11 +23,18 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
 
     private string name;
 
+    private ObjectTreeViewEntity parent;
+
     private ObservableCollection<ObjectTreeViewEntity> children;
 
     #endregion Private Fields
 
     #region Properties
+
+    public ObjectTreeViewEntity Parent {
+      get { return parent; }
+      set { SetField(ref parent, value, () => Parent); }
+    }
 
     public bool IsExpanded {
       get { return isExpanded; }
@@ -67,6 +76,14 @@ namespace UpkManager.Wpf.ViewEntities.Tables {
     }
 
     #endregion ITraversable Implementation
+
+    #region Overrides
+
+    public override string ToString() {
+      return Name;
+    }
+
+    #endregion Overrides
 
   }
 

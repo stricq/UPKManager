@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 using AutoMapper;
 
 using STR.Common.Extensions;
+
 using STR.MvvmCommon.Contracts;
 using STR.MvvmCommon.Mef;
 
@@ -15,7 +18,7 @@ using UpkManager.Domain.Contracts;
 
 namespace UpkManager.Wpf {
 
-  public partial class App : Application {
+  internal sealed partial class App : Application {
 
     #region Private Fields
 
@@ -45,14 +48,25 @@ namespace UpkManager.Wpf {
 
         MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg => configurations.ForEach(configuration => configuration.RegisterMappings(cfg)));
 
-        mapperConfiguration.AssertConfigurationIsValid();
+        try {
+          mapperConfiguration.AssertConfigurationIsValid();
+        }
+        catch(Exception ex) {
+          MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "Mapping Validation Error");
+        }
 
         container.RegisterInstance(mapperConfiguration.CreateMapper());
 
-        container.GetAll<IController>();
+        IEnumerable<IController> controllers = container.GetAll<IController>();
+
+        IOrderedEnumerable<IGrouping<int, IController>> groups = controllers.GroupBy(c => c.InitializePriority).OrderBy(g => g.Key);
+
+        foreach(IGrouping<int, IController> group in groups) {
+          Task.Run(() => group.ForEachAsync(controller => controller.InitializeAsync())).Wait();
+        }
       }
       catch(Exception ex) {
-        MessageBox.Show(ex.Message, "MEF or Mapping Error");
+        MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "MEF Composition Error");
       }
     }
 

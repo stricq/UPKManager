@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Helpers;
@@ -6,7 +7,7 @@ using UpkManager.Domain.Helpers;
 
 namespace UpkManager.Domain.Models.UpkFile.Properties {
 
-  public sealed class DomainPropertyBoolValue : DomainPropertyValueBase {
+  internal sealed class DomainPropertyBoolValue : DomainPropertyValueBase {
 
     #region Properties
 
@@ -28,6 +29,12 @@ namespace UpkManager.Domain.Models.UpkFile.Properties {
 
     public override async Task ReadPropertyValue(ByteArrayReader reader, int size, DomainHeader header) {
       boolValue = await Task.Run(() => reader.ReadUInt32());
+    }
+
+    public override void SetPropertyValue(object value) {
+      if (!(value is bool)) return;
+
+      boolValue = Convert.ToUInt32((bool)value);
     }
 
     #endregion Domain Methods

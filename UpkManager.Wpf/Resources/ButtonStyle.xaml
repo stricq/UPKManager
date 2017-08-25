@@ -1,0 +1,33 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style TargetType="{x:Type Button}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Grid>
+            <Border Name="Background" CornerRadius="2" Padding="6,3,6,4" Background="{StaticResource TabItemSelectedGradient}" BorderThickness="1" BorderBrush="{StaticResource TabItemBorderSelectedColor}">
+              <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" TextBlock.Foreground="White"
+                                VerticalAlignment="{TemplateBinding VerticalAlignment}" HorizontalAlignment="Center" />
+            </Border>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Background" Property="Background" Value="{StaticResource TabItemHighlightGradient}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Background" Property="Background"  Value="{StaticResource MenuGradient}" />
+              <Setter TargetName="Background" Property="BorderBrush" Value="{StaticResource StatusBarBorderColor}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Background" Property="Background"  Value="{StaticResource TabItemDisabledGradient}" />
+              <Setter TargetName="Background" Property="BorderBrush" Value="{StaticResource TabItemBorderUnSelectedColor}" />
+              <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{StaticResource StatusBarBorderColor}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>

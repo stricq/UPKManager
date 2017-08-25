@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 
-using CSharpImageLibrary.General;
-
 using NAudio.Vorbis;
 using NAudio.Wave;
 
@@ -20,8 +18,11 @@ using STR.Common.Messages;
 
 using STR.MvvmCommon.Contracts;
 
+using UpkManager.Dds;
+
 using UpkManager.Domain.Constants;
 using UpkManager.Domain.Models.UpkFile.Objects.Textures;
+
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Rebuild;
 using UpkManager.Wpf.Messages.Tables;
@@ -32,7 +33,7 @@ using UpkManager.Wpf.ViewModels;
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]
-  public class ImageController : IController {
+  public sealed class ImageController : IController {
 
     #region Private Fields
 
@@ -59,11 +60,21 @@ namespace UpkManager.Wpf.Controllers {
       messenger = Messenger;
 
       mapper = Mapper;
-
-      registerMessages();
     }
 
     #endregion Constructor
+
+    #region IController Implementation
+
+    public async Task InitializeAsync() {
+      registerMessages();
+
+      await Task.CompletedTask;
+    }
+
+    public int InitializePriority { get; } = 100;
+
+    #endregion IController Implementation
 
     #region Messages
 
@@ -86,7 +97,6 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-
         case ViewableTypes.Image: {
           texture = message.ExportTableEntry.DomainObject as DomainObjectTexture2D;
 
@@ -95,32 +105,19 @@ namespace UpkManager.Wpf.Controllers {
 
             viewModel.MipMaps = new ObservableCollection<MipMapViewEntity>(mapper.Map<IEnumerable<MipMapViewEntity>>(texture.MipMaps));
 
-            Stream stream = null;
-
             for(int i = 0; i < viewModel.MipMaps.Count; ++i) {
               viewModel.MipMaps[i].Level = i + 1;
 
               viewModel.MipMaps[i].PropertyChanged += onMipMapViewEntityChanged;
-
-              if (stream == null && texture.MipMaps[i].ImageData != null) {
-                stream = texture.GetObjectStream(i);
-
-                viewModel.MipMaps[i].IsChecked = true;
-              }
             }
 
-            if (stream == null) return;
+            MipMapViewEntity largest = viewModel.MipMaps.Aggregate((i1, i2) => i1 != null && i1.IsEnabled & (i1.Width > i2.Width || i1.Height > i2.Height) ? i1 : (i2.IsEnabled ? i2 : null));
 
-            ImageEngineImage image = new ImageEngineImage(stream);
-
-            viewModel.Texture = image.GetWPFBitmap();
-
-            stream.Close();
+            if (largest != null) largest.IsChecked = true;
           }
 
           break;
         }
-
         default: {
           clearViewModel();
 
@@ -139,11 +136,11 @@ namespace UpkManager.Wpf.Controllers {
           break;
         }
         case ".dds": {
-          ImageEngineImage image = new ImageEngineImage(message.Filename);
+          DdsFile image = new DdsFile(message.Filename);
 
           viewModel.MipMaps = null;
 
-          viewModel.Texture = image.GetWPFBitmap();
+          viewModel.Texture = image.BitmapSource;
 
           break;
         }
@@ -191,9 +188,11 @@ namespace UpkManager.Wpf.Controllers {
             Stream stream = texture.GetObjectStream(entity.Level - 1);
 
             if (stream != null) {
-              ImageEngineImage image = new ImageEngineImage(stream);
+              DdsFile ddsFile = new DdsFile();
 
-              viewModel.Texture = image.GetWPFBitmap();
+              ddsFile.Load(stream);
+
+              viewModel.Texture = ddsFile.BitmapSource;
 
               stream.Close();
             }

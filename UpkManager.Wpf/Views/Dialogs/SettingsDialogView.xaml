@@ -25,24 +25,24 @@
 
         <Label Grid.Row="0" Grid.Column="1" Content="Select the directory containing 'bns' and 'Local'." Padding="0,5" HorizontalAlignment="Left" Foreground="{StaticResource ForegroundColor}" />
 
-        <Label      Grid.Row="1" Grid.Column="0" Content="Path to Game:" Padding="5,3,5,5" HorizontalAlignment="Right" Foreground="{StaticResource ForegroundColor}" />
+        <Label      Grid.Row="1" Grid.Column="0" Content="Path to Game:" HorizontalAlignment="Right" Foreground="{StaticResource ForegroundColor}" />
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-          <TextBox Text="{Binding Path=Message.Settings.PathToGame, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" Height="20" />
+          <TextBox Text="{Binding Path=Message.Settings.PathToGame, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" VerticalContentAlignment="Center" />
 
-          <Button Content="Select" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=SelectGameDir}" />
+          <Button Content="Select" Width="50" Margin="6,0,0,0" Command="{Binding Path=SelectGameDir}" />
         </StackPanel>
 
-        <Label      Grid.Row="2" Grid.Column="0" Content="Export Path:" Padding="5,3,5,5" Margin="0,6,0,0" HorizontalAlignment="Right" Foreground="{StaticResource ForegroundColor}" />
+        <Label      Grid.Row="2" Grid.Column="0" Content="Export Path:" Margin="0,6,0,0" HorizontalAlignment="Right" Foreground="{StaticResource ForegroundColor}" />
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,6,0,0">
-          <TextBox Text="{Binding Path=Message.Settings.ExportPath, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" Height="20" />
+          <TextBox Text="{Binding Path=Message.Settings.ExportPath, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" VerticalContentAlignment="Center" />
 
-          <Button Content="Select" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=SelectExportPath}" />
+          <Button Content="Select" Width="50" Margin="6,0,0,0" Command="{Binding Path=SelectExportPath}" />
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,6,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
 
-          <Button Content="Save"   Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=Ok}"     IsDefault="True" />
-          <Button Content="Cancel" Width="50" Height="20" Margin="6,0,0,0" Command="{Binding Path=Cancel}" IsCancel="True" />
+          <Button Content="Save"   Width="50" Margin="6,0,0,0" Command="{Binding Path=Ok}"     IsDefault="True" />
+          <Button Content="Cancel" Width="50" Margin="6,0,0,0" Command="{Binding Path=Cancel}" IsCancel="True" />
 
         </StackPanel>
 

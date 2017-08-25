@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -54,11 +55,11 @@ namespace UpkManager.Domain.Models.UpkFile.Objects {
       AdditionalDataReader = await reader.Splice();
     }
 
-    public virtual async Task SaveObject(string filename) {
+    public virtual async Task SaveObject(string filename, object configuration) {
       await Task.CompletedTask;
     }
 
-    public virtual async Task SetObject(string filename) {
+    public virtual async Task SetObject(string filename, List<DomainNameTableEntry> nameTable, object configuration) {
       await Task.CompletedTask;
     }
 
