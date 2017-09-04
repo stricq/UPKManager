@@ -69,6 +69,8 @@ namespace UpkManager.Wpf.Controllers {
           viewModel =     ViewModel;
       menuViewModel = MenuViewModel;
 
+      menuViewModel.IsDdsDefault = true;
+
       menuViewModel.IsCompressorIterativeFit = true;
       menuViewModel.IsErrorMetricPerceptual  = true;
 
@@ -86,8 +88,6 @@ namespace UpkManager.Wpf.Controllers {
     #region IController Implementation
 
     public async Task InitializeAsync() {
-      menuViewModel.IsDdsUncompressed = true;
-
       registerMessages();
       registerCommands();
 

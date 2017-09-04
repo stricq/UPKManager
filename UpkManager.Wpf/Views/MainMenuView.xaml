@@ -61,7 +61,7 @@
       <Separator />
 
       <MenuItem Header="_Texture Quality" Foreground="{StaticResource BackgroundColor}">
-        <MenuItem Header="_DDS Format" Foreground="{StaticResource BackgroundColor}">
+        <MenuItem Header="_DDS Format" Foreground="{StaticResource BackgroundColor}" Visibility="Collapsed">
           <MenuItem Header="Default"      Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsDefault}" />
           <MenuItem Header="DDS _1"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsFormat1}" />
           <MenuItem Header="DDS _5"       Foreground="{StaticResource BackgroundColor}" IsCheckable="True" IsChecked="{Binding Path=IsDdsFormat5}" />

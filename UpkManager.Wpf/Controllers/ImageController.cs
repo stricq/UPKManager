@@ -144,9 +144,6 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-        default: {
-          break;
-        }
       }
     }
 
@@ -207,9 +204,6 @@ namespace UpkManager.Wpf.Controllers {
 
           break;
         }
-        default: {
-          break;
-        }
       }
     }
 
@@ -243,7 +237,7 @@ namespace UpkManager.Wpf.Controllers {
         messenger.SendUi(new ApplicationErrorMessage { Exception = ex, HeaderText = "Error Playing Audio" });
       }
       finally {
-        stream.Close();
+        stream?.Close();
       }
     }
 
