@@ -35,7 +35,6 @@ using UpkManager.Wpf.ViewModels;
 using static System.IO.Path;
 
 
-
 namespace UpkManager.Wpf.Controllers {
 
   [Export(typeof(IController))]

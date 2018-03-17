@@ -1,4 +1,4 @@
-﻿<Window x:Class="UpkManager.Wpf.Views.UpkManagerView"
+﻿<Window x:Class="UpkManager.Wpf.Views.UpkManagerView" x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:v="clr-namespace:UpkManager.Wpf.Views"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

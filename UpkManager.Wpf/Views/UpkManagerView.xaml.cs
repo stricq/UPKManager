@@ -3,7 +3,7 @@
 
 namespace UpkManager.Wpf.Views {
 
-  public sealed partial class UpkManagerView : Window {
+  internal sealed partial class UpkManagerView : Window {
 
     public UpkManagerView() {
       InitializeComponent();
