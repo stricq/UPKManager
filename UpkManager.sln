@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Wpf", "UpkManager.Wpf\UpkManager.Wpf.csproj", "{D43F407B-1D73-43A6-9711-27F8DB2D188C}"
 EndProject
@@ -19,6 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpkManager.Entities", "UpkM
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Solution Items", "00 Solution Items", "{715DB300-AAD3-450A-8D14-F581CD02959C}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		README.md = README.md
 		UPK_Format.pdf = UPK_Format.pdf
 		UpkManager.sln.DotSettings = UpkManager.sln.DotSettings
@@ -74,5 +75,8 @@ Global
 		{65223597-C0E1-494F-9DBE-F8F12625F060} = {715DB300-AAD3-450A-8D14-F581CD02959C}
 		{576BE056-1485-4702-8569-A50169087DF2} = {63DD830A-A38B-4997-AF10-6C546DB06083}
 		{63287C47-8658-4401-9C51-D06C2A95AF99} = {63DD830A-A38B-4997-AF10-6C546DB06083}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F6C21B23-7024-48BB-97BC-37237EAFC21F}
 	EndGlobalSection
 EndGlobal

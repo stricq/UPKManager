@@ -431,7 +431,7 @@ namespace UpkManager.Wpf.Controllers {
 
         await repository.SaveUpkFile(header, filename);
 
-        DomainUpkFile upkFile = new DomainUpkFile { GameFilename = filename.Replace(settings.PathToGame, null), FileSize = new FileInfo(filename).Length, Package = GetFileNameWithoutExtension(filename).ToLowerInvariant() };
+        DomainUpkFile upkFile = new DomainUpkFile { GameFilename = filename.Replace(settings.PathToGame, null), Filesize = new FileInfo(filename).Length, Package = GetFileNameWithoutExtension(filename).ToLowerInvariant() };
 
         messenger.Send(new ModFileBuiltMessage { UpkFile = upkFile });
       }

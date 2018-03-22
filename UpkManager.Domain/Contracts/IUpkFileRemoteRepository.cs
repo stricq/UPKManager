@@ -13,9 +13,7 @@ namespace UpkManager.Domain.Contracts {
 
     Task SaveUpkFile(DomainUpkFile File);
 
-    Task SaveUpkFile(List<DomainUpkFile> File);
-
-    Task DeleteUpkFile(string Id);
+    Task SaveUpkFile(List<DomainUpkFile> Files);
 
   }
 

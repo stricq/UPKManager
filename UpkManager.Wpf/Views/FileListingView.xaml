@@ -67,10 +67,26 @@
               </GridViewColumn.CellTemplate>
             </GridViewColumn>
 
+            <GridViewColumn Header="Directory">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=RootDirectory}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <GridViewColumn Header="Locale">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=GameLocale}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
             <GridViewColumn Header="Version">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Last Modified Version" />
+                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>

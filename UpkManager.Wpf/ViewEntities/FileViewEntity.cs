@@ -21,6 +21,8 @@ namespace UpkManager.Wpf.ViewEntities {
     private bool isErrored;
 
     private string gameVersion;
+    private string gameLocale;
+    private string rootDirectory;
 
     private long fileSize;
 
@@ -70,6 +72,16 @@ namespace UpkManager.Wpf.ViewEntities {
     public string GameVersion {
       get { return gameVersion; }
       set { SetField(ref gameVersion, value, () => GameVersion); }
+    }
+
+    public string GameLocale {
+      get => gameLocale;
+      set { SetField(ref gameLocale, value, () => GameLocale); }
+    }
+
+    public string RootDirectory {
+      get => rootDirectory;
+      set { SetField(ref rootDirectory, value, () => RootDirectory); }
     }
 
     public string GameFilename {

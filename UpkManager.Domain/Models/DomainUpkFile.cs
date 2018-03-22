@@ -12,6 +12,12 @@ namespace UpkManager.Domain.Models {
   [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
   public sealed class DomainUpkFile {
 
+    #region Private Fields
+
+    private long filesize;
+
+    #endregion Private Fields
+
     #region Constructor
 
     public DomainUpkFile() {
@@ -25,8 +31,6 @@ namespace UpkManager.Domain.Models {
     #region Properties
 
     public string Id { get; set; }
-
-    public long FileSize { get; set; }
 
     public string ContentsRoot { get; set; }
 
@@ -44,6 +48,13 @@ namespace UpkManager.Domain.Models {
 
     public DomainVersion CurrentVersion { get; set; }
 
+    public string CurrentLocale { get; set; }
+
+    public long Filesize {
+      get => GetCurrentExports()?.Filesize ?? filesize;
+      set => filesize = value;
+    }
+
     public string GameFilename { get; set; }
 
     public string Filename => $"{Package}.upk";
@@ -58,45 +69,37 @@ namespace UpkManager.Domain.Models {
 
     #region Domain Methods
 
-    public List<DomainExportType> GetBestExports() {
-      return GetBestExports(GetMaxVersion());
+    public DomainExportVersion GetCurrentExports() {
+      return GetExports(CurrentVersion, CurrentLocale);
     }
 
-    public List<DomainExportType> GetBestExports(DomainVersion version) {
+    public DomainExportVersion GetExports(DomainVersion version, string locale) {
       //
       // Check for exact version match
       //
-      DomainExportVersion found = Exports.SingleOrDefault(v => v.Version == version);
+      DomainExportVersion found = Exports.SingleOrDefault(v => v.Versions.Contains(version) && v.Locale == locale);
 
-      if (found != null) return found.Types;
-      //
-      // Else look for the max of all versions less than the specified version
-      //
-      DomainVersion max = Exports.Where(v => v.Version < version).Max(v => v.Version);
-
-      if (max != null) {
-        found = Exports.Single(v => v.Version == max);
-
-        return found.Types;
-      }
+      if (found != null) return found;
       //
       // Otherwise just return for the max version
       //
-      max = Exports.Max(v => v.Version);
+      DomainVersion max = Exports.Where(v => v.Locale == locale).SelectMany(v => v.Versions).Max();
 
       if (max != null) {
-        found = Exports.Single(v => v.Version == max);
+        found = Exports.Single(v => v.Versions.Contains(max) && v.Locale == locale);
 
-        return found.Types;
+        return found;
       }
       //
       // Otherwise there is nothing to return
       //
-      return new List<DomainExportType>();
+      return null;
     }
 
-    public DomainVersion GetMaxVersion() {
-      return !Exports.Any() ? CurrentVersion : Exports.Max(e => e.Version);
+    public DomainVersion GetLeastVersion() {
+      DomainExportVersion current = Exports.SingleOrDefault(v => v.Versions.Contains(CurrentVersion) && v.Locale == CurrentLocale);
+
+      return current == null ? CurrentVersion : current.Versions.Min();
     }
 
     #endregion Domain Methods
@@ -109,7 +112,11 @@ namespace UpkManager.Domain.Models {
       Types = new List<DomainExportType>();
     }
 
-    public DomainVersion Version { get; set; }
+    public List<DomainVersion> Versions { get; set; }
+
+    public string Locale { get; set; }
+
+    public long Filesize { get; set; }
 
     public List<DomainExportType> Types { get; set; }
 

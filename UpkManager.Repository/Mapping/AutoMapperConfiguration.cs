@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Linq;
 
 using AutoMapper;
 
@@ -26,17 +27,23 @@ namespace UpkManager.Repository.Mapping {
                                                 .ForMember(dest => dest.LastAccess,     opt => opt.Ignore())
                                                 .ForMember(dest => dest.GameFilename,   opt => opt.Ignore())
                                                 .ForMember(dest => dest.CurrentVersion, opt => opt.Ignore())
+                                                .ForMember(dest => dest.CurrentLocale,  opt => opt.Ignore())
+                                                .ForMember(dest => dest.Filesize,       opt => opt.Ignore())
                                                 .ReverseMap();
 
-      config.CreateMap<ExportVersion, DomainExportVersion>().ForMember(dest => dest.Version, opt => opt.ResolveUsing(src => new DomainVersion(src.Version)))
+      config.CreateMap<ExportVersion, DomainExportVersion>().ForMember(dest => dest.Versions, opt => opt.ResolveUsing(src => src.Versions.Select(v => new DomainVersion(v))))
                                                             .ReverseMap()
-                                                            .ForMember(dest => dest.Version, opt => opt.MapFrom(src => src.Version.Version));
+                                                            .ForMember(dest => dest.Versions, opt => opt.ResolveUsing(src => src.Versions.Select(v => v.Version)));
 
       config.CreateMap<ExportType, DomainExportType>().ReverseMap();
 
       config.CreateMap<DomainUpkManagerException, UpkManagerException>().ForMember(dest => dest.Message,    opt => opt.MapFrom(src => src.Exception.Message))
                                                                         .ForMember(dest => dest.StackTrace, opt => opt.MapFrom(src => src.Exception.StackTrace))
                                                                         .ForMember(dest => dest.Id,         opt => opt.Ignore());
+
+      config.CreateMap<UpkFile, UpkFile>().ForMember(dest => dest.Id, opt => opt.Ignore());
+
+      config.CreateMap<UpkManagerException, UpkManagerException>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
       #endregion DTOs
 

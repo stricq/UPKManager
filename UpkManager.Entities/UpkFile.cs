@@ -10,8 +10,6 @@ namespace UpkManager.Entities {
   [SuppressMessage("ReSharper", "UnusedMember.Global")]
   public class UpkFile : ModelBase {
 
-    public long FileSize { get; set; }
-
     public string ContentsRoot { get; set; }
 
     public string Package { get; set; }

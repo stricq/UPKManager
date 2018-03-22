@@ -8,7 +8,11 @@ namespace UpkManager.Entities {
   [SuppressMessage("ReSharper", "UnusedMember.Global")]
   public class ExportVersion {
 
-    public string Version { get; set; }
+    public List<string> Versions { get; set; }
+
+    public string Locale { get; set; }
+
+    public long Filesize { get; set; }
 
     public List<ExportType> Types { get; set; }
 

@@ -21,7 +21,7 @@ using UpkManager.Entities;
 
 namespace UpkManager.Repository.Services {
 
-  [Export(typeof(IUpkFileRemoteRepository))]
+//[Export(typeof(IUpkFileRemoteRepository))]
   public sealed class UpkFileRemoteRepository : IUpkFileRemoteRepository {
 
     #region Private Fields

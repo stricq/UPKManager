@@ -19,6 +19,8 @@ namespace UpkManager.Domain.Contracts {
 
     Task<DomainVersion> GetGameVersion(string GamePath);
 
+    Task<string> GetGameLocale(string GamePath);
+
   }
 
 }

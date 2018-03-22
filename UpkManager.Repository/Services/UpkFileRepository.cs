@@ -41,7 +41,7 @@ namespace UpkManager.Repository.Services {
       FileInfo[] files = await Task.Run(() => dirInfo.GetFiles(Filter));
 
       if (files.Length > 0) {
-        List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(ParentPath, null), ContentsRoot = f.FullName.Replace(ParentPath, null).Split('\\')[0].ToLowerInvariant(), Package = GetFileNameWithoutExtension(f.Name).ToLowerInvariant(), FileSize = f.Length }).ToList();
+        List<DomainUpkFile> upkFiles = files.Select(f => new DomainUpkFile { GameFilename = f.FullName.Replace(ParentPath, null), ContentsRoot = f.FullName.Replace(ParentPath, null).Split('\\')[0].ToLowerInvariant(), Package = GetFileNameWithoutExtension(f.Name).ToLowerInvariant(), Filesize = f.Length }).ToList();
 
         ParentFiles.AddRange(upkFiles);
       }
@@ -108,30 +108,50 @@ namespace UpkManager.Repository.Services {
     public async Task<DomainVersion> GetGameVersion(string GamePath) {
       const string matchLine = "ProductVersion";
 
-      string gameVersion = Combine(GamePath, @"..\bin\Version.ini");
+      string versionFile = Combine(GamePath, @"..\bin\Version.ini");
 
-      if (!File.Exists(gameVersion)) throw new FileNotFoundException(@"Could not find the bin\Version.ini file.");
+      string version = await getConfigLine(versionFile, matchLine);
 
-      StreamReader stream = new StreamReader(File.OpenRead(gameVersion));
+      return new DomainVersion(version);
+    }
 
-      string version = String.Empty;
+    public async Task<string> GetGameLocale(string GamePath) {
+      const string matchLine = "Language";
+
+      string localFile = Combine(GamePath, @"..\bin\local.ini");
+
+      string locale = await getConfigLine(localFile, matchLine);
+
+      return locale;
+    }
+
+    #endregion IUpkFileRepository Implementation
+
+    #region Private Methods
+
+    private static async Task<string> getConfigLine(string configFile, string configItem) {
+      if (!File.Exists(configFile)) throw new FileNotFoundException($"Could not find the file: {configFile}");
+
+      StreamReader stream = new StreamReader(File.OpenRead(configFile));
+
+      string value = String.Empty;
 
       string line;
 
       while((line = await stream.ReadLineAsync()) != null) {
-        if (line.StartsWith(matchLine, StringComparison.CurrentCultureIgnoreCase)) {
+        if (line.StartsWith(configItem, StringComparison.CurrentCultureIgnoreCase)) {
           string[] parts = line.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 
-          if (parts.Length > 1) version = parts[1];
+          if (parts.Length > 1) value = parts[1];
 
           break;
         }
       }
 
-      return new DomainVersion(version);
+      return value;
     }
 
-    #endregion IUpkFileRepository Implementation
+    #endregion Private Methods
 
   }
 

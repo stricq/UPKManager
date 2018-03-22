@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -47,6 +48,8 @@ namespace UpkManager.Wpf.Controllers {
     private bool isScanInProgress;
 
     private string oldPathToGame;
+
+    private string locale;
 
     private CancellationTokenSource filterTokenSource;
     private CancellationTokenSource remoteTokenSource;
@@ -304,6 +307,13 @@ namespace UpkManager.Wpf.Controllers {
         return;
       }
 
+      try {
+        locale  = await repository.GetGameLocale(settings.PathToGame);
+      }
+      catch(FileNotFoundException) {
+        locale = CultureInfo.CurrentCulture.EnglishName.ToLowerInvariant();
+      }
+
       List<DomainUpkFile> localFiles = await loadGameFiles();
 
       if (!localFiles.Any()) {
@@ -336,6 +346,8 @@ namespace UpkManager.Wpf.Controllers {
 
       CancellationToken token = resetToken(ref remoteTokenSource);
 
+      bool loadError = false;
+
       try {
         if (!menuViewModel.IsOfflineMode) remoteFiles = await remoteRepository.LoadUpkFiles(token);
       }
@@ -343,10 +355,12 @@ namespace UpkManager.Wpf.Controllers {
         message = ex.Message;
 
         remoteFiles = new List<DomainUpkFile>();
+
+        loadError = true;
       }
 
-      if (!remoteFiles.Any()) {
-        if (!token.IsCancellationRequested && !menuViewModel.IsOfflineMode) {
+      if ((loadError || token.IsCancellationRequested) && !remoteFiles.Any()) {
+        if (loadError) {
           messenger.Send(new MessageBoxDialogMessage { Header = "Error Received from Remote Database", Message = $"The remote database returned an error.  Please try again in a few minutes.\n\n{message}\n\nThe program will continue using local files only.  Saving of file notes will be disabled.", HasCancel = false });
         }
 
@@ -357,21 +371,23 @@ namespace UpkManager.Wpf.Controllers {
         viewModel.IsShowFilesWithType = false;
       }
 
+      remoteFiles.ForEach(f => {
+        f.CurrentVersion = version;
+        f.CurrentLocale  = locale;
+      });
+
       List<DomainUpkFile> matches = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
-                                    where row1.FileSize == row2.FileSize
+                                    where row2.Exports.Any(f => f.Versions.Contains(version) && f.Locale == locale && f.Filesize == row1.Filesize)
                                       let a = row2.GameFilename = row1.GameFilename
-                                      let b = row2.CurrentVersion = version
                                    select row2).ToList();
 
       if (matches.Any()) allFiles.AddRange(matches.OrderBy(f => f.Filename));
 
       List<DomainUpkFile> changes = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
-                                    where row1.FileSize != row2.FileSize
-                                       && row2.Exports.All(e => e.Version != version)
+                                    where row2.Exports.All(f => !f.Versions.Contains(version) || f.Locale != locale)
                                       let a = row2.GameFilename = row1.GameFilename
-                                      let b = row2.CurrentVersion = version
                                    select row2).ToList();
 
       if (changes.Any()) {
@@ -397,7 +413,7 @@ namespace UpkManager.Wpf.Controllers {
         else adds.ForEach(f => f.Id = Guid.NewGuid().ToString());
       }
 
-      viewModel.AllTypes = menuViewModel.IsOfflineMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetBestExports(version).Select(e => e.Name)).Distinct().OrderBy(s => s));
+      viewModel.AllTypes = menuViewModel.IsOfflineMode ? new ObservableCollection<string>() : new ObservableCollection<string>(allFiles.SelectMany(f => f.GetCurrentExports().Types.Select(e => e.Name)).Distinct().OrderBy(s => s));
 
       allFiles.ForEach(f => { f.ModdedFiles.AddRange(mods.Where(mf =>  Path.GetFileName(mf.GameFilename) == Path.GetFileName(f.GameFilename)
                                                                    && (Path.GetDirectoryName(mf.GameFilename) ?? String.Empty).StartsWith(Path.GetDirectoryName(f.GameFilename) ?? String.Empty))); });
@@ -531,7 +547,7 @@ namespace UpkManager.Wpf.Controllers {
 
             if (token.IsCancellationRequested) return;
 
-            selectedFiles = selectedFiles.Where(f => regex.IsMatch(f.Filename) || regex.IsMatch(f.GameVersion.ToString()) || regex.IsMatch(f.Notes ?? String.Empty)).ToList();
+            selectedFiles = selectedFiles.Where(f => regex.IsMatch(f.Filename) || regex.IsMatch(f.RootDirectory) || regex.IsMatch(f.GameLocale) || regex.IsMatch(f.GameVersion.ToString()) || regex.IsMatch(f.Notes ?? String.Empty)).ToList();
           }
           catch(ArgumentException) { }
         }
@@ -544,7 +560,7 @@ namespace UpkManager.Wpf.Controllers {
       catch(OperationCanceledException) { }
     }
 
-    private CancellationToken resetToken(ref CancellationTokenSource tokenSource) {
+    private static CancellationToken resetToken(ref CancellationTokenSource tokenSource) {
       tokenSource?.Cancel();
 
       tokenSource = new CancellationTokenSource();
@@ -586,27 +602,41 @@ namespace UpkManager.Wpf.Controllers {
 
         messenger.Send(message);
 
-        await scanUpkFile(fileEntity, file);
+        DomainExportVersion bestVersion = file.GetCurrentExports() ?? new DomainExportVersion { Versions = new List<DomainVersion>() };
 
-        file.FileSize = file.Header.FileSize;
+        if (bestVersion.Versions.Contains(version)) {
+          //
+          // This should never happen.  Toss an error to the ui to track it.
+          //
+          messenger.Send(new ApplicationErrorMessage { HeaderText = "Odd Situation", ErrorMessage = $"Tried to scan a file, but the current version was already accounted for. {file.GameFilename} {version}/{locale}", OpenErrorWindow = true });
 
-        List<DomainExportType> exports = new List<DomainExportType>();
-
-        foreach(string type in file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s)) {
-          exports.Add(new DomainExportType {
-            Name        = type,
-            ExportNames = file.Header.ExportTable.Where(e => e.TypeReferenceNameIndex.Name == type).Select(e => e.NameTableIndex.Name).Distinct().OrderBy(s => s).ToList()
-          });
+          continue;
         }
 
-        file.Exports.Where(e => e.Version == version).ToList().ForEach(e => file.Exports.Remove(e));
+        if (bestVersion.Filesize == file.Filesize) {
+          bestVersion.Versions.Add(version);
 
-        file.Exports.Add(new DomainExportVersion { Version = version, Types = exports });
+          if (fileEntity.ExportTypes == null || !fileEntity.ExportTypes.Any()) fileEntity.ExportTypes = new ObservableCollection<string>(bestVersion.Types.Select(t => t.Name));
+        }
+        else {
+          await scanUpkFile(fileEntity, file);
 
-        fileEntity.FileSize    = file.Header.FileSize;
-        fileEntity.ExportTypes = new ObservableCollection<string>(exports.Select(e => e.Name));
+          List<DomainExportType> exports = new List<DomainExportType>();
 
-        file.Header = null;
+          foreach(string type in file.Header.ExportTable.Select(e => e.TypeReferenceNameIndex.Name).Distinct().OrderBy(s => s)) {
+            exports.Add(new DomainExportType {
+              Name        = type,
+              ExportNames = file.Header.ExportTable.Where(e => e.TypeReferenceNameIndex.Name == type).Select(e => e.NameTableIndex.Name).Distinct().OrderBy(s => s).ToList()
+            });
+          }
+
+          file.Exports.Add(new DomainExportVersion { Versions = new List<DomainVersion> { version }, Locale = locale, Filesize = file.Header.FileSize, Types = exports });
+
+          fileEntity.FileSize    = file.Header.FileSize;
+          fileEntity.ExportTypes = new ObservableCollection<string>(exports.Select(e => e.Name));
+
+          file.Header = null;
+        }
 
         string path = Path.GetDirectoryName(file.GameFilename);
 
@@ -614,14 +644,14 @@ namespace UpkManager.Wpf.Controllers {
           if (!menuViewModel.IsOfflineMode) saveCache.Add(file);
 
           if (saveCache.Count == 50) {
-            remoteRepository.SaveUpkFile(saveCache).FireAndForget();
+            remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
 
             saveCache.Clear();
           }
         }
       }
 
-      if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache).FireAndForget();
+      if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
 
       message.IsComplete = true;
 
