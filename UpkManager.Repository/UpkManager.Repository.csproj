@@ -134,7 +134,7 @@
     <Compile Include="Services\ExceptionRepository.cs" />
     <Compile Include="Services\RavenStorage.cs" />
     <Compile Include="Services\SettingsRepository.cs" />
-    <Compile Include="Services\UpkFileRemoteRepository.cs" />
+    <Compile Include="Services\UpkFileRavenRepository.cs" />
     <Compile Include="Services\UpkFileRepository.cs" />
   </ItemGroup>
   <ItemGroup>
