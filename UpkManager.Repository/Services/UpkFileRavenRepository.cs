@@ -120,6 +120,10 @@ namespace UpkManager.Repository.Services {
       }
     }
 
+    public void Shutdown() {
+      store.Shutdown();
+    }
+
     #endregion IUpkFileRemoteRepository Implementation
 
   }

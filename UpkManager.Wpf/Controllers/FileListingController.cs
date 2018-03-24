@@ -125,6 +125,8 @@ namespace UpkManager.Wpf.Controllers {
     private void registerMessages() {
       messenger.RegisterAsync<AppLoadedMessage>(this, onApplicationLoaded);
 
+      messenger.Register<ApplicationClosingMessage>(this, onApplicationClosing);
+
       messenger.Register<SettingsChangedMessage>(this, onSettingsChanged);
 
       messenger.RegisterAsync<StatusTickMessage>(this, onStatusTick);
@@ -139,6 +141,12 @@ namespace UpkManager.Wpf.Controllers {
       viewModel.IsShowFilesWithType = true;
 
       await loadAllFiles();
+    }
+
+    private void onApplicationClosing(ApplicationClosingMessage message) {
+      resetToken(ref remoteTokenSource);
+
+      remoteRepository.Shutdown();
     }
 
     private async void onSettingsChanged(SettingsChangedMessage message) {

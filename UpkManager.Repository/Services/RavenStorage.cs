@@ -38,7 +38,7 @@ namespace UpkManager.Repository.Services {
       Store = manager.GetDocumentStoreFor(DatabaseName);
 
 #if DEBUG
-//    if (IndexAssembly != null) IndexCreation.CreateIndexes(IndexAssembly, Store);
+      if (IndexAssembly != null) IndexCreation.CreateIndexes(IndexAssembly, Store);
 #endif
     }
 
