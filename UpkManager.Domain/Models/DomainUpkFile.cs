@@ -16,6 +16,8 @@ namespace UpkManager.Domain.Models {
 
     private long filesize;
 
+    private string filehash;
+
     #endregion Private Fields
 
     #region Constructor
@@ -53,6 +55,11 @@ namespace UpkManager.Domain.Models {
     public long Filesize {
       get => GetCurrentExports()?.Filesize ?? filesize;
       set => filesize = value;
+    }
+
+    public string Filehash {
+      get => GetCurrentExports()?.Filehash ?? filehash;
+      set => filehash = value;
     }
 
     public string GameFilename { get; set; }
@@ -117,6 +124,8 @@ namespace UpkManager.Domain.Models {
     public string Locale { get; set; }
 
     public long Filesize { get; set; }
+
+    public string Filehash { get; set; }
 
     public List<DomainExportType> Types { get; set; }
 

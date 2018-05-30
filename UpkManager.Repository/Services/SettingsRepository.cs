@@ -14,7 +14,7 @@ using UpkManager.Domain.Models;
 namespace UpkManager.Repository.Services {
 
   [Export(typeof(ISettingsRepository))]
-  public class SettingsRepository : ISettingsRepository {
+  public sealed class SettingsRepository : ISettingsRepository {
 
     #region ISettingsRepository Implementation
 

@@ -66,7 +66,15 @@
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>
-
+            <!--
+            <GridViewColumn Header="File Hash">
+              <GridViewColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Path=FileHash}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                </DataTemplate>
+              </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            -->
             <GridViewColumn Header="Directory">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
@@ -86,7 +94,7 @@
             <GridViewColumn Header="Version">
               <GridViewColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Path=GameVersion, StringFormat={}{0:N0}}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding Path=GameVersion}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 </DataTemplate>
               </GridViewColumn.CellTemplate>
             </GridViewColumn>

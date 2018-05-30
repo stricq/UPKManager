@@ -29,6 +29,7 @@ namespace UpkManager.Repository.Mapping {
                                                 .ForMember(dest => dest.CurrentVersion, opt => opt.Ignore())
                                                 .ForMember(dest => dest.CurrentLocale,  opt => opt.Ignore())
                                                 .ForMember(dest => dest.Filesize,       opt => opt.Ignore())
+                                                .ForMember(dest => dest.Filehash,       opt => opt.Ignore())
                                                 .ReverseMap();
 
       config.CreateMap<ExportVersion, DomainExportVersion>().ForMember(dest => dest.Versions, opt => opt.ResolveUsing(src => src.Versions.Select(v => new DomainVersion(v))))

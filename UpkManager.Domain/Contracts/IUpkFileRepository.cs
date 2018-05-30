@@ -9,7 +9,7 @@ namespace UpkManager.Domain.Contracts {
 
   public interface IUpkFileRepository {
 
-    Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFile, string ParentPath, string Path, string Filter);
+    Task LoadDirectoryRecursiveFlat(List<DomainUpkFile> ParentFile, string ParentPath, string Path, string Filter, bool isRoot = true);
 
     Task LoadDirectoryRecursive(DomainExportedObject Parent, string Path);
 

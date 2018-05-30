@@ -48,12 +48,10 @@ namespace UpkManager.Repository.Services {
 
       return new Lazy<IDocumentStore>(() => {
         IDocumentStore documentStore = new DocumentStore {
-          Certificate = certificate,
+//        Certificate = certificate,
           Database    = databaseName,
           Urls        = new [] {
-            "https://a.stricq.com:8844",
-            "https://b.stricq.com:8845",
-            "https://c.stricq.com:8846"
+            "http://raven.stricq.com:8282"
           }
         };
 

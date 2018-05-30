@@ -339,7 +339,7 @@ namespace UpkManager.Wpf.Controllers {
       List<DomainUpkFile> mods = (from row in localFiles
                                    let path = Path.GetDirectoryName(row.GameFilename)
                                  where path != null
-                                    && !path.EndsWith("CookedPC", StringComparison.CurrentCultureIgnoreCase)
+                                    && !path.ToLowerInvariant().EndsWith("cookedpc", StringComparison.CurrentCultureIgnoreCase)
                                 select row).ToList();
 
       localFiles.RemoveAll(f => mods.Contains(f));
@@ -386,7 +386,7 @@ namespace UpkManager.Wpf.Controllers {
 
       List<DomainUpkFile> matches = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
-                                    where row2.Exports.Any(f => f.Versions.Contains(version) && f.Locale == locale && f.Filesize == row1.Filesize)
+                                    where row2.Exports.Any(f => f.Versions.Contains(version) && f.Locale == locale && f.Filehash == row1.Filehash)
                                       let a = row2.GameFilename = row1.GameFilename
                                    select row2).ToList();
 
@@ -621,7 +621,7 @@ namespace UpkManager.Wpf.Controllers {
           continue;
         }
 
-        if (bestVersion.Filesize == file.Filesize) {
+        if (bestVersion.Filehash == file.Filehash) {
           bestVersion.Versions.Add(version);
 
           if (fileEntity.ExportTypes == null || !fileEntity.ExportTypes.Any()) fileEntity.ExportTypes = new ObservableCollection<string>(bestVersion.Types.Select(t => t.Name));
@@ -638,7 +638,7 @@ namespace UpkManager.Wpf.Controllers {
             });
           }
 
-          file.Exports.Add(new DomainExportVersion { Versions = new List<DomainVersion> { version }, Locale = locale, Filesize = file.Header.FileSize, Types = exports });
+          file.Exports.Add(new DomainExportVersion { Versions = new List<DomainVersion> { version }, Locale = locale, Filesize = file.Header.FileSize, Filehash = file.Filehash, Types = exports });
 
           fileEntity.FileSize    = file.Header.FileSize;
           fileEntity.ExportTypes = new ObservableCollection<string>(exports.Select(e => e.Name));

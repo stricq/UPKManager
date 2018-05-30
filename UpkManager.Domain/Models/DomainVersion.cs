@@ -66,6 +66,10 @@ namespace UpkManager.Domain.Models {
       return Version.GetHashCode();
     }
 
+    public override string ToString() {
+      return Version;
+    }
+
     #endregion Overrides
 
     #region Operators

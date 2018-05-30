@@ -127,6 +127,7 @@
   <ItemGroup>
     <Compile Include="Contracts\IDocumentStoreManager.cs" />
     <Compile Include="Contracts\IRavenStorage.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Indexes\UpkFileCommonIndex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mapping\AutoMapperConfiguration.cs" />

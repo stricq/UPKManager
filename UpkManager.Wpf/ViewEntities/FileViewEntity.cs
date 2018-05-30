@@ -23,6 +23,7 @@ namespace UpkManager.Wpf.ViewEntities {
     private string gameVersion;
     private string gameLocale;
     private string rootDirectory;
+    private string fileHash;
 
     private long fileSize;
 
@@ -40,37 +41,37 @@ namespace UpkManager.Wpf.ViewEntities {
     #region Properties
 
     public bool ContainsTargetObject {
-      get { return containsTargetObject; }
+      get => containsTargetObject;
       set { SetField(ref containsTargetObject, value, () => ContainsTargetObject); }
     }
 
     public bool IsChecked {
-      get { return isChecked; }
+      get => isChecked;
       set { SetField(ref isChecked, value, () => IsChecked); }
     }
 
     public bool IsSelected {
-      get { return isSelected; }
+      get => isSelected;
       set { SetField(ref isSelected, value, () => IsSelected); }
     }
 
     public bool IsErrored {
-      get { return isErrored; }
+      get => isErrored;
       set { SetField(ref isErrored, value, () => IsErrored); }
     }
 
     public long FileSize {
-      get { return fileSize; }
+      get => fileSize;
       set { SetField(ref fileSize, value, () => FileSize); }
     }
 
     public string Id {
-      get { return id; }
+      get => id;
       set { SetField(ref id, value, () => Id); }
     }
 
     public string GameVersion {
-      get { return gameVersion; }
+      get => gameVersion;
       set { SetField(ref gameVersion, value, () => GameVersion); }
     }
 
@@ -84,25 +85,30 @@ namespace UpkManager.Wpf.ViewEntities {
       set { SetField(ref rootDirectory, value, () => RootDirectory); }
     }
 
+    public string FileHash {
+      get => fileHash;
+      set { SetField(ref fileHash, value, () => FileHash); }
+    }
+
     public string GameFilename {
-      get { return gameFilename; }
+      get => gameFilename;
       set { SetField(ref gameFilename, value, () => GameFilename, () => Filename); }
     }
 
     public string Filename {
-      get { return filename; }
+      get => filename;
       set { SetField(ref filename, value, () => Filename); }
     }
 
     public string Notes {
-      get { return notes; }
+      get => notes;
       set { SetField(ref notes, value, () => Notes, () => NotesColumn); }
     }
 
     public string NotesColumn => (Notes?.Length > 50 ? Notes.Substring(0, 50) : Notes)?.Replace("\r\n", " ").Replace('\t', ' ');
 
     public ObservableCollection<string> ExportTypes {
-      get { return exportTypes; }
+      get => exportTypes;
       set { SetField(ref exportTypes, value, () => ExportTypes); }
     }
 

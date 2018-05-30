@@ -14,6 +14,8 @@ namespace UpkManager.Entities {
 
     public long Filesize { get; set; }
 
+    public string Filehash { get; set; }
+
     public List<ExportType> Types { get; set; }
 
   }
