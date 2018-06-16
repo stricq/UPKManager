@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 
 using Raven.Client.Documents;
 
@@ -34,24 +31,11 @@ namespace UpkManager.Repository.Services {
     #region Private Methods
 
     private static Lazy<IDocumentStore> createDocumentStore(string databaseName) {
-      X509Certificate2 certificate;
-
-      using(Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"UpkManager.Repository.Certificates.{databaseName}Client.pfx")) {
-        if (stream == null) return null;
-
-        byte[] data = new byte[stream.Length];
-
-        stream.Read(data, 0, data.Length);
-
-        certificate = new X509Certificate2(data);
-      }
-
       return new Lazy<IDocumentStore>(() => {
         IDocumentStore documentStore = new DocumentStore {
-//        Certificate = certificate,
           Database    = databaseName,
           Urls        = new [] {
-            "http://raven.stricq.com:8282"
+            "https://raven.stricq.com"
           }
         };
 
