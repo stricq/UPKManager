@@ -72,6 +72,10 @@ namespace UpkManager.Domain.Models {
 
     public DateTime? LastAccess { get; set; }
 
+    public string NewFilehash { get; set; }
+
+    public string NewLocale { get; set; }
+
     #endregion Domain Properties
 
     #region Domain Methods
@@ -104,9 +108,9 @@ namespace UpkManager.Domain.Models {
     }
 
     public DomainVersion GetLeastVersion() {
-      DomainExportVersion current = Exports.SingleOrDefault(v => v.Versions.Contains(CurrentVersion) && v.Locale == CurrentLocale);
+      DomainExportVersion version = GetCurrentExports();
 
-      return current == null ? CurrentVersion : current.Versions.Min();
+      return version.Versions.Max();
     }
 
     #endregion Domain Methods

@@ -334,7 +334,10 @@ namespace UpkManager.Wpf.Controllers {
         return;
       }
 
-      localFiles.ForEach(f => f.CurrentVersion = version);
+      localFiles.ForEach(f => {
+        f.CurrentVersion = version;
+        f.CurrentLocale  = locale;
+      });
 
       List<DomainUpkFile> mods = (from row in localFiles
                                    let path = Path.GetDirectoryName(row.GameFilename)
@@ -386,7 +389,7 @@ namespace UpkManager.Wpf.Controllers {
 
       List<DomainUpkFile> matches = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
-                                    where row2.Exports.Any(f => f.Versions.Contains(version) && f.Locale == locale && f.Filehash == row1.Filehash)
+                                    where row2.Exports.Any(f => f.Locale == locale && f.Filehash == row1.Filehash)
                                       let a = row2.GameFilename = row1.GameFilename
                                    select row2).ToList();
 
@@ -394,8 +397,10 @@ namespace UpkManager.Wpf.Controllers {
 
       List<DomainUpkFile> changes = (from row1 in localFiles
                                      join row2 in remoteFiles on new { row1.ContentsRoot, row1.Package } equals new { row2.ContentsRoot, row2.Package }
-                                    where row2.Exports.All(f => !f.Versions.Contains(version) || f.Locale != locale)
+                                    where row2.Exports.All(f => f.Locale != locale || f.Filehash != row1.Filehash)
                                       let a = row2.GameFilename = row1.GameFilename
+                                      let b = row2.NewFilehash  = row1.Filehash
+                                      let c = row2.NewLocale    = row1.CurrentLocale
                                    select row2).ToList();
 
       if (changes.Any()) {
@@ -621,7 +626,7 @@ namespace UpkManager.Wpf.Controllers {
           continue;
         }
 
-        if (bestVersion.Filehash == file.Filehash) {
+        if (bestVersion.Filehash == file.NewFilehash) {
           bestVersion.Versions.Add(version);
 
           if (fileEntity.ExportTypes == null || !fileEntity.ExportTypes.Any()) fileEntity.ExportTypes = new ObservableCollection<string>(bestVersion.Types.Select(t => t.Name));
@@ -652,14 +657,14 @@ namespace UpkManager.Wpf.Controllers {
           if (!menuViewModel.IsOfflineMode) saveCache.Add(file);
 
           if (saveCache.Count == 50) {
-            remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
+//          remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
 
             saveCache.Clear();
           }
         }
       }
 
-      if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
+//    if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
 
       message.IsComplete = true;
 

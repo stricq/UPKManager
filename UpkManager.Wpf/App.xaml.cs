@@ -66,6 +66,8 @@ namespace UpkManager.Wpf {
         }
       }
       catch(Exception ex) {
+        while(ex.InnerException != null) ex = ex.InnerException;
+
         MessageBox.Show($"{ex.Message}\n\n{ex.GetType().FullName}", "MEF Composition Error");
       }
     }
