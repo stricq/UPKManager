@@ -143,7 +143,7 @@ namespace UpkManager.Domain.Models.UpkFile {
 
       await readDependsTable();
 
-      if (CookerVersion != 0) await decodePointers();
+      await decodePointers();
 
       message.Text  = "Reading Objects...";
       message.Total = ExportTableCount;

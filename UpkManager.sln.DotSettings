@@ -156,4 +156,5 @@
 &#xD;
   public class $CLASS$ {$END$}&#xD;
 &#xD;
-}</s:String></wpf:ResourceDictionary>
+}</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=cookedpc/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

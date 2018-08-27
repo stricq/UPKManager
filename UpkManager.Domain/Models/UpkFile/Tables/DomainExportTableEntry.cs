@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 using UpkManager.Domain.Constants;
@@ -10,6 +11,8 @@ using UpkManager.Domain.Models.UpkFile.Objects.Textures;
 
 namespace UpkManager.Domain.Models.UpkFile.Tables {
 
+  [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+  [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
   public sealed class DomainExportTableEntry : DomainExportTableEntryBuilderBase {
 
     #region Constructor
@@ -198,9 +201,7 @@ namespace UpkManager.Domain.Models.UpkFile.Tables {
     #region Private Methods
 
     private DomainObjectBase objectTypeFactory() {
-      ObjectTypes type;
-
-      Enum.TryParse(TypeReferenceNameIndex?.Name, true, out type);
+      Enum.TryParse(TypeReferenceNameIndex?.Name, true, out ObjectTypes type);
 
       if (type == ObjectTypes.Unknown && TypeReferenceNameIndex != null) {
         if (TypeReferenceNameIndex.Name.StartsWith("CustomUIComp", StringComparison.CurrentCultureIgnoreCase) ||
@@ -237,11 +238,11 @@ namespace UpkManager.Domain.Models.UpkFile.Tables {
     }
 
     private static uint ror32(uint val, int shift) {
-      return val >> shift | val << (32 - shift);
+      return (val >> shift) | (val << (32 - shift));
     }
 
     private static uint rol32(uint val, int shift) {
-      return val >> (32 - shift) | val << shift;
+      return (val >> (32 - shift)) | (val << shift);
     }
 
     #endregion Private Methods

@@ -626,7 +626,7 @@ namespace UpkManager.Wpf.Controllers {
           continue;
         }
 
-        if (bestVersion.Filehash == file.NewFilehash) {
+        if (bestVersion.Versions.Any() && bestVersion.Filehash == file.NewFilehash) {
           bestVersion.Versions.Add(version);
 
           if (fileEntity.ExportTypes == null || !fileEntity.ExportTypes.Any()) fileEntity.ExportTypes = new ObservableCollection<string>(bestVersion.Types.Select(t => t.Name));
@@ -643,7 +643,7 @@ namespace UpkManager.Wpf.Controllers {
             });
           }
 
-          file.Exports.Add(new DomainExportVersion { Versions = new List<DomainVersion> { version }, Locale = locale, Filesize = file.Header.FileSize, Filehash = file.Filehash, Types = exports });
+          file.Exports.Add(new DomainExportVersion { Versions = new List<DomainVersion> { version }, Locale = locale, Filesize = file.Header.FileSize, Filehash = file.NewFilehash ?? file.Filehash, Types = exports });
 
           fileEntity.FileSize    = file.Header.FileSize;
           fileEntity.ExportTypes = new ObservableCollection<string>(exports.Select(e => e.Name));
@@ -657,14 +657,14 @@ namespace UpkManager.Wpf.Controllers {
           if (!menuViewModel.IsOfflineMode) saveCache.Add(file);
 
           if (saveCache.Count == 50) {
-//          remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
+            remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
 
             saveCache.Clear();
           }
         }
       }
 
-//    if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
+      if (saveCache.Any()) remoteRepository.SaveUpkFile(saveCache.ToList()).FireAndForget();
 
       message.IsComplete = true;
 
