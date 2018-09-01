@@ -2,7 +2,7 @@
 
 namespace UpkManager.Wpf.Constants {
 
-  public static class DialogNames {
+  internal static class DialogNames {
 
     public const string Settings = "Settings";
 
