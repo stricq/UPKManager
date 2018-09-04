@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 
 namespace UpkManager.Repository.Extensions {
 
-  public static class StreamExtensions {
+  internal static class StreamExtensions {
 
     public static String GetHash<T>(this FileStream stream, int bufferSize) where T : HashAlgorithm {
       MethodInfo create = typeof(T).GetMethod("Create", new Type[] { });
