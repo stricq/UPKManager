@@ -284,7 +284,7 @@ namespace UpkManager.Wpf.Controllers {
 
       notesViewModel.SelectedFile = null;
 
-      messenger.Send(new FileLoadingMessage());
+      messenger.SendUi(new FileLoadingMessage());
 
       allFileEntities.ForEach(fe => fe.PropertyChanged -= onFileEntityViewModelChanged);
 
@@ -441,7 +441,7 @@ namespace UpkManager.Wpf.Controllers {
 
       messenger.Send(progress);
 
-      messenger.Send(new FileListingLoadedMessage { Allfiles = allFiles });
+      messenger.SendUi(new FileListingLoadedMessage { Allfiles = allFiles });
 
       isLoadInProgress = false;
     }

@@ -16,8 +16,10 @@ using STR.MvvmCommon.Contracts;
 
 using UpkManager.Dds;
 using UpkManager.Dds.Constants;
+
 using UpkManager.Domain.Models.UpkFile.Properties;
 using UpkManager.Domain.Models.UpkFile.Tables;
+
 using UpkManager.Wpf.Messages.FileListing;
 using UpkManager.Wpf.Messages.Tables;
 using UpkManager.Wpf.ViewEntities;
