@@ -63,6 +63,10 @@ Any textures not checked will be pulled from the source game file and copied unm
 
 Any modified UPK files will appear in the Mod Files tab.  These files can be selected and their contents viewed just the same as the game files in the Game Files tab.
 
+# Changes for Release 1.6.1
+
+* Removed all code still referencing the old database server.
+
 # Changes for Release 1.6.0
 
 * A number of bug fixes, but nothing to do with the textures.

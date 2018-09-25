@@ -37,7 +37,7 @@
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <TextBlock Grid.Row="0">Blade and Soul - UPK File Content Manager - v1.5.2</TextBlock>
+      <TextBlock Grid.Row="0">Blade and Soul - UPK File Content Manager - v1.6.1</TextBlock>
       <TextBlock Grid.Row="1">STR Programming Services</TextBlock>
       <TextBlock Grid.Row="3">Extract and re-integrate Texture2D and other object types.</TextBlock>
       <TextBlock Grid.Row="5">Uses code obtained from Open Paint.Net <Hyperlink NavigateUri="https://raw.githubusercontent.com/stricq/UPKManager/master/UpkManager.Dds/License.txt" b:HyperlinkBehaviors.RequestNavigationCommand="{Binding Path=Navigate}">License</Hyperlink>.</TextBlock>
